@@ -34,14 +34,14 @@ export interface PlacedComponent {
   y: number;
   label: string;
   /** id do componente de sinal (botão/sensor) que aciona esta válvula */
-  actuatorId?: string | null;
+  actuatorId?: string | null | undefined;
   /** botão: momentâneo ou trava */
-  momentary?: boolean;
+  momentary?: boolean | undefined;
   /** cilindro: velocidade relativa de avanço (0.2 – 2) */
-  speed?: number;
+  speed?: number | undefined;
   /** sensor: cilindro observado e posição de disparo */
-  targetId?: string | null;
-  trigger?: "extended" | "retracted";
+  targetId?: string | null | undefined;
+  trigger?: "extended" | "retracted" | undefined;
 }
 
 export interface Tube {
