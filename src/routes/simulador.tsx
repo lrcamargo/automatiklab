@@ -98,18 +98,10 @@ function SimulatorPage() {
       setPendingPort(null);
       return;
     }
+    const from = pendingPort;
     setCircuit((prev) => ({
       ...prev,
-      tubes: [
-        ...prev.tubes.filter(
-          (t) =>
-            !(
-              (t.from.componentId === componentId && t.from.portId === portId) ||
-              (t.to.componentId === componentId && t.to.portId === portId)
-            ) || true,
-        ),
-        { id: nextId("tube"), from: pendingPort, to: { componentId, portId } },
-      ],
+      tubes: [...prev.tubes, { id: nextId("tube"), from, to: { componentId, portId } }],
     }));
     setPendingPort(null);
   };
