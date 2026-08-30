@@ -78,7 +78,6 @@ export function ComponentGlyph({ comp, stroke, actuated, signal, pressurizedPort
     case "cylinderSingle":
     case "cylinderDouble": {
       const bodyW = 150;
-      const rodTravel = 54;
       const pistonX = 16 + stroke * (bodyW - 46);
       return (
         <svg width={def.width} height={def.height} className="overflow-visible">
@@ -112,7 +111,7 @@ export function ComponentGlyph({ comp, stroke, actuated, signal, pressurizedPort
           <rect
             x={pistonX + 8}
             y={38}
-            width={bodyW + 4 - pistonX + rodTravel * 0}
+            width={Math.max(4, bodyW + 4 - pistonX)}
             height={8}
             className="fill-steel"
           />
