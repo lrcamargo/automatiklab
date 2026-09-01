@@ -60,11 +60,13 @@ export function solveCircuit(circuit: Circuit, runtime: RuntimeState): SolveResu
         break;
       case "valve52":
         if (actuated[comp.id]) {
-          link(k("P"), k("A"));
-          vented.add(k("B"));
-        } else {
+          // posição acionada normalizada: 1 → 4 e 2 → 3
           link(k("P"), k("B"));
           vented.add(k("A"));
+        } else {
+          // posição de repouso normalizada: 1 → 2 e 4 → 5
+          link(k("P"), k("A"));
+          vented.add(k("B"));
         }
         break;
       default:

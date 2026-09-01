@@ -10,7 +10,7 @@ export const CATALOG: Record<ComponentType, ComponentDef> = {
     family: "alimentacao",
     width: 120,
     height: 80,
-    ports: [{ id: "P", label: "1", x: 120, y: 40, kind: "supply" }],
+    ports: [{ id: "P", label: "1 (P)", x: 120, y: 40, kind: "supply" }],
   },
   valve32: {
     type: "valve32",
@@ -22,9 +22,9 @@ export const CATALOG: Record<ComponentType, ComponentDef> = {
     width: 140,
     height: 92,
     ports: [
-      { id: "P", label: "1", x: 0, y: 46, kind: "supply" },
-      { id: "A", label: "2", x: 140, y: 46, kind: "work" },
-      { id: "R", label: "3", x: 70, y: 92, kind: "exhaust" },
+      { id: "A", label: "2 (A)", x: 70, y: 0, kind: "work" },
+      { id: "P", label: "1 (P)", x: 35, y: 92, kind: "supply" },
+      { id: "R", label: "3 (R)", x: 105, y: 92, kind: "exhaust" },
     ],
   },
   valve52: {
@@ -37,11 +37,11 @@ export const CATALOG: Record<ComponentType, ComponentDef> = {
     width: 170,
     height: 92,
     ports: [
-      { id: "P", label: "1", x: 85, y: 92, kind: "supply" },
-      { id: "A", label: "4", x: 170, y: 32, kind: "work" },
-      { id: "B", label: "2", x: 170, y: 66, kind: "work" },
-      { id: "R1", label: "5", x: 20, y: 92, kind: "exhaust" },
-      { id: "R2", label: "3", x: 150, y: 92, kind: "exhaust" },
+      { id: "A", label: "2 (A)", x: 45, y: 0, kind: "work" },
+      { id: "B", label: "4 (B)", x: 125, y: 0, kind: "work" },
+      { id: "R1", label: "3 (R)", x: 25, y: 92, kind: "exhaust" },
+      { id: "P", label: "1 (P)", x: 85, y: 92, kind: "supply" },
+      { id: "R2", label: "5 (S)", x: 145, y: 92, kind: "exhaust" },
     ],
   },
   cylinderSingle: {
@@ -53,7 +53,7 @@ export const CATALOG: Record<ComponentType, ComponentDef> = {
     family: "atuacao",
     width: 220,
     height: 84,
-    ports: [{ id: "A", label: "A", x: 0, y: 42, kind: "work" }],
+    ports: [{ id: "A", label: "2 (A)", x: 0, y: 42, kind: "work" }],
   },
   cylinderDouble: {
     type: "cylinderDouble",
@@ -65,8 +65,8 @@ export const CATALOG: Record<ComponentType, ComponentDef> = {
     width: 220,
     height: 84,
     ports: [
-      { id: "A", label: "A", x: 0, y: 26, kind: "work" },
-      { id: "B", label: "B", x: 0, y: 62, kind: "work" },
+      { id: "A", label: "2 (A)", x: 0, y: 26, kind: "work" },
+      { id: "B", label: "4 (B)", x: 0, y: 62, kind: "work" },
     ],
   },
   button: {

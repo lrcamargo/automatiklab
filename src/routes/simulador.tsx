@@ -13,18 +13,20 @@ import type { Circuit, ComponentType, PlacedComponent } from "@/lib/pneumatics/t
 export const Route = createFileRoute("/simulador")({
   head: () => ({
     meta: [
-      { title: "Bancada de simulação pneumática | Pneumatik Lab" },
+      { title: "Bancada de simulação pneumática | AutoMatikLab" },
       {
         name: "description",
         content:
           "Monte circuitos pneumáticos em grade, ligue mangueiras entre portas e veja o cilindro avançar em tempo real.",
       },
-      { property: "og:title", content: "Bancada de simulação pneumática | Pneumatik Lab" },
+      { property: "og:title", content: "Bancada de simulação pneumática | AutoMatikLab" },
       {
         property: "og:description",
         content:
           "Componentes, área de montagem em grade e painel de propriedades para praticar automação pneumática.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: SimulatorPage,

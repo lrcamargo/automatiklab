@@ -5,17 +5,19 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 export const Route = createFileRoute("/roadmap")({
   head: () => ({
     meta: [
-      { title: "Roadmap e expansão | Pneumatik Lab" },
+      { title: "Roadmap e expansão | AutoMatikLab" },
       {
         name: "description",
         content:
           "O que já funciona no simulador pneumático, o que está em preparação na interface e as direções de evolução da plataforma.",
       },
-      { property: "og:title", content: "Roadmap e expansão | Pneumatik Lab" },
+      { property: "og:title", content: "Roadmap e expansão | AutoMatikLab" },
       {
         property: "og:description",
         content: "Estado atual honesto da plataforma e direções de evolução, sem prazos.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: RoadmapPage,
