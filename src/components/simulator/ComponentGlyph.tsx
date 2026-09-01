@@ -54,7 +54,7 @@ export function ComponentGlyph({ comp, stroke, actuated, signal, pressurizedPort
 
           {/* Solenoide à esquerda e retorno por mola à direita. */}
           <rect x={4} y={32} width={16} height={28} className={line} strokeWidth={1.5} />
-          <path d="M6 58 L18 34" className={signal ? "stroke-signal" : "stroke-steel"} strokeWidth={1.5} />
+          <path d="M6 58 L18 34" className={actuated ? "stroke-signal" : "stroke-steel"} strokeWidth={1.5} />
           <path d="M120 46 h4 l3 -9 l5 18 l5 -18" className={line} strokeWidth={1.5} />
           <text x={4} y={10} className="fill-muted-foreground font-mono text-[8px]">3/2 NF</text>
         </svg>
@@ -80,7 +80,7 @@ export function ComponentGlyph({ comp, stroke, actuated, signal, pressurizedPort
           <text x={140} y={90} textAnchor="middle" className="fill-muted-foreground font-mono text-[8px]">5 (S)</text>
 
           <rect x={4} y={32} width={16} height={28} className={line} strokeWidth={1.5} />
-          <path d="M6 58 L18 34" className={signal ? "stroke-signal" : "stroke-steel"} strokeWidth={1.5} />
+          <path d="M6 58 L18 34" className={actuated ? "stroke-signal" : "stroke-steel"} strokeWidth={1.5} />
           <path d="M150 46 h4 l3 -9 l5 18 l5 -18" className={line} strokeWidth={1.5} />
           <text x={4} y={10} className="fill-muted-foreground font-mono text-[8px]">5/2</text>
         </svg>

@@ -22,9 +22,9 @@ export const CATALOG: Record<ComponentType, ComponentDef> = {
     width: 140,
     height: 92,
     ports: [
-      { id: "A", label: "2 (A)", x: 70, y: 0, kind: "work" },
-      { id: "P", label: "1 (P)", x: 47, y: 92, kind: "supply" },
-      { id: "R", label: "3 (R)", x: 93, y: 92, kind: "exhaust" },
+      { id: "A", label: "2 (A)", x: 95, y: 0, kind: "work" },
+      { id: "P", label: "1 (P)", x: 82, y: 92, kind: "supply" },
+      { id: "R", label: "3 (R)", x: 108, y: 92, kind: "exhaust" },
     ],
   },
   valve52: {
@@ -37,11 +37,11 @@ export const CATALOG: Record<ComponentType, ComponentDef> = {
     width: 170,
     height: 92,
     ports: [
-      { id: "A", label: "2 (A)", x: 57, y: 0, kind: "work" },
-      { id: "B", label: "4 (B)", x: 113, y: 0, kind: "work" },
-      { id: "R1", label: "3 (R)", x: 38, y: 92, kind: "exhaust" },
-      { id: "P", label: "1 (P)", x: 85, y: 92, kind: "supply" },
-      { id: "R2", label: "5 (S)", x: 132, y: 92, kind: "exhaust" },
+      { id: "A", label: "2 (A)", x: 101, y: 0, kind: "work" },
+      { id: "B", label: "4 (B)", x: 134, y: 0, kind: "work" },
+      { id: "R1", label: "3 (R)", x: 96, y: 92, kind: "exhaust" },
+      { id: "P", label: "1 (P)", x: 117, y: 92, kind: "supply" },
+      { id: "R2", label: "5 (S)", x: 140, y: 92, kind: "exhaust" },
     ],
   },
   cylinderSingle: {

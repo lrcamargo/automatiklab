@@ -68,12 +68,14 @@ export function solveCircuit(circuit: Circuit, runtime: RuntimeState): SolveResu
         if (actuated[comp.id]) {
           // posição acionada normalizada: 1 → 4 e 2 → 3
           link(k("P"), k("B"));
+          link(k("A"), k("R1"));
           vented.add(k("A"));
           vented.add(k("R1"));
           vented.add(k("R2"));
         } else {
           // posição de repouso normalizada: 1 → 2 e 4 → 5
           link(k("P"), k("A"));
+          link(k("B"), k("R2"));
           vented.add(k("B"));
           vented.add(k("R1"));
           vented.add(k("R2"));
