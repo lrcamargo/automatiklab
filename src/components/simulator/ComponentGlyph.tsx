@@ -13,64 +13,69 @@ interface GlyphProps {
 export function ComponentGlyph({ comp, stroke, actuated, signal, pressurizedPorts }: GlyphProps) {
   const def = CATALOG[comp.type];
   const live = (port: string) => pressurizedPorts.has(`${comp.id}:${port}`);
+  const activeStroke = "stroke-air";
+  const idleStroke = "stroke-steel";
 
   switch (comp.type) {
     case "source":
       return (
         <svg width={def.width} height={def.height} className="overflow-visible">
-          <rect
-            x={1}
-            y={1}
-            width={def.width - 2}
-            height={def.height - 2}
-            rx={4}
-            className="fill-surface-strong stroke-steel"
-          />
-          <circle cx={38} cy={40} r={17} className="fill-none stroke-steel" strokeWidth={2} />
-          <path d="M38 24 L46 40 L30 40 Z" className="fill-primary" />
-          <text x={64} y={36} className="fill-foreground font-mono text-[11px]">
+          <circle cx={34} cy={40} r={21} className="fill-none stroke-steel" strokeWidth={2} />
+          <path d="M34 53 V27 M34 27 l-7 10 M34 27 l7 10" className="fill-none stroke-air" strokeWidth={2} />
+          <path d="M55 40 H120" className="fill-none stroke-air" strokeWidth={2} />
+          <text x={64} y={32} className="fill-foreground font-mono text-[11px]">
             6 bar
           </text>
-          <text x={64} y={52} className="fill-muted-foreground font-mono text-[10px]">
-            ATIVA
+          <text x={64} y={50} className="fill-muted-foreground font-mono text-[9px]">
+            1 (P) PRESSÃO
           </text>
         </svg>
       );
 
     case "valve32":
     case "valve52": {
-      const boxes = comp.type === "valve32" ? 2 : 2;
-      const boxW = (def.width - 8) / boxes;
+      const boxW = (def.width - 8) / 2;
+      const positionClass = (positionActuated: boolean) =>
+        positionActuated === actuated ? "fill-primary/25 stroke-primary" : "fill-surface-strong stroke-steel";
+
+      if (comp.type === "valve32") {
+        return (
+          <svg width={def.width} height={def.height} className="overflow-visible">
+            <text x={6} y={10} className="fill-muted-foreground font-mono text-[9px]">3/2 NF</text>
+            <text x={70} y={9} textAnchor="middle" className="fill-muted-foreground font-mono text-[8px]">2 (A)</text>
+            <path d="M70 0 V26 M35 66 V92 M105 66 V92" className="fill-none stroke-steel" strokeWidth={1.5} />
+            <text x={35} y={90} textAnchor="middle" className="fill-muted-foreground font-mono text-[8px]">1 (P)</text>
+            <text x={105} y={90} textAnchor="middle" className="fill-muted-foreground font-mono text-[8px]">3 (R)</text>
+
+            <rect x={4} y={26} width={boxW} height={40} className={positionClass(true)} strokeWidth={1.5} />
+            <rect x={4 + boxW} y={26} width={boxW} height={40} className={positionClass(false)} strokeWidth={1.5} />
+
+            {/* Acionada: alimentação 1 → trabalho 2; escape 3 bloqueado. */}
+            <path d="M21 60 L55 32 M50 33 l6 -1 l-2 6" className={`fill-none ${actuated ? activeStroke : idleStroke}`} strokeWidth={2} />
+            <path d="M64 58 V46 M58 46 H70" className="fill-none stroke-steel" strokeWidth={2} />
+            {/* Repouso: trabalho 2 → escape 3; alimentação 1 bloqueada. */}
+            <path d="M84 32 L119 60 M114 55 l5 5 l-7 0" className={`fill-none ${!actuated ? activeStroke : idleStroke}`} strokeWidth={2} />
+            <path d="M78 58 V46 M72 46 H84" className="fill-none stroke-steel" strokeWidth={2} />
+          </svg>
+        );
+      }
+
       return (
         <svg width={def.width} height={def.height} className="overflow-visible">
-          {[0, 1].map((i) => (
-            <rect
-              key={i}
-              x={4 + i * boxW}
-              y={26}
-              width={boxW}
-              height={40}
-              className={
-                (actuated ? i === 0 : i === 1)
-                  ? "fill-primary/25 stroke-primary"
-                  : "fill-surface-strong stroke-steel"
-              }
-              strokeWidth={1.5}
-            />
-          ))}
-          {/* setas indicando passagem */}
-          <path
-            d={`M${12 + (actuated ? 0 : boxW)} 58 L${boxW - 8 + (actuated ? 0 : boxW)} 34`}
-            className="stroke-air"
-            strokeWidth={2}
-            markerEnd=""
-          />
-          <text x={6} y={20} className="fill-muted-foreground font-mono text-[10px]">
-            {comp.type === "valve32" ? "3/2" : "5/2"}
-          </text>
-          <text x={def.width - 6} y={20} textAnchor="end" className="fill-muted-foreground font-mono text-[10px]">
-            {actuated ? "ACIONADA" : "REPOUSO"}
-          </text>
+          <text x={6} y={10} className="fill-muted-foreground font-mono text-[9px]">5/2</text>
+          <text x={45} y={9} textAnchor="middle" className="fill-muted-foreground font-mono text-[8px]">2 (A)</text>
+          <text x={125} y={9} textAnchor="middle" className="fill-muted-foreground font-mono text-[8px]">4 (B)</text>
+          <path d="M45 0 V26 M125 0 V26 M25 66 V92 M85 66 V92 M145 66 V92" className="fill-none stroke-steel" strokeWidth={1.5} />
+          <text x={25} y={90} textAnchor="middle" className="fill-muted-foreground font-mono text-[8px]">3 (R)</text>
+          <text x={85} y={90} textAnchor="middle" className="fill-muted-foreground font-mono text-[8px]">1 (P)</text>
+          <text x={145} y={90} textAnchor="middle" className="fill-muted-foreground font-mono text-[8px]">5 (S)</text>
+
+          <rect x={4} y={26} width={boxW} height={40} className={positionClass(true)} strokeWidth={1.5} />
+          <rect x={4 + boxW} y={26} width={boxW} height={40} className={positionClass(false)} strokeWidth={1.5} />
+          {/* Acionada: 1 → 4 e 2 → 3. */}
+          <path d="M43 60 L68 32 M63 33 l6 -1 l-2 6 M12 32 L35 60 M30 55 l5 5 l-7 0" className={`fill-none ${actuated ? activeStroke : idleStroke}`} strokeWidth={2} />
+          {/* Repouso: 1 → 2 e 4 → 5. */}
+          <path d="M108 60 L96 32 M92 37 l4 -5 l3 6 M135 32 L158 60 M153 55 l5 5 l-7 0" className={`fill-none ${!actuated ? activeStroke : idleStroke}`} strokeWidth={2} />
         </svg>
       );
     }
@@ -125,11 +130,12 @@ export function ComponentGlyph({ comp, stroke, actuated, signal, pressurizedPort
           />
           {comp.type === "cylinderSingle" && (
             <path
-              d={`M${pistonX + 10} 42 h${Math.max(6, bodyW - pistonX)} `}
-              className="stroke-muted-foreground"
-              strokeDasharray="4 4"
+              d={`M${pistonX + 11} 52 l8 -18 l8 18 l8 -18 l8 18 l8 -18 l8 18`}
+              className="fill-none stroke-muted-foreground"
+              strokeWidth={1.5}
             />
           )}
+          <text x={3} y={46} className="fill-muted-foreground font-mono text-[8px]">{comp.type === "cylinderSingle" ? "2 (A)" : "2/4"}</text>
           <text x={12} y={16} className="fill-muted-foreground font-mono text-[10px]">
             {Math.round(stroke * 100)}% curso
           </text>
@@ -140,24 +146,13 @@ export function ComponentGlyph({ comp, stroke, actuated, signal, pressurizedPort
     case "button":
       return (
         <svg width={def.width} height={def.height} className="overflow-visible">
-          <rect
-            x={1}
-            y={1}
-            width={def.width - 2}
-            height={def.height - 2}
-            rx={6}
-            className="fill-surface-strong stroke-steel"
-          />
-          <circle
-            cx={def.width / 2}
-            cy={def.height / 2 - 4}
-            r={22}
-            className={signal ? "fill-signal stroke-signal" : "fill-muted stroke-steel"}
-            strokeWidth={2}
-          />
+          <path d="M48 18 V42" className={signal ? "stroke-signal" : "stroke-steel"} strokeWidth={2} />
+          <path d="M34 18 H62 M38 12 H58" className="stroke-steel" strokeWidth={2} />
+          <path d="M30 42 H66 V66 H30 Z" className={signal ? "fill-signal/25 stroke-signal" : "fill-none stroke-steel"} strokeWidth={2} />
+          <path d="M38 58 L58 48" className="stroke-steel" strokeWidth={2} />
           <text
             x={def.width / 2}
-            y={def.height - 10}
+            y={def.height - 12}
             textAnchor="middle"
             className="fill-muted-foreground font-mono text-[10px]"
           >
@@ -169,20 +164,9 @@ export function ComponentGlyph({ comp, stroke, actuated, signal, pressurizedPort
     case "sensor":
       return (
         <svg width={def.width} height={def.height} className="overflow-visible">
-          <rect
-            x={1}
-            y={1}
-            width={def.width - 2}
-            height={def.height - 2}
-            rx={4}
-            className="fill-surface-strong stroke-steel"
-          />
-          <circle
-            cx={22}
-            cy={def.height / 2}
-            r={9}
-            className={signal ? "fill-signal" : "fill-muted"}
-          />
+          <path d="M18 14 V34 M9 14 H27 M12 8 H24" className={signal ? "stroke-signal" : "stroke-steel"} strokeWidth={2} />
+          <rect x={7} y={34} width={24} height={24} className={signal ? "fill-signal/25 stroke-signal" : "fill-none stroke-steel"} strokeWidth={2} />
+          <path d="M12 52 L26 40" className="stroke-steel" strokeWidth={1.5} />
           <text x={40} y={32} className="fill-foreground font-mono text-[10px]">
             {comp.trigger === "retracted" ? "RECUADO" : "AVANÇADO"}
           </text>
