@@ -108,8 +108,11 @@ export function solveCircuit(circuit: Circuit, runtime: RuntimeState): SolveResu
     const node = queue.shift()!;
     if (pressurized.has(node)) continue;
     pressurized.add(node);
-    for (const next of adjacency.get(node) ?? []) {
-      if (!pressurized.has(next)) queue.push(next);
+    for (const edge of adjacency.get(node) ?? []) {
+      // uma mangueira só entrega pressão a uma válvula pela porta 1 (P);
+      // ligar a fonte em 2, 3, 4 ou 5 não gera pressão útil no circuito
+      if (edge.external && !acceptsSupply(edge.to)) continue;
+      if (!pressurized.has(edge.to)) queue.push(edge.to);
     }
   }
 
@@ -120,10 +123,11 @@ export function solveCircuit(circuit: Circuit, runtime: RuntimeState): SolveResu
     const node = ventedQueue.shift()!;
     if (ventedAll.has(node)) continue;
     ventedAll.add(node);
-    for (const next of adjacency.get(node) ?? []) {
-      if (!ventedAll.has(next) && !pressurized.has(next)) ventedQueue.push(next);
+    for (const edge of adjacency.get(node) ?? []) {
+      if (!ventedAll.has(edge.to) && !pressurized.has(edge.to)) ventedQueue.push(edge.to);
     }
   }
+
 
   return { pressurized, actuated };
 }
