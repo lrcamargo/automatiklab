@@ -6,18 +6,20 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Pneumatik Lab — simulador de circuitos pneumáticos" },
+      { title: "AutoMatikLab — simulador de circuitos pneumáticos" },
       {
         name: "description",
         content:
           "Plataforma educacional em português para montar, conectar e simular circuitos pneumáticos: válvulas, cilindros, botões e sensores em uma bancada virtual.",
       },
-      { property: "og:title", content: "Pneumatik Lab — simulador de circuitos pneumáticos" },
+      { property: "og:title", content: "AutoMatikLab — simulador de circuitos pneumáticos" },
       {
         property: "og:description",
         content:
           "Monte circuitos pneumáticos em uma bancada virtual e veja pressão e movimento em tempo real.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Home,
@@ -76,7 +78,7 @@ function Home() {
                 Aprenda pneumática montando o circuito, não decorando o diagrama.
               </h1>
               <p className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground">
-                O Pneumatik Lab é uma bancada de simulação para ensino técnico. Você posiciona
+                O AutoMatikLab é uma bancada de simulação para ensino técnico. Você posiciona
                 os componentes em uma grade, conecta as mangueiras entre as portas e vê o ar
                 percorrer o circuito enquanto o cilindro se move.
               </p>

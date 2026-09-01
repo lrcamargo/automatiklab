@@ -17,7 +17,7 @@ export function SiteHeader() {
             <Gauge className="size-4" />
           </span>
           <span className="font-mono text-sm font-semibold tracking-tight">
-            PNEUMATIK<span className="text-primary">LAB</span>
+            AUTOMATIK<span className="text-primary">LAB</span>
           </span>
         </Link>
         <nav className="flex items-center gap-1 text-sm">

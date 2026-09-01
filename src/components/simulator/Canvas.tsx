@@ -20,6 +20,11 @@ interface CanvasProps {
 
 const GRID = 24;
 const snap = (value: number) => Math.round(value / GRID) * GRID;
+const PORT_ROLE = {
+  supply: "alimentação/pressão",
+  work: "trabalho/saída",
+  exhaust: "exaustão",
+} as const;
 
 export function Canvas(props: CanvasProps) {
   const {
@@ -180,7 +185,7 @@ export function Canvas(props: CanvasProps) {
                 <button
                   key={port.id}
                   type="button"
-                  title={`Porta ${port.label}`}
+                  title={`Porta ${port.label} — ${PORT_ROLE[port.kind]}`}
                   onClick={(event) => {
                     event.stopPropagation();
                     onPortClick(comp.id, port.id);
@@ -194,7 +199,20 @@ export function Canvas(props: CanvasProps) {
                         ? "border-air bg-air"
                         : "border-steel bg-background hover:border-primary",
                   )}
-                />
+                >
+                  <span
+                    aria-hidden
+                    className={cn(
+                      "pointer-events-none absolute left-1/2 -translate-x-1/2 whitespace-nowrap font-mono text-[8px] font-semibold text-muted-foreground",
+                      port.y === 0 ? "top-3" : "bottom-3",
+                    )}
+                  >
+                    {port.label}
+                  </span>
+                  <span className="sr-only">
+                    Porta {port.label}, {PORT_ROLE[port.kind]}
+                  </span>
+                </button>
               );
             })}
           </div>

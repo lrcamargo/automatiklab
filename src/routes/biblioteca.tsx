@@ -6,17 +6,19 @@ import { CATALOG_LIST, FAMILIES } from "@/lib/pneumatics/catalog";
 export const Route = createFileRoute("/biblioteca")({
   head: () => ({
     meta: [
-      { title: "Biblioteca de componentes pneumáticos | Pneumatik Lab" },
+      { title: "Biblioteca pneumática | AutoMatikLab" },
       {
         name: "description",
         content:
           "Referência dos componentes disponíveis no simulador: fonte de ar, válvulas 3/2 e 5/2, cilindros, botões e sensores de fim de curso.",
       },
-      { property: "og:title", content: "Biblioteca de componentes pneumáticos | Pneumatik Lab" },
+      { property: "og:title", content: "Biblioteca pneumática | AutoMatikLab" },
       {
         property: "og:description",
         content: "Portas, função e comportamento de cada componente da bancada virtual.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: LibraryPage,
@@ -34,6 +36,11 @@ function LibraryPage() {
           fica fora de sincronia com o que você encontra na bancada.
         </p>
 
+        <p className="mt-5 max-w-3xl border-l-2 border-primary pl-4 font-mono text-xs leading-relaxed text-muted-foreground">
+          Numeração normalizada: 1 (P) = alimentação/pressão · 2 (A) e 4 (B) =
+          trabalho/saída · 3 (R) e 5 (S) = exaustão.
+        </p>
+
         {FAMILIES.map((family) => (
           <section key={family.id} className="mt-10">
             <h2 className="font-mono text-xs uppercase tracking-widest text-primary">
@@ -48,7 +55,11 @@ function LibraryPage() {
                   </p>
                   <p className="mt-3 font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
                     {item.ports.length
-                      ? `Portas: ${item.ports.map((p) => `${p.label} (${p.kind})`).join(" · ")}`
+                      ? `Portas: ${item.ports
+                          .map((p) =>
+                            `${p.label} (${p.kind === "supply" ? "alimentação" : p.kind === "work" ? "trabalho" : "exaustão"})`,
+                          )
+                          .join(" · ")}`
                       : "Componente de sinal, sem portas pneumáticas"}
                   </p>
                 </article>
