@@ -22,19 +22,19 @@ export function ComponentGlyph({ comp, stroke, actuated, signal, pressurizedPort
   switch (comp.type) {
     case "source":
       return (
-        <svg width={def.width} height={def.height} className="overflow-visible" aria-label="Fonte de ar comprimido">
+        <svg width={def.width} height={def.height} viewBox="0 0 120 80" className="overflow-visible" aria-label="Fonte de ar comprimido">
           <circle cx={38} cy={40} r={22} className={line} strokeWidth={2} />
           {/* Triângulo aberto: energia pneumática, com sentido para a saída. */}
           <path d="M28 31 L50 40 L28 49 Z" className="fill-background stroke-air" strokeWidth={2} />
           <path d="M60 40 H120" className="fill-none stroke-air" strokeWidth={2} />
           <text x={68} y={31} className="fill-foreground font-mono text-[10px]">6 bar</text>
-          <text x={68} y={53} className="fill-muted-foreground font-mono text-[8px]">1 (P)</text>
+          <text x={68} y={53} className="fill-muted-foreground font-mono text-[8px]">1</text>
         </svg>
       );
 
     case "valve32":
       return (
-        <svg width={def.width} height={def.height} className="overflow-visible" aria-label="Válvula direcional 3 por 2, normalmente fechada">
+        <svg width={def.width} height={def.height} viewBox="0 0 140 92" className="overflow-visible" aria-label="Válvula direcional 3 por 2, normalmente fechada">
           {/* Duas posições; a posição junto à mola (direita) é o repouso. */}
           <rect x={20} y={24} width={50} height={44} className={position(actuated)} strokeWidth={1.5} />
           <rect x={70} y={24} width={50} height={44} className={position(!actuated)} strokeWidth={1.5} />
@@ -48,9 +48,9 @@ export function ComponentGlyph({ comp, stroke, actuated, signal, pressurizedPort
 
           {/* Conexões externas na posição normal. */}
           <path d="M95 0 V24 M82 68 V92 M108 68 V92" className={line} strokeWidth={1.5} />
-          <text x={95} y={9} textAnchor="middle" className="fill-muted-foreground font-mono text-[8px]">2 (A)</text>
-          <text x={82} y={90} textAnchor="middle" className="fill-muted-foreground font-mono text-[8px]">1 (P)</text>
-          <text x={108} y={90} textAnchor="middle" className="fill-muted-foreground font-mono text-[8px]">3 (R)</text>
+          <text x={95} y={9} textAnchor="middle" className="fill-muted-foreground font-mono text-[8px]">2</text>
+          <text x={82} y={90} textAnchor="middle" className="fill-muted-foreground font-mono text-[8px]">1</text>
+          <text x={108} y={90} textAnchor="middle" className="fill-muted-foreground font-mono text-[8px]">3</text>
 
           {/* Solenoide à esquerda e retorno por mola à direita. */}
           <rect x={4} y={32} width={16} height={28} className={line} strokeWidth={1.5} />
@@ -62,7 +62,7 @@ export function ComponentGlyph({ comp, stroke, actuated, signal, pressurizedPort
 
     case "valve52":
       return (
-        <svg width={def.width} height={def.height} className="overflow-visible" aria-label="Válvula direcional 5 por 2 com retorno por mola">
+        <svg width={def.width} height={def.height} viewBox="0 0 170 92" className="overflow-visible" aria-label="Válvula direcional 5 por 2 com retorno por mola">
           <rect x={20} y={24} width={65} height={44} className={position(actuated)} strokeWidth={1.5} />
           <rect x={85} y={24} width={65} height={44} className={position(!actuated)} strokeWidth={1.5} />
 
@@ -73,11 +73,11 @@ export function ComponentGlyph({ comp, stroke, actuated, signal, pressurizedPort
 
           {/* Cinco vias, mostradas somente uma vez na posição normal. */}
           <path d="M101 0 V24 M134 0 V24 M96 68 V92 M117 68 V92 M140 68 V92" className={line} strokeWidth={1.5} />
-          <text x={101} y={9} textAnchor="middle" className="fill-muted-foreground font-mono text-[8px]">2 (A)</text>
-          <text x={134} y={9} textAnchor="middle" className="fill-muted-foreground font-mono text-[8px]">4 (B)</text>
-          <text x={96} y={90} textAnchor="middle" className="fill-muted-foreground font-mono text-[8px]">3 (R)</text>
-          <text x={117} y={79} textAnchor="middle" className="fill-muted-foreground font-mono text-[8px]">1 (P)</text>
-          <text x={140} y={90} textAnchor="middle" className="fill-muted-foreground font-mono text-[8px]">5 (S)</text>
+          <text x={101} y={9} textAnchor="middle" className="fill-muted-foreground font-mono text-[8px]">2</text>
+          <text x={134} y={9} textAnchor="middle" className="fill-muted-foreground font-mono text-[8px]">4</text>
+          <text x={96} y={90} textAnchor="middle" className="fill-muted-foreground font-mono text-[8px]">3</text>
+          <text x={117} y={79} textAnchor="middle" className="fill-muted-foreground font-mono text-[8px]">1</text>
+          <text x={140} y={90} textAnchor="middle" className="fill-muted-foreground font-mono text-[8px]">5</text>
 
           <rect x={4} y={32} width={16} height={28} className={line} strokeWidth={1.5} />
           <path d="M6 58 L18 34" className={actuated ? "stroke-signal" : "stroke-steel"} strokeWidth={1.5} />
@@ -96,7 +96,7 @@ export function ComponentGlyph({ comp, stroke, actuated, signal, pressurizedPort
       const rodEnd = 216;
       const springRoom = Math.max(8, bodyX + bodyW - pistonX - 8);
       return (
-        <svg width={def.width} height={def.height} className="overflow-visible" aria-label={`Cilindro de ${comp.type === "cylinderSingle" ? "simples" : "dupla"} ação`}>
+        <svg width={def.width} height={def.height} viewBox="0 0 220 84" className="overflow-visible" aria-label={`Cilindro de ${comp.type === "cylinderSingle" ? "simples" : "dupla"} ação`}>
           <rect x={bodyX} y={bodyY} width={bodyW} height={bodyH} className="fill-surface-strong stroke-steel" strokeWidth={1.5} />
           <rect x={bodyX + 1} y={bodyY + 1} width={Math.max(0, pistonX - bodyX - 1)} height={bodyH - 2} className={live("A") ? "fill-air/35" : "fill-transparent"} />
           {comp.type === "cylinderDouble" && (
@@ -115,8 +115,8 @@ export function ComponentGlyph({ comp, stroke, actuated, signal, pressurizedPort
           {/* Portas nas câmaras correspondentes. */}
           <path d="M34 64 V84" className={flow(live("A"))} strokeWidth={1.5} />
           {comp.type === "cylinderDouble" && <path d="M148 64 V84" className={flow(live("B"))} strokeWidth={1.5} />}
-          <text x={34} y={79} textAnchor="middle" className="fill-muted-foreground font-mono text-[8px]">2 (A)</text>
-          {comp.type === "cylinderDouble" && <text x={148} y={79} textAnchor="middle" className="fill-muted-foreground font-mono text-[8px]">4 (B)</text>}
+          <text x={34} y={79} textAnchor="middle" className="fill-muted-foreground font-mono text-[8px]">2</text>
+          {comp.type === "cylinderDouble" && <text x={148} y={79} textAnchor="middle" className="fill-muted-foreground font-mono text-[8px]">4</text>}
           <text x={24} y={14} className="fill-muted-foreground font-mono text-[9px]">{Math.round(stroke * 100)}% curso</text>
         </svg>
       );
@@ -124,7 +124,7 @@ export function ComponentGlyph({ comp, stroke, actuated, signal, pressurizedPort
 
     case "button":
       return (
-        <svg width={def.width} height={def.height} className="overflow-visible" aria-label="Botão de comando manual">
+        <svg width={def.width} height={def.height} viewBox="0 0 96 96" className="overflow-visible" aria-label="Botão de comando manual">
           {/* Acionamento manual por botão, sem portas pneumáticas próprias. */}
           <path d="M48 10 V29 M34 10 H62 M38 5 H58" className={signal ? "stroke-signal" : "stroke-steel"} strokeWidth={2} />
           <rect x={28} y={29} width={40} height={38} className={signal ? "fill-signal/25 stroke-signal" : "fill-none stroke-steel"} strokeWidth={1.5} />
@@ -137,7 +137,7 @@ export function ComponentGlyph({ comp, stroke, actuated, signal, pressurizedPort
 
     case "sensor":
       return (
-        <svg width={def.width} height={def.height} className="overflow-visible" aria-label="Sensor mecânico de fim de curso">
+        <svg width={def.width} height={def.height} viewBox="0 0 110 76" className="overflow-visible" aria-label="Sensor mecânico de fim de curso">
           {/* Acionamento mecânico por rolete e contato de fim de curso. */}
           <circle cx={20} cy={10} r={6} className={signal ? "fill-signal/25 stroke-signal" : "fill-none stroke-steel"} strokeWidth={1.5} />
           <path d="M24 15 L31 30" className={signal ? "stroke-signal" : "stroke-steel"} strokeWidth={2} />
