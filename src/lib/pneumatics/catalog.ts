@@ -6,11 +6,11 @@ export const CATALOG: Record<ComponentType, ComponentDef> = {
     name: "Fonte de ar comprimido",
     short: "Fonte",
     description:
-      "Unidade de alimentação que fornece ar pressurizado ao circuito. Todo caminho de pressão parte daqui.",
+      "Unidade de alimentação que fornece ar pressurizado ao circuito. Todo caminho de pressão parte daqui e deve entrar nas válvulas pela porta 1.",
     family: "alimentacao",
-    width: 120,
-    height: 80,
-    ports: [{ id: "P", label: "1 (P)", x: 120, y: 40, kind: "supply" }],
+    width: 150,
+    height: 100,
+    ports: [{ id: "P", label: "1", x: 150, y: 50, kind: "supply" }],
   },
   valve32: {
     type: "valve32",
@@ -19,12 +19,12 @@ export const CATALOG: Record<ComponentType, ComponentDef> = {
     description:
       "Três vias e duas posições. Em repouso conecta o trabalho ao escape; acionada, liga a alimentação ao trabalho.",
     family: "comando",
-    width: 140,
-    height: 92,
+    width: 196,
+    height: 129,
     ports: [
-      { id: "A", label: "2 (A)", x: 95, y: 0, kind: "work" },
-      { id: "P", label: "1 (P)", x: 82, y: 92, kind: "supply" },
-      { id: "R", label: "3 (R)", x: 108, y: 92, kind: "exhaust" },
+      { id: "A", label: "2", x: 133, y: 0, kind: "work" },
+      { id: "P", label: "1", x: 115, y: 129, kind: "supply" },
+      { id: "R", label: "3", x: 151, y: 129, kind: "exhaust" },
     ],
   },
   valve52: {
@@ -34,14 +34,14 @@ export const CATALOG: Record<ComponentType, ComponentDef> = {
     description:
       "Cinco vias e duas posições. Alterna a pressão entre as duas câmaras de um cilindro de dupla ação.",
     family: "comando",
-    width: 170,
-    height: 92,
+    width: 238,
+    height: 129,
     ports: [
-      { id: "A", label: "2 (A)", x: 101, y: 0, kind: "work" },
-      { id: "B", label: "4 (B)", x: 134, y: 0, kind: "work" },
-      { id: "R1", label: "3 (R)", x: 96, y: 92, kind: "exhaust" },
-      { id: "P", label: "1 (P)", x: 117, y: 92, kind: "supply" },
-      { id: "R2", label: "5 (S)", x: 140, y: 92, kind: "exhaust" },
+      { id: "A", label: "2", x: 141, y: 0, kind: "work" },
+      { id: "B", label: "4", x: 188, y: 0, kind: "work" },
+      { id: "R1", label: "3", x: 134, y: 129, kind: "exhaust" },
+      { id: "P", label: "1", x: 164, y: 129, kind: "supply" },
+      { id: "R2", label: "5", x: 196, y: 129, kind: "exhaust" },
     ],
   },
   cylinderSingle: {
@@ -51,24 +51,25 @@ export const CATALOG: Record<ComponentType, ComponentDef> = {
     description:
       "Avança com ar na câmara traseira e retorna por mola quando a linha é despressurizada.",
     family: "atuacao",
-    width: 220,
-    height: 84,
-    ports: [{ id: "A", label: "2 (A)", x: 34, y: 84, kind: "work" }],
+    width: 242,
+    height: 92,
+    ports: [{ id: "A", label: "2", x: 37, y: 92, kind: "work" }],
   },
   cylinderDouble: {
     type: "cylinderDouble",
     name: "Cilindro de dupla ação",
     short: "Dupla ação",
     description:
-      "Avança e recua por ar comprimido, com pressão alternada entre as câmaras A e B.",
+      "Avança e recua por ar comprimido, com pressão alternada entre as câmaras 2 e 4.",
     family: "atuacao",
-    width: 220,
-    height: 84,
+    width: 242,
+    height: 92,
     ports: [
-      { id: "A", label: "2 (A)", x: 34, y: 84, kind: "work" },
-      { id: "B", label: "4 (B)", x: 148, y: 84, kind: "work" },
+      { id: "A", label: "2", x: 37, y: 92, kind: "work" },
+      { id: "B", label: "4", x: 163, y: 92, kind: "work" },
     ],
   },
+
   button: {
     type: "button",
     name: "Botão de comando",
