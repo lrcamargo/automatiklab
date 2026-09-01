@@ -29,21 +29,37 @@ export function solveCircuit(circuit: Circuit, runtime: RuntimeState): SolveResu
     }
   }
 
-  // grafo de portas
-  const adjacency = new Map<string, string[]>();
-  const link = (a: string, b: string) => {
+  // grafo de portas (arestas externas = mangueiras, internas = caminhos da válvula)
+  type Edge = { to: string; external: boolean };
+  const adjacency = new Map<string, Edge[]>();
+  const link = (a: string, b: string, external = false) => {
     if (!adjacency.has(a)) adjacency.set(a, []);
     if (!adjacency.has(b)) adjacency.set(b, []);
-    adjacency.get(a)!.push(b);
-    adjacency.get(b)!.push(a);
+    adjacency.get(a)!.push({ to: b, external });
+    adjacency.get(b)!.push({ to: a, external });
+  };
+
+  /** válvulas só aceitam alimentação externa pela porta 1 (P) */
+  const valvePorts = new Map<string, string>(); // portKey -> portId, apenas válvulas
+  for (const comp of circuit.components) {
+    if (comp.type !== "valve32" && comp.type !== "valve52") continue;
+    for (const port of CATALOG[comp.type].ports) {
+      valvePorts.set(portKey(comp.id, port.id), port.id);
+    }
+  }
+  const acceptsSupply = (node: string) => {
+    const portId = valvePorts.get(node);
+    return portId === undefined || portId === "P";
   };
 
   for (const tube of circuit.tubes) {
     link(
       portKey(tube.from.componentId, tube.from.portId),
       portKey(tube.to.componentId, tube.to.portId),
+      true,
     );
   }
+
 
   const sources: string[] = [];
   const vented = new Set<string>();
