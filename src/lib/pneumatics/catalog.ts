@@ -69,7 +69,6 @@ export const CATALOG: Record<ComponentType, ComponentDef> = {
       { id: "B", label: "4", x: 163, y: 92, kind: "work" },
     ],
   },
-
   button: {
     type: "button",
     name: "Botão de comando",
@@ -77,8 +76,8 @@ export const CATALOG: Record<ComponentType, ComponentDef> = {
     description:
       "Sinal de entrada do operador. Pode ser momentâneo (pulso) ou com trava (liga/desliga).",
     family: "sinal",
-    width: 96,
-    height: 96,
+    width: 125,
+    height: 125,
     ports: [],
   },
   sensor: {
@@ -88,8 +87,8 @@ export const CATALOG: Record<ComponentType, ComponentDef> = {
     description:
       "Detecta o cilindro em posição avançada ou recuada e gera um sinal para acionar uma válvula.",
     family: "sinal",
-    width: 110,
-    height: 76,
+    width: 143,
+    height: 99,
     ports: [],
   },
 };
