@@ -44,7 +44,7 @@ export function ComponentGlyph({ comp, stroke, actuated, signal, pressurizedPort
           <path d="M30 30 L52 40 L30 50 Z" className="fill-air stroke-air" strokeWidth={1.5} />
           <path d="M58 40 H120" className="fill-none stroke-air" strokeWidth={2} />
           <path d="M92 40 v-8" className={line} strokeWidth={1.5} />
-          <text x={78} y={28} className="fill-foreground font-mono text-[10px]">
+          <text x={66} y={26} className="fill-foreground font-mono text-[10px]">
             6 bar
           </text>
           <text x={12} y={74} className="fill-muted-foreground font-mono text-[8px]">
