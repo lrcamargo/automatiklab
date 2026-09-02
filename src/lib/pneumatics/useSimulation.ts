@@ -56,5 +56,5 @@ export function useSimulation(circuit: Circuit, running: boolean) {
     setSolved(EMPTY);
   }, []);
 
-  return { runtime, solved, setSignal, toggleSignal, reset };
+  return { runtime, solved, setSignal, toggleSignal, setStroke, reset };
 }
