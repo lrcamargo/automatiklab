@@ -15,6 +15,8 @@ interface CanvasProps {
   onPortClick: (componentId: string, portId: string) => void;
   onSignalDown: (comp: PlacedComponent) => void;
   onSignalUp: (comp: PlacedComponent) => void;
+  onActivate: (comp: PlacedComponent) => void;
+  blockedId: string | null;
   onDropComponent: (type: string, x: number, y: number) => void;
 }
 
@@ -38,10 +40,12 @@ export function Canvas(props: CanvasProps) {
     onPortClick,
     onSignalDown,
     onSignalUp,
+    onActivate,
+    blockedId,
     onDropComponent,
   } = props;
   const areaRef = useRef<HTMLDivElement>(null);
-  const dragRef = useRef<{ id: string; dx: number; dy: number } | null>(null);
+  const dragRef = useRef<{ id: string; dx: number; dy: number; moved: boolean } | null>(null);
 
   const startDrag = (event: PointerEvent, comp: PlacedComponent) => {
     const rect = areaRef.current?.getBoundingClientRect();
@@ -50,6 +54,7 @@ export function Canvas(props: CanvasProps) {
       id: comp.id,
       dx: event.clientX - rect.left - comp.x,
       dy: event.clientY - rect.top - comp.y,
+      moved: false,
     };
     onSelect(comp.id);
     (event.target as Element).setPointerCapture?.(event.pointerId);
@@ -59,6 +64,7 @@ export function Canvas(props: CanvasProps) {
     const drag = dragRef.current;
     const rect = areaRef.current?.getBoundingClientRect();
     if (!drag || !rect) return;
+    drag.moved = true;
     onMove(
       drag.id,
       Math.max(0, snap(event.clientX - rect.left - drag.dx)),
@@ -68,6 +74,12 @@ export function Canvas(props: CanvasProps) {
 
   const endDrag = () => {
     dragRef.current = null;
+  };
+
+  /** clique curto (sem arrastar) aciona o componente na bancada */
+  const handleGlyphClick = (comp: PlacedComponent) => {
+    if (dragRef.current?.moved) return;
+    onActivate(comp);
   };
 
   const portPosition = (componentId: string, portId: string) => {
@@ -142,10 +154,13 @@ export function Canvas(props: CanvasProps) {
             className={cn(
               "absolute select-none rounded-md border bg-surface/80 p-0 shadow-lg backdrop-blur-[1px] transition-colors",
               selectedId === comp.id ? "border-primary" : "border-border",
+              solved.actuated[comp.id] && "ring-2 ring-signal/70",
+              blockedId === comp.id && "ring-2 ring-destructive animate-pulse",
             )}
           >
             <div
               onPointerDown={(event) => startDrag(event, comp)}
+              onClick={() => handleGlyphClick(comp)}
               className="cursor-grab active:cursor-grabbing"
             >
               <div className="flex items-center justify-between border-b border-border/70 px-2 py-1">
