@@ -45,6 +45,12 @@ export function useSimulation(circuit: Circuit, running: boolean) {
     setRuntime((prev) => ({ ...prev, signals: { ...prev.signals, [id]: !prev.signals[id] } }));
   }, []);
 
+  /** move o cilindro para uma posição de curso (usado por interações válidas na bancada) */
+  const setStroke = useCallback((id: string, value: number) => {
+    setRuntime((prev) => ({ ...prev, strokes: { ...prev.strokes, [id]: value } }));
+  }, []);
+
+
   const reset = useCallback(() => {
     setRuntime({ strokes: {}, signals: {} });
     setSolved(EMPTY);
