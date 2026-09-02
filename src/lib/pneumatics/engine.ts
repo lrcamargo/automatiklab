@@ -13,21 +13,20 @@ export function solveCircuit(circuit: Circuit, runtime: RuntimeState): SolveResu
 
   for (const comp of circuit.components) {
     if (comp.type !== "valve32" && comp.type !== "valve52") continue;
+    // acionamento manual direto no símbolo da válvula (clique na bancada)
+    const manual = !!runtime.signals[comp.id];
     const actuator = circuit.components.find((c) => c.id === comp.actuatorId);
-    if (!actuator) {
-      actuated[comp.id] = false;
-      continue;
-    }
-    if (actuator.type === "button") {
-      actuated[comp.id] = !!runtime.signals[actuator.id];
-    } else if (actuator.type === "sensor") {
+    let fromActuator = false;
+    if (actuator?.type === "button") {
+      fromActuator = !!runtime.signals[actuator.id];
+    } else if (actuator?.type === "sensor") {
       const stroke = runtime.strokes[actuator.targetId ?? ""] ?? 0;
-      actuated[comp.id] =
-        actuator.trigger === "retracted" ? stroke <= 0.02 : stroke >= 0.98;
-    } else {
-      actuated[comp.id] = false;
+      fromActuator = actuator.trigger === "retracted" ? stroke <= 0.02 : stroke >= 0.98;
     }
+    // o clique manual comuta a posição em relação ao acionamento do circuito
+    actuated[comp.id] = manual !== fromActuator;
   }
+
 
   // grafo de portas (arestas externas = mangueiras, internas = caminhos da válvula)
   type Edge = { to: string; external: boolean };
