@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Pause, Play, RotateCcw, Save, FolderOpen, Trash } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { Canvas } from "@/components/simulator/Canvas";
@@ -8,6 +8,7 @@ import { PropertiesPanel } from "@/components/simulator/PropertiesPanel";
 import { CATALOG } from "@/lib/pneumatics/catalog";
 import { basicCircuit, springReturnCircuit } from "@/lib/pneumatics/presets";
 import { useSimulation } from "@/lib/pneumatics/useSimulation";
+import { strokeDirection } from "@/lib/pneumatics/engine";
 import type { Circuit, ComponentType, PlacedComponent } from "@/lib/pneumatics/types";
 
 export const Route = createFileRoute("/simulador")({
@@ -42,7 +43,44 @@ function SimulatorPage() {
   const [pendingPort, setPendingPort] = useState<{ componentId: string; portId: string } | null>(
     null,
   );
-  const { runtime, solved, setSignal, toggleSignal, reset } = useSimulation(circuit, running);
+  const [blockedId, setBlockedId] = useState<string | null>(null);
+  const blockedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { runtime, solved, setSignal, toggleSignal, setStroke, reset } = useSimulation(
+    circuit,
+    running,
+  );
+
+  const flagBlocked = (id: string) => {
+    setBlockedId(id);
+    if (blockedTimer.current) clearTimeout(blockedTimer.current);
+    blockedTimer.current = setTimeout(() => setBlockedId(null), 900);
+  };
+
+  /** clique direto no símbolo: comuta válvulas e atua cilindros sem burlar a pressão */
+  const activateComponent = (comp: PlacedComponent) => {
+    setSelectedId(comp.id);
+    if (comp.type === "valve32" || comp.type === "valve52") {
+      toggleSignal(comp.id);
+      return;
+    }
+    if (comp.type === "button") {
+      if (comp.momentary) {
+        setSignal(comp.id, true);
+        setTimeout(() => setSignal(comp.id, false), 700);
+      } else {
+        toggleSignal(comp.id);
+      }
+      return;
+    }
+    if (comp.type === "cylinderSingle" || comp.type === "cylinderDouble") {
+      const direction = strokeDirection(comp, solved);
+      if (direction === 0) {
+        flagBlocked(comp.id);
+        return;
+      }
+      setStroke(comp.id, direction > 0 ? 1 : 0);
+    }
+  };
 
   const selected = useMemo(
     () => circuit.components.find((c) => c.id === selectedId) ?? null,
@@ -198,8 +236,15 @@ function SimulatorPage() {
               comp.momentary ? setSignal(comp.id, true) : toggleSignal(comp.id)
             }
             onSignalUp={(comp) => comp.momentary && setSignal(comp.id, false)}
+            onActivate={activateComponent}
+            blockedId={blockedId}
             onDropComponent={(type, x, y) => addComponent(type as ComponentType, x, y)}
           />
+          {blockedId && (
+            <div className="pointer-events-none absolute bottom-14 left-1/2 -translate-x-1/2 rounded-sm border border-destructive bg-surface px-3 py-1.5 text-xs">
+              Sem pressão válida nesta porta: verifique a alimentação pela porta 1 e as conexões
+            </div>
+          )}
           {pendingPort && (
             <div className="pointer-events-none absolute bottom-4 left-1/2 -translate-x-1/2 rounded-sm border border-primary bg-surface px-3 py-1.5 text-xs">
               Selecione a porta de destino para concluir a mangueira

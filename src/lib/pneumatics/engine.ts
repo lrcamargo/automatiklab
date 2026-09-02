@@ -13,21 +13,20 @@ export function solveCircuit(circuit: Circuit, runtime: RuntimeState): SolveResu
 
   for (const comp of circuit.components) {
     if (comp.type !== "valve32" && comp.type !== "valve52") continue;
+    // acionamento manual direto no símbolo da válvula (clique na bancada)
+    const manual = !!runtime.signals[comp.id];
     const actuator = circuit.components.find((c) => c.id === comp.actuatorId);
-    if (!actuator) {
-      actuated[comp.id] = false;
-      continue;
-    }
-    if (actuator.type === "button") {
-      actuated[comp.id] = !!runtime.signals[actuator.id];
-    } else if (actuator.type === "sensor") {
+    let fromActuator = false;
+    if (actuator?.type === "button") {
+      fromActuator = !!runtime.signals[actuator.id];
+    } else if (actuator?.type === "sensor") {
       const stroke = runtime.strokes[actuator.targetId ?? ""] ?? 0;
-      actuated[comp.id] =
-        actuator.trigger === "retracted" ? stroke <= 0.02 : stroke >= 0.98;
-    } else {
-      actuated[comp.id] = false;
+      fromActuator = actuator.trigger === "retracted" ? stroke <= 0.02 : stroke >= 0.98;
     }
+    // o clique manual comuta a posição em relação ao acionamento do circuito
+    actuated[comp.id] = manual !== fromActuator;
   }
+
 
   // grafo de portas (arestas externas = mangueiras, internas = caminhos da válvula)
   type Edge = { to: string; external: boolean };
@@ -145,19 +144,30 @@ export function stepStrokes(
     if (comp.type !== "cylinderSingle" && comp.type !== "cylinderDouble") continue;
     const current = next[comp.id] ?? 0;
     const speed = (comp.speed ?? 1) * deltaSeconds;
-    const a = solved.pressurized.has(portKey(comp.id, "A"));
-    const b = comp.type === "cylinderDouble" && solved.pressurized.has(portKey(comp.id, "B"));
-
-    let direction = 0;
-    if (comp.type === "cylinderSingle") direction = a ? 1 : -1;
-    else if (a && !b) direction = 1;
-    else if (b && !a) direction = -1;
-
+    const direction = strokeDirection(comp, solved);
     next[comp.id] = clamp(current + direction * speed, 0, 1);
   }
 
   return next;
 }
+
+/**
+ * Direção admissível do cilindro conforme a pressão realmente disponível.
+ * 1 = avanço, -1 = recuo, 0 = sem movimento válido.
+ */
+export function strokeDirection(
+  comp: Circuit["components"][number],
+  solved: SolveResult,
+): -1 | 0 | 1 {
+  if (comp.type !== "cylinderSingle" && comp.type !== "cylinderDouble") return 0;
+  const a = solved.pressurized.has(portKey(comp.id, "A"));
+  const b = comp.type === "cylinderDouble" && solved.pressurized.has(portKey(comp.id, "B"));
+  if (comp.type === "cylinderSingle") return a ? 1 : -1;
+  if (a && !b) return 1;
+  if (b && !a) return -1;
+  return 0;
+}
+
 
 export const clamp = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, value));
