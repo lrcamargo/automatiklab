@@ -144,19 +144,30 @@ export function stepStrokes(
     if (comp.type !== "cylinderSingle" && comp.type !== "cylinderDouble") continue;
     const current = next[comp.id] ?? 0;
     const speed = (comp.speed ?? 1) * deltaSeconds;
-    const a = solved.pressurized.has(portKey(comp.id, "A"));
-    const b = comp.type === "cylinderDouble" && solved.pressurized.has(portKey(comp.id, "B"));
-
-    let direction = 0;
-    if (comp.type === "cylinderSingle") direction = a ? 1 : -1;
-    else if (a && !b) direction = 1;
-    else if (b && !a) direction = -1;
-
+    const direction = strokeDirection(comp, solved);
     next[comp.id] = clamp(current + direction * speed, 0, 1);
   }
 
   return next;
 }
+
+/**
+ * Direção admissível do cilindro conforme a pressão realmente disponível.
+ * 1 = avanço, -1 = recuo, 0 = sem movimento válido.
+ */
+export function strokeDirection(
+  comp: Circuit["components"][number],
+  solved: SolveResult,
+): -1 | 0 | 1 {
+  if (comp.type !== "cylinderSingle" && comp.type !== "cylinderDouble") return 0;
+  const a = solved.pressurized.has(portKey(comp.id, "A"));
+  const b = comp.type === "cylinderDouble" && solved.pressurized.has(portKey(comp.id, "B"));
+  if (comp.type === "cylinderSingle") return a ? 1 : -1;
+  if (a && !b) return 1;
+  if (b && !a) return -1;
+  return 0;
+}
+
 
 export const clamp = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, value));
