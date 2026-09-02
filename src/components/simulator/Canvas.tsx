@@ -72,13 +72,16 @@ export function Canvas(props: CanvasProps) {
     );
   };
 
+  const movedRef = useRef(false);
+
   const endDrag = () => {
+    movedRef.current = !!dragRef.current?.moved;
     dragRef.current = null;
   };
 
   /** clique curto (sem arrastar) aciona o componente na bancada */
   const handleGlyphClick = (comp: PlacedComponent) => {
-    if (dragRef.current?.moved) return;
+    if (movedRef.current || dragRef.current?.moved) return;
     onActivate(comp);
   };
 
