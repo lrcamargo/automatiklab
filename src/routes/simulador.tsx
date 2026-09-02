@@ -64,7 +64,12 @@ function SimulatorPage() {
       return;
     }
     if (comp.type === "button") {
-      toggleSignal(comp.id);
+      if (comp.momentary) {
+        setSignal(comp.id, true);
+        setTimeout(() => setSignal(comp.id, false), 700);
+      } else {
+        toggleSignal(comp.id);
+      }
       return;
     }
     if (comp.type === "cylinderSingle" || comp.type === "cylinderDouble") {
