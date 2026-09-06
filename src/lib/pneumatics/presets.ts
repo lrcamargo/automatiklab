@@ -4,37 +4,37 @@ import type { Circuit } from "./types";
 export function basicCircuit(): Circuit {
   return {
     components: [
-      { id: "src1", type: "source", x: 60, y: 300, label: "Fonte 6 bar" },
+      { id: "src1", type: "source", x: 60, y: 360, label: "1P1" },
       {
         id: "btn1",
         type: "button",
-        x: 80,
-        y: 90,
-        label: "Comando S1",
+        x: 90,
+        y: 120,
+        label: "1S1",
         momentary: false,
       },
       {
         id: "v1",
         type: "valve52",
-        x: 300,
-        y: 260,
-        label: "Válvula V1",
+        x: 340,
+        y: 320,
+        label: "1V1",
         actuatorId: "btn1",
       },
       {
         id: "cil1",
         type: "cylinderDouble",
-        x: 600,
-        y: 250,
-        label: "Cilindro A",
+        x: 650,
+        y: 100,
+        label: "1A1",
         speed: 0.8,
       },
       {
         id: "sen1",
         type: "sensor",
-        x: 620,
-        y: 130,
-        label: "Fim de curso A1",
+        x: 690,
+        y: 230,
+        label: "1S2",
         targetId: "cil1",
         trigger: "extended",
       },
@@ -51,10 +51,10 @@ export function basicCircuit(): Circuit {
 export function springReturnCircuit(): Circuit {
   return {
     components: [
-      { id: "src1", type: "source", x: 60, y: 320, label: "Fonte 6 bar" },
-      { id: "btn1", type: "button", x: 90, y: 110, label: "Comando S1", momentary: true },
-      { id: "v1", type: "valve32", x: 300, y: 290, label: "Válvula V1", actuatorId: "btn1" },
-      { id: "cil1", type: "cylinderSingle", x: 580, y: 295, label: "Cilindro B", speed: 1 },
+      { id: "src1", type: "source", x: 60, y: 360, label: "1P1" },
+      { id: "btn1", type: "button", x: 90, y: 130, label: "1S1", momentary: true },
+      { id: "v1", type: "valve32", x: 340, y: 320, label: "1V1", actuatorId: "btn1" },
+      { id: "cil1", type: "cylinderSingle", x: 620, y: 110, label: "1A1", speed: 1 },
     ],
     tubes: [
       { id: "t1", from: { componentId: "src1", portId: "P" }, to: { componentId: "v1", portId: "P" } },
