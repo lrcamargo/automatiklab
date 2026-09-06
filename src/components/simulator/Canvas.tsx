@@ -13,8 +13,6 @@ interface CanvasProps {
   onSelect: (id: string | null) => void;
   onMove: (id: string, x: number, y: number) => void;
   onPortClick: (componentId: string, portId: string) => void;
-  onSignalDown: (comp: PlacedComponent) => void;
-  onSignalUp: (comp: PlacedComponent) => void;
   onActivate: (comp: PlacedComponent) => void;
   blockedId: string | null;
   onDropComponent: (type: string, x: number, y: number) => void;
@@ -38,8 +36,6 @@ export function Canvas(props: CanvasProps) {
     onSelect,
     onMove,
     onPortClick,
-    onSignalDown,
-    onSignalUp,
     onActivate,
     blockedId,
     onDropComponent,
@@ -120,17 +116,23 @@ export function Canvas(props: CanvasProps) {
           const charged =
             solved.pressurized.has(`${tube.from.componentId}:${tube.from.portId}`) ||
             solved.pressurized.has(`${tube.to.componentId}:${tube.to.portId}`);
-          const mid = (a.x + b.x) / 2;
-          const path = `M${a.x} ${a.y} C ${mid} ${a.y}, ${mid} ${b.y}, ${b.x} ${b.y}`;
+          const middleY = a.y + (b.y - a.y) / 2;
+          const path = `M${a.x} ${a.y} V${middleY} H${b.x} V${b.y}`;
           return (
             <g key={tube.id}>
-              <path d={path} className="fill-none stroke-air-dim" strokeWidth={6} strokeLinecap="round" />
+              <defs>
+                <marker id={`flow-${tube.id}`} markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+                  <path d="M0 0 L7 3.5 L0 7 Z" className="fill-air" />
+                </marker>
+              </defs>
+              <path d={path} className="fill-none stroke-air-dim" strokeWidth={5} strokeLinejoin="round" />
               <path
                 d={path}
                 className={cn("fill-none", charged ? "stroke-air" : "stroke-muted")}
                 strokeWidth={3}
-                strokeLinecap="round"
+                strokeLinejoin="round"
                 strokeDasharray={charged ? "10 8" : undefined}
+                markerEnd={charged ? `url(#flow-${tube.id})` : undefined}
               >
                 {charged && (
                   <animate attributeName="stroke-dashoffset" from="18" to="0" dur="0.6s" repeatCount="indefinite" />
@@ -153,46 +155,27 @@ export function Canvas(props: CanvasProps) {
         return (
           <div
             key={comp.id}
-            style={{ left: comp.x, top: comp.y, width: def.width }}
+            style={{ left: comp.x, top: comp.y, width: def.width, height: def.height }}
             className={cn(
-              "absolute select-none rounded-md border bg-surface/80 p-0 shadow-lg backdrop-blur-[1px] transition-colors",
-              selectedId === comp.id ? "border-primary" : "border-border",
-              solved.actuated[comp.id] && "ring-2 ring-signal/70",
-              blockedId === comp.id && "ring-2 ring-destructive animate-pulse",
+              "group absolute select-none transition-[filter]",
+              selectedId === comp.id && "drop-shadow-[0_0_6px_var(--color-primary)]",
+              solved.actuated[comp.id] && "drop-shadow-[0_0_7px_var(--color-signal)]",
+              blockedId === comp.id && "animate-pulse drop-shadow-[0_0_8px_var(--color-destructive)]",
             )}
           >
             <div
               onPointerDown={(event) => startDrag(event, comp)}
               onClick={() => handleGlyphClick(comp)}
-              className="cursor-grab active:cursor-grabbing"
+              className="size-full cursor-grab active:cursor-grabbing"
             >
-              <div className="flex items-center justify-between border-b border-border/70 px-2 py-1">
-                <span className="truncate font-mono text-[10px] uppercase tracking-wider text-muted-foreground">
-                  {comp.label}
-                </span>
-              </div>
-              <div className="p-1">
-                <ComponentGlyph
-                  comp={comp}
-                  stroke={runtime.strokes[comp.id] ?? 0}
-                  actuated={!!solved.actuated[comp.id]}
-                  signal={isSignal ? !!runtime.signals[comp.id] : sensorOn}
-                  pressurizedPorts={solved.pressurized}
-                />
-              </div>
+              <ComponentGlyph
+                comp={comp}
+                stroke={runtime.strokes[comp.id] ?? 0}
+                actuated={!!solved.actuated[comp.id]}
+                signal={isSignal ? !!runtime.signals[comp.id] : sensorOn}
+                pressurizedPorts={solved.pressurized}
+              />
             </div>
-
-            {isSignal && (
-              <button
-                type="button"
-                onPointerDown={() => onSignalDown(comp)}
-                onPointerUp={() => onSignalUp(comp)}
-                onPointerLeave={() => onSignalUp(comp)}
-                className="mb-1 w-[calc(100%-8px)] translate-x-1 rounded-sm bg-primary px-2 py-1 text-[11px] font-semibold text-primary-foreground"
-              >
-                Acionar
-              </button>
-            )}
 
             {def.ports.map((port) => {
               const key = `${comp.id}:${port.id}`;
@@ -208,9 +191,10 @@ export function Canvas(props: CanvasProps) {
                     event.stopPropagation();
                     onPortClick(comp.id, port.id);
                   }}
-                  style={{ left: port.x - 7, top: port.y + 21 }}
+                  aria-label={`Porta ${port.label}, ${PORT_ROLE[port.kind]}`}
+                  style={{ left: port.x - 7, top: port.y - 7 }}
                   className={cn(
-                    "absolute size-3.5 rounded-full border-2 transition-colors",
+                    "absolute size-3.5 rounded-full border-2 transition-colors opacity-75 hover:opacity-100",
                     pending
                       ? "border-primary bg-primary"
                       : active
@@ -218,18 +202,6 @@ export function Canvas(props: CanvasProps) {
                         : "border-steel bg-background hover:border-primary",
                   )}
                 >
-                  <span
-                    aria-hidden
-                    className={cn(
-                      "pointer-events-none absolute left-1/2 -translate-x-1/2 whitespace-nowrap font-mono text-[8px] font-semibold text-muted-foreground",
-                      port.y === 0 ? "top-3" : "bottom-3",
-                    )}
-                  >
-                    {port.label}
-                  </span>
-                  <span className="sr-only">
-                    Porta {port.label}, {PORT_ROLE[port.kind]}
-                  </span>
                 </button>
               );
             })}

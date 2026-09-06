@@ -10,7 +10,7 @@ export const CATALOG: Record<ComponentType, ComponentDef> = {
     family: "alimentacao",
     width: 150,
     height: 100,
-    ports: [{ id: "P", label: "1", x: 150, y: 50, kind: "supply" }],
+    ports: [{ id: "P", label: "1", x: 150, y: 42, kind: "supply" }],
   },
   valve32: {
     type: "valve32",
@@ -22,9 +22,9 @@ export const CATALOG: Record<ComponentType, ComponentDef> = {
     width: 196,
     height: 129,
     ports: [
-      { id: "A", label: "2", x: 133, y: 0, kind: "work" },
-      { id: "P", label: "1", x: 115, y: 129, kind: "supply" },
-      { id: "R", label: "3", x: 151, y: 129, kind: "exhaust" },
+      { id: "A", label: "2", x: 118, y: 0, kind: "work" },
+      { id: "P", label: "1", x: 104, y: 129, kind: "supply" },
+      { id: "R", label: "3", x: 134, y: 112, kind: "exhaust" },
     ],
   },
   valve52: {
@@ -37,11 +37,11 @@ export const CATALOG: Record<ComponentType, ComponentDef> = {
     width: 238,
     height: 129,
     ports: [
-      { id: "A", label: "2", x: 141, y: 0, kind: "work" },
-      { id: "B", label: "4", x: 188, y: 0, kind: "work" },
-      { id: "R1", label: "3", x: 134, y: 129, kind: "exhaust" },
-      { id: "P", label: "1", x: 164, y: 129, kind: "supply" },
-      { id: "R2", label: "5", x: 196, y: 129, kind: "exhaust" },
+      { id: "B", label: "4", x: 134, y: 0, kind: "work" },
+      { id: "A", label: "2", x: 178, y: 0, kind: "work" },
+      { id: "R2", label: "5", x: 126, y: 112, kind: "exhaust" },
+      { id: "P", label: "1", x: 154, y: 129, kind: "supply" },
+      { id: "R1", label: "3", x: 184, y: 112, kind: "exhaust" },
     ],
   },
   cylinderSingle: {
@@ -52,8 +52,8 @@ export const CATALOG: Record<ComponentType, ComponentDef> = {
       "Avança com ar na câmara traseira e retorna por mola quando a linha é despressurizada.",
     family: "atuacao",
     width: 242,
-    height: 92,
-    ports: [{ id: "A", label: "2", x: 37, y: 92, kind: "work" }],
+    height: 100,
+    ports: [{ id: "A", label: "2", x: 40, y: 100, kind: "work" }],
   },
   cylinderDouble: {
     type: "cylinderDouble",
@@ -63,10 +63,10 @@ export const CATALOG: Record<ComponentType, ComponentDef> = {
       "Avança e recua por ar comprimido, com pressão alternada entre as câmaras 2 e 4.",
     family: "atuacao",
     width: 242,
-    height: 92,
+    height: 100,
     ports: [
-      { id: "A", label: "2", x: 37, y: 92, kind: "work" },
-      { id: "B", label: "4", x: 163, y: 92, kind: "work" },
+      { id: "A", label: "2", x: 40, y: 100, kind: "work" },
+      { id: "B", label: "4", x: 168, y: 100, kind: "work" },
     ],
   },
   button: {
@@ -76,8 +76,8 @@ export const CATALOG: Record<ComponentType, ComponentDef> = {
     description:
       "Sinal de entrada do operador. Pode ser momentâneo (pulso) ou com trava (liga/desliga).",
     family: "sinal",
-    width: 125,
-    height: 125,
+    width: 148,
+    height: 110,
     ports: [],
   },
   sensor: {
@@ -87,8 +87,8 @@ export const CATALOG: Record<ComponentType, ComponentDef> = {
     description:
       "Detecta o cilindro em posição avançada ou recuada e gera um sinal para acionar uma válvula.",
     family: "sinal",
-    width: 143,
-    height: 99,
+    width: 148,
+    height: 92,
     ports: [],
   },
 };
