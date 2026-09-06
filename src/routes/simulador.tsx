@@ -1,10 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useRef, useState } from "react";
-import { Pause, Play, RotateCcw, Save, FolderOpen, Trash } from "lucide-react";
+import { Pause, Play, RotateCcw, Save, FolderOpen, Trash, Printer } from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { Canvas } from "@/components/simulator/Canvas";
 import { Palette } from "@/components/simulator/Palette";
 import { PropertiesPanel } from "@/components/simulator/PropertiesPanel";
+import { TechnicalDiagram } from "@/components/simulator/TechnicalDiagram";
+import { Button } from "@/components/ui/button";
 import { CATALOG } from "@/lib/pneumatics/catalog";
 import { basicCircuit, springReturnCircuit } from "@/lib/pneumatics/presets";
 import { useSimulation } from "@/lib/pneumatics/useSimulation";
@@ -155,69 +157,85 @@ function SimulatorPage() {
 
   const activeCylinders = circuit.components.filter((c) => c.type.startsWith("cylinder"));
 
-  return (
-    <div className="flex h-screen flex-col overflow-hidden">
-      <SiteHeader />
+  const printTechnicalDiagram = () => {
+    setSelectedId(null);
+    setPendingPort(null);
+    window.setTimeout(() => window.print(), 80);
+  };
 
-      <div className="flex items-center gap-2 border-b border-border bg-surface px-4 py-2">
-        <button
+  return (
+    <div className="simulator-page flex h-screen flex-col overflow-hidden">
+      <div className="editor-only"><SiteHeader /></div>
+
+      <div className="editor-only flex items-center gap-2 overflow-x-auto border-b border-border bg-surface px-4 py-2">
+        <span className="shrink-0 font-mono text-[10px] font-semibold uppercase text-primary">Modo editor</span>
+        <Button
           type="button"
           onClick={() => setRunning((v) => !v)}
-          className="flex items-center gap-2 rounded-sm bg-primary px-3 py-1.5 text-sm font-semibold text-primary-foreground"
+          size="sm"
         >
           {running ? <Pause className="size-4" /> : <Play className="size-4" />}
           {running ? "Pausar" : "Simular"}
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
           onClick={reset}
-          className="flex items-center gap-2 rounded-sm border border-border px-3 py-1.5 text-sm hover:bg-secondary"
+          variant="outline" size="sm"
         >
           <RotateCcw className="size-4" /> Reiniciar
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
           onClick={() => loadPreset(basicCircuit())}
-          className="rounded-sm border border-border px-3 py-1.5 text-sm hover:bg-secondary"
+          variant="outline" size="sm"
         >
           Exemplo dupla ação
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
           onClick={() => loadPreset(springReturnCircuit())}
-          className="rounded-sm border border-border px-3 py-1.5 text-sm hover:bg-secondary"
+          variant="outline" size="sm"
         >
           Exemplo simples ação
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
           onClick={() => loadPreset({ components: [], tubes: [] })}
-          className="flex items-center gap-2 rounded-sm border border-border px-3 py-1.5 text-sm hover:bg-secondary"
+          variant="outline" size="sm"
         >
           <Trash className="size-4" /> Limpar
-        </button>
+        </Button>
 
         <div className="ml-auto flex items-center gap-2">
-          <button
+          <Button
+            type="button"
+            onClick={printTechnicalDiagram}
+            variant="secondary"
+            size="sm"
+            title="Abrir a impressão limpa; escolha Salvar como PDF para exportar"
+          >
+            <Printer className="size-4" /> Imprimir / Exportar
+          </Button>
+          <Button
             type="button"
             disabled
             title="Salvamento de projetos em preparação"
-            className="flex cursor-not-allowed items-center gap-2 rounded-sm border border-dashed border-border px-3 py-1.5 text-sm text-muted-foreground"
+            variant="outline" size="sm" className="border-dashed"
           >
             <Save className="size-4" /> Salvar projeto
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
             disabled
             title="Biblioteca de projetos em preparação"
-            className="flex cursor-not-allowed items-center gap-2 rounded-sm border border-dashed border-border px-3 py-1.5 text-sm text-muted-foreground"
+            variant="outline" size="sm" className="border-dashed"
           >
             <FolderOpen className="size-4" /> Meus projetos
-          </button>
+          </Button>
         </div>
       </div>
 
-      <div className="flex min-h-0 flex-1">
+      <div className="editor-only flex min-h-0 flex-1">
         <aside className="hidden w-64 shrink-0 border-r border-border bg-sidebar lg:block">
           <Palette onAdd={(type) => addComponent(type)} />
         </aside>
@@ -232,10 +250,6 @@ function SimulatorPage() {
             onSelect={setSelectedId}
             onMove={moveComponent}
             onPortClick={handlePortClick}
-            onSignalDown={(comp) =>
-              comp.momentary ? setSignal(comp.id, true) : toggleSignal(comp.id)
-            }
-            onSignalUp={(comp) => comp.momentary && setSignal(comp.id, false)}
             onActivate={activateComponent}
             blockedId={blockedId}
             onDropComponent={(type, x, y) => addComponent(type as ComponentType, x, y)}
@@ -287,6 +301,7 @@ function SimulatorPage() {
           </div>
         </aside>
       </div>
+      <TechnicalDiagram circuit={circuit} runtime={runtime} solved={solved} />
     </div>
   );
 }
