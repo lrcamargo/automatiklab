@@ -37,6 +37,15 @@ export const Route = createFileRoute("/simulador")({
 
 let counter = 0;
 const nextId = (type: string) => `${type}-${Date.now().toString(36)}-${counter++}`;
+const TECHNICAL_PREFIX: Record<ComponentType, string> = {
+  source: "1P",
+  valve32: "1V",
+  valve52: "1V",
+  cylinderSingle: "1A",
+  cylinderDouble: "1A",
+  button: "1S",
+  sensor: "1S",
+};
 
 function SimulatorPage() {
   const [circuit, setCircuit] = useState<Circuit>(() => basicCircuit());
@@ -97,7 +106,7 @@ function SimulatorPage() {
       type,
       x,
       y,
-      label: `${def.short} ${circuit.components.filter((c) => c.type === type).length + 1}`,
+      label: `${TECHNICAL_PREFIX[type]}${circuit.components.filter((c) => c.type === type).length + 1}`,
       momentary: type === "button" ? true : undefined,
       speed: type.startsWith("cylinder") ? 1 : undefined,
       trigger: type === "sensor" ? "extended" : undefined,

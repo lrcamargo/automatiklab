@@ -50,6 +50,19 @@ export function TechnicalDiagram({ circuit, runtime, solved }: TechnicalDiagramP
               <path d="M0 0 L7 3.5 L0 7 Z" className="fill-air" />
             </marker>
           </defs>
+          {circuit.components
+            .filter((comp) => (comp.type === "valve32" || comp.type === "valve52") && comp.actuatorId)
+            .map((valve) => {
+              const actuator = circuit.components.find((comp) => comp.id === valve.actuatorId);
+              if (!actuator) return null;
+              const actuatorDef = CATALOG[actuator.type];
+              const x1 = actuator.x + actuatorDef.width;
+              const y1 = actuator.y + actuatorDef.height / 2;
+              const x2 = valve.x + 8;
+              const y2 = valve.y + CATALOG[valve.type].height / 2;
+              const middleX = x1 + (x2 - x1) / 2;
+              return <path key={`pilot-${valve.id}`} d={`M${x1} ${y1} H${middleX} V${y2} H${x2}`} className="fill-none stroke-steel" strokeWidth={1.3} strokeDasharray="5 5" />;
+            })}
           {circuit.tubes.map((tube) => {
             const a = portPosition(circuit, tube.from.componentId, tube.from.portId);
             const b = portPosition(circuit, tube.to.componentId, tube.to.portId);
