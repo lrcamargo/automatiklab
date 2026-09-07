@@ -225,8 +225,8 @@ export function ComponentGlyph({
           {comp.type === "cylinderSingle" && <path d={`M${pistonX + 5} 62 l10 -28 l10 28 l10 -28 l10 28`} className={baseLine} strokeWidth={1.6} />}
           <path d="M40 72 V100" className={live("A") ? "fill-none stroke-air" : baseLine} strokeWidth={2} />
           {comp.type === "cylinderDouble" && <path d="M168 72 V100" className={live("B") ? "fill-none stroke-air" : baseLine} strokeWidth={2} />}
-          <PortNumber x={40} y={88} value="2" />
-          {comp.type === "cylinderDouble" && <PortNumber x={168} y={88} value="4" />}
+          <PortNumber x={40} y={92} value="2" />
+          {comp.type === "cylinderDouble" && <PortNumber x={168} y={92} value="4" />}
         </svg>
       );
     }
