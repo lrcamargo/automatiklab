@@ -150,7 +150,10 @@ export function ComponentGlyph({
           <path d="M76 42 H150" className={live("P") ? "fill-none stroke-air" : baseLine} strokeWidth={2} />
           <path d="M101 42 a14 14 0 0 1 28 0" className={baseLine} strokeWidth={1.5} />
           <path d="M115 42 l8 -8" className={baseLine} strokeWidth={1.5} />
-          <PortNumber x={143} y={34} value="1" />
+          <text x={30} y={92} className="fill-air font-mono text-[11px] font-semibold">
+            {(comp.pressure ?? 6).toFixed(1)} bar
+          </text>
+          <PortNumber x={136} y={50} value="1" />
         </svg>
       );
 
