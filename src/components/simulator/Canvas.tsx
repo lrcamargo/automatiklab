@@ -109,6 +109,27 @@ export function Canvas(props: CanvasProps) {
       className="grid-plate relative h-full min-h-[560px] w-full overflow-auto bg-background"
     >
       <svg className="pointer-events-none absolute inset-0 h-full w-full">
+        {circuit.components
+          .filter((comp) => (comp.type === "valve32" || comp.type === "valve52") && comp.actuatorId)
+          .map((valve) => {
+            const actuator = circuit.components.find((comp) => comp.id === valve.actuatorId);
+            if (!actuator) return null;
+            const actuatorDef = CATALOG[actuator.type];
+            const y1 = actuator.y + actuatorDef.height / 2;
+            const y2 = valve.y + CATALOG[valve.type].height / 2;
+            const x1 = actuator.x + actuatorDef.width;
+            const x2 = valve.x + 8;
+            const middleX = x1 + (x2 - x1) / 2;
+            return (
+              <path
+                key={`pilot-${valve.id}`}
+                d={`M${x1} ${y1} H${middleX} V${y2} H${x2}`}
+                className="fill-none stroke-signal"
+                strokeWidth={1.5}
+                strokeDasharray="5 5"
+              />
+            );
+          })}
         {circuit.tubes.map((tube) => {
           const a = portPosition(tube.from.componentId, tube.from.portId);
           const b = portPosition(tube.to.componentId, tube.to.portId);

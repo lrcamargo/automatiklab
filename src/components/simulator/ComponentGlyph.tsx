@@ -116,11 +116,11 @@ export function ComponentGlyph({
           <text x={40} y={13} className="fill-foreground font-mono text-[10px] font-semibold">{comp.label}</text>
           <rect x={40} y={y} width={76} height={54} className={activeBox(actuated)} strokeWidth={1.7} />
           <rect x={116} y={y} width={76} height={54} className={activeBox(!actuated)} strokeWidth={1.7} />
-          <FlowArrow d="M78 84 V66 L100 40" active={actuated} />
-          <FlowArrow d="M54 38 V58 L62 84" active={actuated} />
+          <FlowArrow d="M78 84 V62 L58 40" active={actuated} />
+          <FlowArrow d="M102 38 V60 L108 84" active={actuated} />
           <Blocked x={106} y={84} />
-          <FlowArrow d="M154 84 V66 L134 40" active={!actuated} />
-          <FlowArrow d="M178 38 V58 L184 84" active={!actuated} />
+          <FlowArrow d="M154 84 V62 L178 40" active={!actuated} />
+          <FlowArrow d="M134 38 V60 L126 84" active={!actuated} />
           <Blocked x={126} y={84} />
           <path d="M134 0 V34 M178 0 V34 M126 88 V112 M154 88 V129 M184 88 V112" className={baseLine} strokeWidth={1.7} />
           <path d="M118 124 H134 M121 119 H131 M124 114 H128 M176 124 H192 M179 119 H189 M182 114 H186" className={baseLine} strokeWidth={1.4} />
