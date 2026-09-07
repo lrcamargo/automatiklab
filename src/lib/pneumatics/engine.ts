@@ -67,7 +67,8 @@ export function solveCircuit(circuit: Circuit, runtime: RuntimeState): SolveResu
     const k = (port: string) => portKey(comp.id, port);
     switch (comp.type) {
       case "source":
-        sources.push(k("P"));
+        // pressão zero = fonte fechada, não alimenta o circuito
+        if ((comp.pressure ?? 6) > 0) sources.push(k("P"));
         break;
       case "valve32":
         if (actuated[comp.id]) {
