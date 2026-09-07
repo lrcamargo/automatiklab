@@ -38,12 +38,81 @@ function Spring({ x, y }: { x: number; y: number }) {
   );
 }
 
+/** número normalizado desenhado à direita da porta, nunca sobre a linha */
 function PortNumber({ x, y, value }: { x: number; y: number; value: string }) {
   return (
-    <text x={x} y={y} textAnchor="middle" className="fill-muted-foreground font-mono text-[9px] font-semibold">
+    <text x={x + 6} y={y + 3} textAnchor="start" className="fill-muted-foreground font-mono text-[9px] font-semibold">
       {value}
     </text>
   );
+}
+
+/** símbolo de acionamento (lado esquerdo da válvula), conforme os tipos usuais da norma */
+function Actuation({
+  type,
+  x,
+  y,
+  active,
+}: {
+  type: ActuationType;
+  x: number;
+  y: number;
+  active: boolean;
+}) {
+  const cls = active ? "fill-none stroke-signal" : baseLine;
+  const stem = <path d={`M${x + 8} ${y} H${x + 24}`} className={cls} strokeWidth={1.8} />;
+  switch (type) {
+    case "alavanca":
+      return (
+        <g>
+          {stem}
+          <path d={`M${x + 8} ${y} L${x + 2} ${y - 14}`} className={cls} strokeWidth={1.8} />
+          <circle cx={x + 1} cy={y - 17} r={3} className={active ? "fill-signal stroke-signal" : "fill-background stroke-steel"} strokeWidth={1.5} />
+          <path d={`M${x + 8} ${y - 8} V${y + 8}`} className={cls} strokeWidth={1.8} />
+        </g>
+      );
+    case "pedal":
+      return (
+        <g>
+          {stem}
+          <path d={`M${x - 2} ${y - 10} L${x + 14} ${y - 4}`} className={cls} strokeWidth={1.8} />
+          <path d={`M${x + 8} ${y - 8} V${y + 8}`} className={cls} strokeWidth={1.8} />
+        </g>
+      );
+    case "rolete":
+      return (
+        <g>
+          {stem}
+          <circle cx={x} cy={y} r={5} className={active ? "fill-signal/25 stroke-signal" : "fill-background stroke-steel"} strokeWidth={1.6} />
+          <path d={`M${x + 8} ${y - 8} V${y + 8}`} className={cls} strokeWidth={1.8} />
+        </g>
+      );
+    case "piloto":
+      return (
+        <g>
+          {stem}
+          <path d={`M${x - 2} ${y - 6} L${x + 8} ${y} L${x - 2} ${y + 6} Z`} className={active ? "fill-signal stroke-signal" : "fill-background stroke-steel"} strokeWidth={1.5} />
+        </g>
+      );
+    case "solenoide":
+      return (
+        <g>
+          {stem}
+          <rect x={x - 8} y={y - 8} width={17} height={16} className={active ? "fill-signal/20 stroke-signal" : "fill-background stroke-steel"} strokeWidth={1.5} />
+          <path d={`M${x - 8} ${y + 8} L${x + 9} ${y - 8}`} className={cls} strokeWidth={1.5} />
+        </g>
+      );
+    case "botao":
+    default:
+      return (
+        <g>
+          {stem}
+          <path d={`M${x + 8} ${y - 8} V${y + 8}`} className={cls} strokeWidth={1.8} />
+          <rect x={x - 8} y={y - 5} width={10} height={10} className={active ? "fill-signal/25 stroke-signal" : "fill-background stroke-steel"} strokeWidth={1.5} />
+          <path d={`M${x + 2} ${y} H${x + 8}`} className={cls} strokeWidth={1.8} />
+        </g>
+      );
+  }
 }
 
 /** Símbolos técnicos pneumáticos inspirados no padrão didático ISO 1219 dos materiais de referência. */
