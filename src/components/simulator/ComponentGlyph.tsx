@@ -246,9 +246,9 @@ export function ComponentGlyph({
           <path d="M84 104 H96 M86 100 H94 M88 96 H92" className={baseLine} strokeWidth={1.2} />
           <path d="M12 43 H24 M5 43 H19 M12 28 V43" className={signal ? "fill-none stroke-signal" : baseLine} strokeWidth={2} />
           <Spring x={96} y={55} />
-          <PortNumber x={78} y={29} value="2" />
-          <PortNumber x={68} y={89} value="1" />
-          <PortNumber x={90} y={89} value="3" />
+          <PortNumber x={78} y={24} value="2" />
+          <PortNumber x={68} y={96} value="1" />
+          <PortNumber x={90} y={86} value="3" />
         </svg>
       );
 
