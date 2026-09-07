@@ -196,13 +196,13 @@ export function ComponentGlyph({
           <Blocked x={126} y={84} />
           <path d="M134 0 V34 M178 0 V34 M126 88 V112 M154 88 V129 M184 88 V112" className={baseLine} strokeWidth={1.7} />
           <path d="M118 124 H134 M121 119 H131 M124 114 H128 M176 124 H192 M179 119 H189 M182 114 H186" className={baseLine} strokeWidth={1.4} />
-          <path d="M16 48 H40 M16 48 V72 M8 72 H24" className={signal || actuated ? "fill-none stroke-signal" : baseLine} strokeWidth={1.8} />
+          <Actuation type={comp.actuation ?? "botao"} x={16} y={61} active={signal || actuated} />
           <Spring x={192} y={61} />
-          <PortNumber x={134} y={29} value="4" />
-          <PortNumber x={178} y={29} value="2" />
-          <PortNumber x={126} y={102} value="5" />
-          <PortNumber x={154} y={102} value="1" />
-          <PortNumber x={184} y={102} value="3" />
+          <PortNumber x={134} y={8} value="4" />
+          <PortNumber x={178} y={8} value="2" />
+          <PortNumber x={126} y={104} value="5" />
+          <PortNumber x={154} y={120} value="1" />
+          <PortNumber x={184} y={104} value="3" />
         </svg>
       );
     }
