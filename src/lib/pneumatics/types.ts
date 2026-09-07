@@ -42,7 +42,28 @@ export interface PlacedComponent {
   /** sensor: cilindro observado e posição de disparo */
   targetId?: string | null | undefined;
   trigger?: "extended" | "retracted" | undefined;
+  /** fonte: pressão de alimentação em bar */
+  pressure?: number | undefined;
+  /** válvula: tipo de acionamento do lado esquerdo */
+  actuation?: ActuationType | undefined;
 }
+
+export type ActuationType =
+  | "botao"
+  | "alavanca"
+  | "pedal"
+  | "rolete"
+  | "piloto"
+  | "solenoide";
+
+export const ACTUATIONS: { id: ActuationType; label: string }[] = [
+  { id: "botao", label: "Manual — botão" },
+  { id: "alavanca", label: "Manual — alavanca" },
+  { id: "pedal", label: "Manual — pedal" },
+  { id: "rolete", label: "Mecânico — rolete" },
+  { id: "piloto", label: "Pneumático — piloto" },
+  { id: "solenoide", label: "Elétrico — solenoide" },
+];
 
 export interface Tube {
   id: string;

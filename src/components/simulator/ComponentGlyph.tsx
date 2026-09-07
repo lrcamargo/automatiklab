@@ -38,12 +38,81 @@ function Spring({ x, y }: { x: number; y: number }) {
   );
 }
 
+/** número normalizado desenhado à direita da porta, nunca sobre a linha */
 function PortNumber({ x, y, value }: { x: number; y: number; value: string }) {
   return (
-    <text x={x} y={y} textAnchor="middle" className="fill-muted-foreground font-mono text-[9px] font-semibold">
+    <text x={x + 6} y={y + 3} textAnchor="start" className="fill-muted-foreground font-mono text-[9px] font-semibold">
       {value}
     </text>
   );
+}
+
+/** símbolo de acionamento (lado esquerdo da válvula), conforme os tipos usuais da norma */
+function Actuation({
+  type,
+  x,
+  y,
+  active,
+}: {
+  type: ActuationType;
+  x: number;
+  y: number;
+  active: boolean;
+}) {
+  const cls = active ? "fill-none stroke-signal" : baseLine;
+  const stem = <path d={`M${x + 8} ${y} H${x + 24}`} className={cls} strokeWidth={1.8} />;
+  switch (type) {
+    case "alavanca":
+      return (
+        <g>
+          {stem}
+          <path d={`M${x + 8} ${y} L${x + 2} ${y - 14}`} className={cls} strokeWidth={1.8} />
+          <circle cx={x + 1} cy={y - 17} r={3} className={active ? "fill-signal stroke-signal" : "fill-background stroke-steel"} strokeWidth={1.5} />
+          <path d={`M${x + 8} ${y - 8} V${y + 8}`} className={cls} strokeWidth={1.8} />
+        </g>
+      );
+    case "pedal":
+      return (
+        <g>
+          {stem}
+          <path d={`M${x - 2} ${y - 10} L${x + 14} ${y - 4}`} className={cls} strokeWidth={1.8} />
+          <path d={`M${x + 8} ${y - 8} V${y + 8}`} className={cls} strokeWidth={1.8} />
+        </g>
+      );
+    case "rolete":
+      return (
+        <g>
+          {stem}
+          <circle cx={x} cy={y} r={5} className={active ? "fill-signal/25 stroke-signal" : "fill-background stroke-steel"} strokeWidth={1.6} />
+          <path d={`M${x + 8} ${y - 8} V${y + 8}`} className={cls} strokeWidth={1.8} />
+        </g>
+      );
+    case "piloto":
+      return (
+        <g>
+          {stem}
+          <path d={`M${x - 2} ${y - 6} L${x + 8} ${y} L${x - 2} ${y + 6} Z`} className={active ? "fill-signal stroke-signal" : "fill-background stroke-steel"} strokeWidth={1.5} />
+        </g>
+      );
+    case "solenoide":
+      return (
+        <g>
+          {stem}
+          <rect x={x - 8} y={y - 8} width={17} height={16} className={active ? "fill-signal/20 stroke-signal" : "fill-background stroke-steel"} strokeWidth={1.5} />
+          <path d={`M${x - 8} ${y + 8} L${x + 9} ${y - 8}`} className={cls} strokeWidth={1.5} />
+        </g>
+      );
+    case "botao":
+    default:
+      return (
+        <g>
+          {stem}
+          <path d={`M${x + 8} ${y - 8} V${y + 8}`} className={cls} strokeWidth={1.8} />
+          <rect x={x - 8} y={y - 5} width={10} height={10} className={active ? "fill-signal/25 stroke-signal" : "fill-background stroke-steel"} strokeWidth={1.5} />
+          <path d={`M${x + 2} ${y} H${x + 8}`} className={cls} strokeWidth={1.8} />
+        </g>
+      );
+  }
 }
 
 /** Símbolos técnicos pneumáticos inspirados no padrão didático ISO 1219 dos materiais de referência. */
@@ -81,7 +150,10 @@ export function ComponentGlyph({
           <path d="M76 42 H150" className={live("P") ? "fill-none stroke-air" : baseLine} strokeWidth={2} />
           <path d="M101 42 a14 14 0 0 1 28 0" className={baseLine} strokeWidth={1.5} />
           <path d="M115 42 l8 -8" className={baseLine} strokeWidth={1.5} />
-          <PortNumber x={143} y={34} value="1" />
+          <text x={30} y={92} className="fill-air font-mono text-[11px] font-semibold">
+            {(comp.pressure ?? 6).toFixed(1)} bar
+          </text>
+          <PortNumber x={136} y={50} value="1" />
         </svg>
       );
 
@@ -99,11 +171,11 @@ export function ComponentGlyph({
           <Blocked x={104} y={84} />
           <path d="M118 0 V34 M104 88 V129 M134 88 V112" className={baseLine} strokeWidth={1.7} />
           <path d="M126 124 H142 M129 119 H139 M132 114 H136" className={baseLine} strokeWidth={1.4} />
-          <path d="M16 48 H40 M16 48 V72 M8 72 H24" className={signal || actuated ? "fill-none stroke-signal" : baseLine} strokeWidth={1.8} />
+          <Actuation type={comp.actuation ?? "botao"} x={16} y={61} active={signal || actuated} />
           <Spring x={144} y={61} />
-          <PortNumber x={118} y={29} value="2" />
-          <PortNumber x={104} y={102} value="1" />
-          <PortNumber x={134} y={102} value="3" />
+          <PortNumber x={118} y={8} value="2" />
+          <PortNumber x={104} y={120} value="1" />
+          <PortNumber x={134} y={104} value="3" />
         </svg>
       );
     }
@@ -124,13 +196,13 @@ export function ComponentGlyph({
           <Blocked x={126} y={84} />
           <path d="M134 0 V34 M178 0 V34 M126 88 V112 M154 88 V129 M184 88 V112" className={baseLine} strokeWidth={1.7} />
           <path d="M118 124 H134 M121 119 H131 M124 114 H128 M176 124 H192 M179 119 H189 M182 114 H186" className={baseLine} strokeWidth={1.4} />
-          <path d="M16 48 H40 M16 48 V72 M8 72 H24" className={signal || actuated ? "fill-none stroke-signal" : baseLine} strokeWidth={1.8} />
+          <Actuation type={comp.actuation ?? "botao"} x={16} y={61} active={signal || actuated} />
           <Spring x={192} y={61} />
-          <PortNumber x={134} y={29} value="4" />
-          <PortNumber x={178} y={29} value="2" />
-          <PortNumber x={126} y={102} value="5" />
-          <PortNumber x={154} y={102} value="1" />
-          <PortNumber x={184} y={102} value="3" />
+          <PortNumber x={134} y={8} value="4" />
+          <PortNumber x={178} y={8} value="2" />
+          <PortNumber x={126} y={104} value="5" />
+          <PortNumber x={154} y={120} value="1" />
+          <PortNumber x={184} y={104} value="3" />
         </svg>
       );
     }
@@ -153,8 +225,8 @@ export function ComponentGlyph({
           {comp.type === "cylinderSingle" && <path d={`M${pistonX + 5} 62 l10 -28 l10 28 l10 -28 l10 28`} className={baseLine} strokeWidth={1.6} />}
           <path d="M40 72 V100" className={live("A") ? "fill-none stroke-air" : baseLine} strokeWidth={2} />
           {comp.type === "cylinderDouble" && <path d="M168 72 V100" className={live("B") ? "fill-none stroke-air" : baseLine} strokeWidth={2} />}
-          <PortNumber x={40} y={88} value="2" />
-          {comp.type === "cylinderDouble" && <PortNumber x={168} y={88} value="4" />}
+          <PortNumber x={40} y={92} value="2" />
+          {comp.type === "cylinderDouble" && <PortNumber x={168} y={92} value="4" />}
         </svg>
       );
     }
@@ -174,9 +246,9 @@ export function ComponentGlyph({
           <path d="M84 104 H96 M86 100 H94 M88 96 H92" className={baseLine} strokeWidth={1.2} />
           <path d="M12 43 H24 M5 43 H19 M12 28 V43" className={signal ? "fill-none stroke-signal" : baseLine} strokeWidth={2} />
           <Spring x={96} y={55} />
-          <PortNumber x={78} y={29} value="2" />
-          <PortNumber x={68} y={89} value="1" />
-          <PortNumber x={90} y={89} value="3" />
+          <PortNumber x={78} y={24} value="2" />
+          <PortNumber x={68} y={96} value="1" />
+          <PortNumber x={90} y={86} value="3" />
         </svg>
       );
 
