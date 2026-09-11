@@ -67,6 +67,49 @@ export function PropertiesPanel({
         />
       </div>
 
+      {selected.type === "source" && (
+        <div>
+          <label className={labelClass} htmlFor="pressure">
+            Pressão de alimentação ({(selected.pressure ?? 6).toFixed(1)} bar)
+          </label>
+          <input
+            id="pressure"
+            type="range"
+            min={0}
+            max={10}
+            step={0.5}
+            value={selected.pressure ?? 6}
+            onChange={(event) => onChange({ pressure: Number(event.target.value) })}
+            className="w-full accent-[var(--color-primary)]"
+          />
+          <p className="mt-1 text-[11px] leading-snug text-muted-foreground">
+            Com 0 bar a fonte fica fechada e nenhum atuador se move.
+          </p>
+        </div>
+      )}
+
+      {(selected.type === "valve32" || selected.type === "valve52") && (
+        <div>
+          <label className={labelClass} htmlFor="actuation">
+            Tipo de acionamento
+          </label>
+          <select
+            id="actuation"
+            className={fieldClass}
+            value={selected.actuation ?? "botao"}
+            onChange={(event) =>
+              onChange({ actuation: event.target.value as PlacedComponent["actuation"] })
+            }
+          >
+            {ACTUATIONS.map((item) => (
+              <option key={item.id} value={item.id}>
+                {item.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+
       {(selected.type === "valve32" || selected.type === "valve52") && (
         <div>
           <label className={labelClass} htmlFor="actuator">
