@@ -1,5 +1,5 @@
 import { CATALOG } from "@/lib/pneumatics/catalog";
-import type { PlacedComponent } from "@/lib/pneumatics/types";
+import type { ActuationType, PlacedComponent } from "@/lib/pneumatics/types";
 
 interface GlyphProps {
   comp: PlacedComponent;
