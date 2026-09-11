@@ -313,24 +313,25 @@ export function ComponentGlyph({
       return (
         <svg width={def.width} height={def.height} viewBox={`0 0 ${def.width} ${def.height}`} aria-label="Válvula direcional 5/2 com retorno por mola">
           {defs}
-          <text x={40} y={13} className="fill-foreground font-mono text-[10px] font-semibold">{comp.label}</text>
-          <rect x={40} y={y} width={76} height={54} className={activeBox(actuated)} strokeWidth={1.7} />
-          <rect x={116} y={y} width={76} height={54} className={activeBox(!actuated)} strokeWidth={1.7} />
-          <FlowArrow d="M78 84 V62 L58 40" active={actuated} />
-          <FlowArrow d="M102 38 V60 L108 84" active={actuated} />
-          <Blocked x={106} y={84} />
-          <FlowArrow d="M154 84 V62 L178 40" active={!actuated} />
-          <FlowArrow d="M134 38 V60 L126 84" active={!actuated} />
-          <Blocked x={126} y={84} />
-          <path d="M134 0 V34 M178 0 V34 M126 88 V112 M154 88 V129 M184 88 V112" className={baseLine} strokeWidth={1.7} />
-          <path d="M118 124 H134 M121 119 H131 M124 114 H128 M176 124 H192 M179 119 H189 M182 114 H186" className={baseLine} strokeWidth={1.4} />
-          <Actuation type={comp.actuation ?? "botao"} x={16} y={61} active={signal || actuated} />
-          <Spring x={192} y={61} />
-          <PortNumber x={134} y={8} value="4" />
-          <PortNumber x={178} y={8} value="2" />
-          <PortNumber x={126} y={104} value="5" />
-          <PortNumber x={154} y={120} value="1" />
-          <PortNumber x={184} y={104} value="3" />
+          <text x={72} y={13} className="fill-foreground font-mono text-[10px] font-semibold">{comp.label}</text>
+          <rect x={72} y={y} width={76} height={54} className={activeBox(actuated)} strokeWidth={1.7} />
+          <rect x={148} y={y} width={76} height={54} className={activeBox(!actuated)} strokeWidth={1.7} />
+          <FlowArrow d="M110 84 V62 L90 40" active={actuated} />
+          <FlowArrow d="M134 38 V60 L140 84" active={actuated} />
+          <Blocked x={138} y={84} />
+          <FlowArrow d="M186 84 V62 L210 40" active={!actuated} />
+          <FlowArrow d="M166 38 V60 L158 84" active={!actuated} />
+          <Blocked x={158} y={84} />
+          <path d="M166 0 V34 M210 0 V34 M158 88 V112 M186 88 V129 M216 88 V112" className={baseLine} strokeWidth={1.7} />
+          <path d="M150 124 H166 M153 119 H163 M156 114 H160 M208 124 H224 M211 119 H221 M214 114 H218" className={baseLine} strokeWidth={1.4} />
+          <ActuationSymbol type={comp.actuation ?? "botao"} x={72} y={61} dir={-1} active={signal || actuated} />
+          <ActuationSymbol type={comp.returnType ?? "mola"} x={224} y={61} dir={1} active={false} />
+          <PortNumber x={166} y={8} value="4" />
+          <PortNumber x={210} y={8} value="2" />
+          <PortNumber x={158} y={104} value="5" />
+          <PortNumber x={186} y={120} value="1" />
+          <PortNumber x={216} y={104} value="3" />
+
         </svg>
       );
     }
