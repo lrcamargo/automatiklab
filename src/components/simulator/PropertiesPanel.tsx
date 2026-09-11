@@ -90,26 +90,56 @@ export function PropertiesPanel({
       )}
 
       {(selected.type === "valve32" || selected.type === "valve52") && (
-        <div>
-          <label className={labelClass} htmlFor="actuation">
-            Tipo de acionamento
-          </label>
-          <select
-            id="actuation"
-            className={fieldClass}
-            value={selected.actuation ?? "botao"}
-            onChange={(event) =>
-              onChange({ actuation: event.target.value as PlacedComponent["actuation"] })
-            }
-          >
-            {ACTUATIONS.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.label}
-              </option>
-            ))}
-          </select>
-        </div>
+        <>
+          <div>
+            <label className={labelClass} htmlFor="actuation">
+              Acionamento (lado esquerdo)
+            </label>
+            <select
+              id="actuation"
+              className={fieldClass}
+              value={selected.actuation ?? "botao"}
+              onChange={(event) =>
+                onChange({ actuation: event.target.value as PlacedComponent["actuation"] })
+              }
+            >
+              {ACTUATION_GROUPS.map((group) => (
+                <optgroup key={group} label={group}>
+                  {ACTUATIONS.filter((item) => item.group === group).map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.label}
+                    </option>
+                  ))}
+                </optgroup>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className={labelClass} htmlFor="returnType">
+              Retorno (lado direito)
+            </label>
+            <select
+              id="returnType"
+              className={fieldClass}
+              value={selected.returnType ?? "mola"}
+              onChange={(event) =>
+                onChange({ returnType: event.target.value as PlacedComponent["returnType"] })
+              }
+            >
+              {ACTUATION_GROUPS.map((group) => (
+                <optgroup key={group} label={group}>
+                  {ACTUATIONS.filter((item) => item.group === group).map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.label}
+                    </option>
+                  ))}
+                </optgroup>
+              ))}
+            </select>
+          </div>
+        </>
       )}
+
 
       {(selected.type === "valve32" || selected.type === "valve52") && (
         <div>
