@@ -289,23 +289,24 @@ export function ComponentGlyph({
       return (
         <svg width={def.width} height={def.height} viewBox={`0 0 ${def.width} ${def.height}`} aria-label="Válvula direcional 3/2 normalmente fechada">
           {defs}
-          <text x={40} y={13} className="fill-foreground font-mono text-[10px] font-semibold">{comp.label}</text>
-          <rect x={40} y={y} width={52} height={54} className={activeBox(actuated)} strokeWidth={1.7} />
-          <rect x={92} y={y} width={52} height={54} className={activeBox(!actuated)} strokeWidth={1.7} />
-          <FlowArrow d="M54 84 V42 H78" active={actuated} />
-          <Blocked x={80} y={84} />
-          <FlowArrow d="M118 38 V80 H134" active={!actuated} />
-          <Blocked x={104} y={84} />
-          <path d="M118 0 V34 M104 88 V129 M134 88 V112" className={baseLine} strokeWidth={1.7} />
-          <path d="M126 124 H142 M129 119 H139 M132 114 H136" className={baseLine} strokeWidth={1.4} />
-          <Actuation type={comp.actuation ?? "botao"} x={16} y={61} active={signal || actuated} />
-          <Spring x={144} y={61} />
-          <PortNumber x={118} y={8} value="2" />
-          <PortNumber x={104} y={120} value="1" />
-          <PortNumber x={134} y={104} value="3" />
+          <text x={72} y={13} className="fill-foreground font-mono text-[10px] font-semibold">{comp.label}</text>
+          <rect x={72} y={y} width={52} height={54} className={activeBox(actuated)} strokeWidth={1.7} />
+          <rect x={124} y={y} width={52} height={54} className={activeBox(!actuated)} strokeWidth={1.7} />
+          <FlowArrow d="M86 84 V42 H110" active={actuated} />
+          <Blocked x={112} y={84} />
+          <FlowArrow d="M150 38 V80 H166" active={!actuated} />
+          <Blocked x={136} y={84} />
+          <path d="M150 0 V34 M136 88 V129 M166 88 V112" className={baseLine} strokeWidth={1.7} />
+          <path d="M158 124 H174 M161 119 H171 M164 114 H168" className={baseLine} strokeWidth={1.4} />
+          <ActuationSymbol type={comp.actuation ?? "botao"} x={72} y={61} dir={-1} active={signal || actuated} />
+          <ActuationSymbol type={comp.returnType ?? "mola"} x={176} y={61} dir={1} active={false} />
+          <PortNumber x={150} y={8} value="2" />
+          <PortNumber x={136} y={120} value="1" />
+          <PortNumber x={166} y={104} value="3" />
         </svg>
       );
     }
+
 
     case "valve52": {
       const y = 34;
