@@ -19,12 +19,12 @@ export const CATALOG: Record<ComponentType, ComponentDef> = {
     description:
       "Três vias e duas posições. Em repouso conecta o trabalho ao escape; acionada, liga a alimentação ao trabalho.",
     family: "comando",
-    width: 196,
+    width: 240,
     height: 129,
     ports: [
-      { id: "A", label: "2", x: 118, y: 0, kind: "work" },
-      { id: "P", label: "1", x: 104, y: 129, kind: "supply" },
-      { id: "R", label: "3", x: 134, y: 112, kind: "exhaust" },
+      { id: "A", label: "2", x: 150, y: 0, kind: "work" },
+      { id: "P", label: "1", x: 136, y: 129, kind: "supply" },
+      { id: "R", label: "3", x: 166, y: 112, kind: "exhaust" },
     ],
   },
   valve52: {
@@ -34,16 +34,17 @@ export const CATALOG: Record<ComponentType, ComponentDef> = {
     description:
       "Cinco vias e duas posições. Alterna a pressão entre as duas câmaras de um cilindro de dupla ação.",
     family: "comando",
-    width: 238,
+    width: 288,
     height: 129,
     ports: [
-      { id: "B", label: "4", x: 134, y: 0, kind: "work" },
-      { id: "A", label: "2", x: 178, y: 0, kind: "work" },
-      { id: "R2", label: "5", x: 126, y: 112, kind: "exhaust" },
-      { id: "P", label: "1", x: 154, y: 129, kind: "supply" },
-      { id: "R1", label: "3", x: 184, y: 112, kind: "exhaust" },
+      { id: "B", label: "4", x: 166, y: 0, kind: "work" },
+      { id: "A", label: "2", x: 210, y: 0, kind: "work" },
+      { id: "R2", label: "5", x: 158, y: 112, kind: "exhaust" },
+      { id: "P", label: "1", x: 186, y: 129, kind: "supply" },
+      { id: "R1", label: "3", x: 216, y: 112, kind: "exhaust" },
     ],
   },
+
   cylinderSingle: {
     type: "cylinderSingle",
     name: "Cilindro de simples ação",
