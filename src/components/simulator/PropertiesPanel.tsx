@@ -1,4 +1,5 @@
 import { CATALOG } from "@/lib/pneumatics/catalog";
+import { ACTUATIONS } from "@/lib/pneumatics/types";
 import type { Circuit, PlacedComponent, RuntimeState } from "@/lib/pneumatics/types";
 import { Trash2 } from "lucide-react";
 

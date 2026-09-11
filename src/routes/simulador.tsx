@@ -108,6 +108,8 @@ function SimulatorPage() {
       y,
       label: `${TECHNICAL_PREFIX[type]}${circuit.components.filter((c) => c.type === type).length + 1}`,
       momentary: type === "button" ? true : undefined,
+      pressure: type === "source" ? 6 : undefined,
+      actuation: type === "valve32" || type === "valve52" ? "botao" : undefined,
       speed: type.startsWith("cylinder") ? 1 : undefined,
       trigger: type === "sensor" ? "extended" : undefined,
     };
