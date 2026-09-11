@@ -47,73 +47,200 @@ function PortNumber({ x, y, value }: { x: number; y: number; value: string }) {
   );
 }
 
-/** símbolo de acionamento (lado esquerdo da válvula), conforme os tipos usuais da norma */
-function Actuation({
+/**
+ * Símbolo de acionamento desenhado ao lado da caixa da válvula, na escala dos
+ * diagramas didáticos (ISO 1219). `x` é a borda da caixa e `dir` o lado:
+ * -1 desenha para a esquerda, +1 para a direita.
+ */
+function ActuationSymbol({
   type,
   x,
   y,
+  dir,
   active,
 }: {
   type: ActuationType;
   x: number;
   y: number;
+  dir: 1 | -1;
   active: boolean;
 }) {
   const cls = active ? "fill-none stroke-signal" : baseLine;
-  const stem = <path d={`M${x + 8} ${y} H${x + 24}`} className={cls} strokeWidth={1.8} />;
+  const filled = active ? "fill-signal stroke-signal" : "fill-background stroke-steel";
+  const soft = active ? "fill-signal/20 stroke-signal" : "fill-background stroke-steel";
+  const p = (d: number, off = 0) => `${x + dir * d} ${y + off}`;
+  const px = (d: number) => x + dir * d;
+  /** rect ocupando as distâncias d0..d0+w a partir da borda */
+  const rectAt = (d0: number, w: number, h: number) => ({
+    x: dir > 0 ? px(d0) : px(d0 + w),
+    y: y - h / 2,
+    width: w,
+    height: h,
+  });
+  const wall = <path d={`M${p(1, -16)} L${p(1, 16)}`} className={cls} strokeWidth={1.8} />;
+  const stem = (to: number) => <path d={`M${p(1)} L${p(to)}`} className={cls} strokeWidth={1.8} />;
+
+  const spring = (d0: number) => (
+    <path
+      d={`M${p(d0)} L${p(d0 + 6, -11)} L${p(d0 + 14, 11)} L${p(d0 + 22, -11)} L${p(d0 + 30, 11)} L${p(d0 + 38, -11)} L${p(d0 + 44)}`}
+      className={cls}
+      strokeWidth={1.8}
+    />
+  );
+
+  const pilotBox = (d0: number) => {
+    const r = rectAt(d0, 26, 30);
+    const tipIn = px(d0);
+    const back = px(d0 + 18);
+    return (
+      <g>
+        <rect {...r} className={soft} strokeWidth={1.8} />
+        <path
+          d={`M${back} ${y - 9} L${tipIn + dir * 8} ${y} L${back} ${y + 9} Z`}
+          className={filled}
+          strokeWidth={1.5}
+        />
+      </g>
+    );
+  };
+
+  const solenoidBox = (d0: number) => {
+    const r = rectAt(d0, 26, 30);
+    return (
+      <g>
+        <rect {...r} className={soft} strokeWidth={1.8} />
+        <path d={`M${p(d0 + 3, 12)} L${p(d0 + 23, -12)}`} className={cls} strokeWidth={1.8} />
+        <path d={`M${p(d0 + 9, 12)} L${p(d0 + 26, -8)}`} className={cls} strokeWidth={1.4} />
+      </g>
+    );
+  };
+
+  const manualCap = (d0: number) => (
+    <path
+      d={`M${p(d0, -13)} L${p(d0 + 12, -13)} A 13 13 0 0 ${dir > 0 ? 1 : 0} ${p(d0 + 12, 13)} L${p(d0, 13)}`}
+      className={soft}
+      strokeWidth={1.8}
+    />
+  );
+
+  const roller = (d0: number) => (
+    <g>
+      <rect {...rectAt(d0, 12, 26)} className={soft} strokeWidth={1.7} />
+      <circle cx={px(d0 + 22)} cy={y} r={10} className={soft} strokeWidth={1.8} />
+    </g>
+  );
+
   switch (type) {
+    case "mola":
+      return (
+        <g>
+          {spring(2)}
+          <path d={`M${p(48, -14)} L${p(48, 14)}`} className={cls} strokeWidth={1.8} />
+        </g>
+      );
+    case "centragemMolas":
+      return (
+        <g>
+          {wall}
+          {spring(4)}
+          <path d={`M${p(50, -16)} L${p(50, 16)}`} className={cls} strokeWidth={1.8} />
+        </g>
+      );
+    case "manual":
+      return (
+        <g>
+          {wall}
+          {stem(30)}
+          {manualCap(30)}
+        </g>
+      );
     case "alavanca":
       return (
         <g>
-          {stem}
-          <path d={`M${x + 8} ${y} L${x + 2} ${y - 14}`} className={cls} strokeWidth={1.8} />
-          <circle cx={x + 1} cy={y - 17} r={3} className={active ? "fill-signal stroke-signal" : "fill-background stroke-steel"} strokeWidth={1.5} />
-          <path d={`M${x + 8} ${y - 8} V${y + 8}`} className={cls} strokeWidth={1.8} />
+          {wall}
+          {stem(26)}
+          <path d={`M${p(26)} L${p(38, -26)}`} className={cls} strokeWidth={2.4} />
+          <circle cx={px(40)} cy={y - 30} r={6} className={filled} strokeWidth={1.5} />
         </g>
       );
     case "pedal":
       return (
         <g>
-          {stem}
-          <path d={`M${x - 2} ${y - 10} L${x + 14} ${y - 4}`} className={cls} strokeWidth={1.8} />
-          <path d={`M${x + 8} ${y - 8} V${y + 8}`} className={cls} strokeWidth={1.8} />
+          {wall}
+          {stem(24)}
+          <path d={`M${p(16, -16)} L${p(50, -6)}`} className={cls} strokeWidth={3} />
+          <path d={`M${p(24)} L${p(24, -12)}`} className={cls} strokeWidth={1.6} />
+        </g>
+      );
+    case "came":
+      return (
+        <g>
+          {wall}
+          {stem(28)}
+          <path
+            d={`M${p(28, -13)} L${p(38, -13)} A 13 13 0 0 ${dir > 0 ? 1 : 0} ${p(38, 13)} L${p(28, 13)} Z`}
+            className={soft}
+            strokeWidth={1.8}
+          />
         </g>
       );
     case "rolete":
       return (
         <g>
-          {stem}
-          <circle cx={x} cy={y} r={5} className={active ? "fill-signal/25 stroke-signal" : "fill-background stroke-steel"} strokeWidth={1.6} />
-          <path d={`M${x + 8} ${y - 8} V${y + 8}`} className={cls} strokeWidth={1.8} />
+          {wall}
+          {stem(22)}
+          {roller(22)}
+        </g>
+      );
+    case "roleteEscamoteavel":
+      return (
+        <g>
+          {wall}
+          {stem(22)}
+          {roller(22)}
+          <path d={`M${p(20, 18)} L${p(46, 26)}`} className={cls} strokeWidth={1.8} />
         </g>
       );
     case "piloto":
+      return <g>{pilotBox(1)}</g>;
+    case "servoPiloto":
       return (
         <g>
-          {stem}
-          <path d={`M${x - 2} ${y - 6} L${x + 8} ${y} L${x - 2} ${y + 6} Z`} className={active ? "fill-signal stroke-signal" : "fill-background stroke-steel"} strokeWidth={1.5} />
+          {pilotBox(1)}
+          {spring(28)}
         </g>
       );
     case "solenoide":
+      return <g>{solenoidBox(1)}</g>;
+    case "solenoideManual":
       return (
         <g>
-          {stem}
-          <rect x={x - 8} y={y - 8} width={17} height={16} className={active ? "fill-signal/20 stroke-signal" : "fill-background stroke-steel"} strokeWidth={1.5} />
-          <path d={`M${x - 8} ${y + 8} L${x + 9} ${y - 8}`} className={cls} strokeWidth={1.5} />
+          {solenoidBox(1)}
+          {stem(1)}
+          {manualCap(30)}
+        </g>
+      );
+    case "servoSolenoide":
+      return (
+        <g>
+          {solenoidBox(1)}
+          {pilotBox(28)}
         </g>
       );
     case "botao":
     default:
       return (
         <g>
-          {stem}
-          <path d={`M${x + 8} ${y - 8} V${y + 8}`} className={cls} strokeWidth={1.8} />
-          <rect x={x - 8} y={y - 5} width={10} height={10} className={active ? "fill-signal/25 stroke-signal" : "fill-background stroke-steel"} strokeWidth={1.5} />
-          <path d={`M${x + 2} ${y} H${x + 8}`} className={cls} strokeWidth={1.8} />
+          {wall}
+          {stem(26)}
+          <rect {...rectAt(26, 16, 24)} className={soft} strokeWidth={1.8} />
+          <path d={`M${p(42)} L${p(50)}`} className={cls} strokeWidth={1.8} />
+          <path d={`M${p(50, -14)} L${p(50, 14)}`} className={cls} strokeWidth={2.2} />
         </g>
       );
   }
 }
+
 
 /** Símbolos técnicos pneumáticos inspirados no padrão didático ISO 1219 dos materiais de referência. */
 export function ComponentGlyph({
