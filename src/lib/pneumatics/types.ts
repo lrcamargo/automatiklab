@@ -60,11 +60,13 @@ export type ActuationType =
   | "roleteEscamoteavel"
   | "mola"
   | "centragemMolas"
-  | "piloto"
-  | "servoPiloto"
-  | "solenoide"
-  | "solenoideManual"
-  | "servoSolenoide";
+  | "pilotoSimples"
+  | "pilotoDuplo"
+  | "servoPilotoSimples"
+  | "servoPilotoDuplo"
+  | "solenoideSimples"
+  | "solenoideDuplo"
+  | "servoSolenoideDuploManual";
 
 export const ACTUATIONS: { id: ActuationType; label: string; group: string }[] = [
   { id: "manual", label: "Manual — geral", group: "Manual" },
@@ -76,14 +78,16 @@ export const ACTUATIONS: { id: ActuationType; label: string; group: string }[] =
   { id: "roleteEscamoteavel", label: "Mecânico — rolete escamoteável", group: "Mecânico" },
   { id: "mola", label: "Mecânico — mola", group: "Mecânico" },
   { id: "centragemMolas", label: "Mecânico — centragem por molas", group: "Mecânico" },
-  { id: "piloto", label: "Pneumático — piloto", group: "Pneumático" },
-  { id: "servoPiloto", label: "Pneumático — servo-piloto", group: "Pneumático" },
-  { id: "solenoide", label: "Elétrico — solenoide", group: "Elétrico" },
-  { id: "solenoideManual", label: "Elétrico — solenoide com manual", group: "Elétrico" },
-  { id: "servoSolenoide", label: "Elétrico — servo-solenoide", group: "Elétrico" },
+  { id: "pilotoSimples", label: "Pneumático — piloto simples", group: "Pneumático" },
+  { id: "pilotoDuplo", label: "Pneumático — piloto duplo", group: "Pneumático" },
+  { id: "servoPilotoSimples", label: "Pneumático — servo-piloto simples", group: "Pneumático" },
+  { id: "servoPilotoDuplo", label: "Pneumático — servo-piloto duplo", group: "Pneumático" },
+  { id: "solenoideSimples", label: "Elétrico — solenoide simples", group: "Elétrico" },
+  { id: "solenoideDuplo", label: "Elétrico — solenoide duplo", group: "Elétrico" },
+  { id: "servoSolenoideDuploManual", label: "Combinado — duplo servo-solenoide com manual", group: "Combinado" },
 ];
 
-export const ACTUATION_GROUPS = ["Manual", "Mecânico", "Pneumático", "Elétrico"];
+export const ACTUATION_GROUPS = ["Manual", "Mecânico", "Pneumático", "Elétrico", "Combinado"];
 
 
 export interface Tube {
