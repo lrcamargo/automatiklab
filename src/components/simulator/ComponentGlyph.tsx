@@ -77,8 +77,8 @@ function ActuationSymbol({
     width: w,
     height: h,
   });
-  const wall = <path d={`M${p(1, -16)} L${p(1, 16)}`} className={cls} strokeWidth={1.8} />;
-  const stem = (to: number) => <path d={`M${p(1)} L${p(to)}`} className={cls} strokeWidth={1.8} />;
+  const wall = <path d={`M${p(1, -16)} L${p(1, 16)} M${p(1, -16)} L${p(8, -16)} M${p(1, 16)} L${p(8, 16)}`} className={cls} strokeWidth={1.8} />;
+  const stem = (from: number, to: number) => <path d={`M${p(from)} L${p(to)}`} className={cls} strokeWidth={1.8} />;
 
   const spring = (d0: number) => (
     <path
@@ -88,18 +88,13 @@ function ActuationSymbol({
     />
   );
 
-  const pilotBox = (d0: number) => {
-    const r = rectAt(d0, 26, 30);
-    const tipIn = px(d0);
-    const back = px(d0 + 18);
+  const pilot = (d0: number) => {
+    const tip = px(d0);
+    const back = px(d0 + 16);
     return (
       <g>
-        <rect {...r} className={soft} strokeWidth={1.8} />
-        <path
-          d={`M${back} ${y - 9} L${tipIn + dir * 8} ${y} L${back} ${y + 9} Z`}
-          className={filled}
-          strokeWidth={1.5}
-        />
+        <path d={`M${back} ${y - 8} L${tip} ${y} L${back} ${y + 8} Z`} className={soft} strokeWidth={1.6} />
+        <path d={`M${p(d0 + 16)} L${p(d0 + 23)}`} className={cls} strokeWidth={1.6} />
       </g>
     );
   };
@@ -110,23 +105,21 @@ function ActuationSymbol({
       <g>
         <rect {...r} className={soft} strokeWidth={1.8} />
         <path d={`M${p(d0 + 3, 12)} L${p(d0 + 23, -12)}`} className={cls} strokeWidth={1.8} />
-        <path d={`M${p(d0 + 9, 12)} L${p(d0 + 26, -8)}`} className={cls} strokeWidth={1.4} />
       </g>
     );
   };
 
-  const manualCap = (d0: number) => (
-    <path
-      d={`M${p(d0, -13)} L${p(d0 + 12, -13)} A 13 13 0 0 ${dir > 0 ? 1 : 0} ${p(d0 + 12, 13)} L${p(d0, 13)}`}
-      className={soft}
-      strokeWidth={1.8}
-    />
+  const roller = (d0: number, cy = y) => (
+    <g>
+      <circle cx={px(d0)} cy={cy} r={7} className={soft} strokeWidth={1.8} />
+      <circle cx={px(d0)} cy={cy} r={1.5} className={filled} strokeWidth={0} />
+    </g>
   );
 
-  const roller = (d0: number) => (
+  const manualOverride = (d0: number) => (
     <g>
-      <rect {...rectAt(d0, 12, 26)} className={soft} strokeWidth={1.7} />
-      <circle cx={px(d0 + 22)} cy={y} r={10} className={soft} strokeWidth={1.8} />
+      <path d={`M${p(d0, -10)} L${p(d0 + 18, -10)} M${p(d0, 10)} L${p(d0 + 18, 10)}`} className={cls} strokeWidth={1.5} />
+      <path d={`M${p(d0 + 5, -10)} L${p(d0 + 5, 10)} M${p(d0 + 13, -10)} L${p(d0 + 13, 10)}`} className={cls} strokeWidth={1.3} />
     </g>
   );
 
@@ -150,15 +143,16 @@ function ActuationSymbol({
       return (
         <g>
           {wall}
-          {stem(30)}
-          {manualCap(30)}
+          {stem(1, 34)}
+          <path d={`M${p(34, -11)} L${p(34, 11)}`} className={cls} strokeWidth={2.2} />
         </g>
       );
     case "alavanca":
       return (
         <g>
           {wall}
-          {stem(26)}
+          {stem(1, 24)}
+          <circle cx={px(24)} cy={y} r={3} className={soft} strokeWidth={1.5} />
           <path d={`M${p(26)} L${p(38, -26)}`} className={cls} strokeWidth={2.4} />
           <circle cx={px(40)} cy={y - 30} r={6} className={filled} strokeWidth={1.5} />
         </g>
@@ -167,64 +161,65 @@ function ActuationSymbol({
       return (
         <g>
           {wall}
-          {stem(24)}
-          <path d={`M${p(16, -16)} L${p(50, -6)}`} className={cls} strokeWidth={3} />
-          <path d={`M${p(24)} L${p(24, -12)}`} className={cls} strokeWidth={1.6} />
+          {stem(1, 22)}
+          <path d={`M${p(16, -14)} L${p(48, -7)}`} className={cls} strokeWidth={3} />
+          <path d={`M${p(22)} L${p(22, -12)}`} className={cls} strokeWidth={1.6} />
         </g>
       );
     case "came":
       return (
         <g>
           {wall}
-          {stem(28)}
-          <path
-            d={`M${p(28, -13)} L${p(38, -13)} A 13 13 0 0 ${dir > 0 ? 1 : 0} ${p(38, 13)} L${p(28, 13)} Z`}
-            className={soft}
-            strokeWidth={1.8}
-          />
+          {stem(1, 28)}
+          <path d={`M${p(28, -5)} H${px(47)}`} className={cls} strokeWidth={5} strokeLinecap="round" />
         </g>
       );
     case "rolete":
       return (
         <g>
           {wall}
-          {stem(22)}
-          {roller(22)}
+          {stem(1, 28)}
+          {roller(35)}
         </g>
       );
     case "roleteEscamoteavel":
       return (
         <g>
           {wall}
-          {stem(22)}
-          {roller(22)}
-          <path d={`M${p(20, 18)} L${p(46, 26)}`} className={cls} strokeWidth={1.8} />
+          {stem(1, 18)}
+          <path d={`M${p(18)} L${p(30, -13)} L${p(42, -13)}`} className={cls} strokeWidth={1.8} />
+          <circle cx={px(30)} cy={y - 13} r={3} className={soft} strokeWidth={1.5} />
+          {roller(49, y - 13)}
         </g>
       );
-    case "piloto":
-      return <g>{pilotBox(1)}</g>;
-    case "servoPiloto":
+    case "pilotoSimples":
+      return <g>{pilot(1)}</g>;
+    case "pilotoDuplo":
       return (
         <g>
-          {pilotBox(1)}
-          {spring(28)}
+          {pilot(1)}
+          {pilot(25)}
         </g>
       );
-    case "solenoide":
+    case "servoPilotoSimples":
+      return <g>{pilot(1)}{pilot(25)}</g>;
+    case "servoPilotoDuplo":
+      return <g>{pilot(1)}{pilot(25)}{pilot(49)}</g>;
+    case "solenoideSimples":
       return <g>{solenoidBox(1)}</g>;
-    case "solenoideManual":
+    case "solenoideDuplo":
       return (
         <g>
           {solenoidBox(1)}
-          {stem(1)}
-          {manualCap(30)}
+          {solenoidBox(28)}
         </g>
       );
-    case "servoSolenoide":
+    case "servoSolenoideDuploManual":
       return (
         <g>
-          {solenoidBox(1)}
-          {pilotBox(28)}
+          {manualOverride(1)}
+          {solenoidBox(20)}
+          {pilot(47)}
         </g>
       );
     case "botao":
@@ -232,10 +227,8 @@ function ActuationSymbol({
       return (
         <g>
           {wall}
-          {stem(26)}
-          <rect {...rectAt(26, 16, 24)} className={soft} strokeWidth={1.8} />
-          <path d={`M${p(42)} L${p(50)}`} className={cls} strokeWidth={1.8} />
-          <path d={`M${p(50, -14)} L${p(50, 14)}`} className={cls} strokeWidth={2.2} />
+          {stem(1, 30)}
+          <path d={`M${p(30, -12)} A12 12 0 0 ${dir > 0 ? 1 : 0} ${p(30, 12)}`} className={cls} strokeWidth={1.8} />
         </g>
       );
   }

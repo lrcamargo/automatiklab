@@ -1,4 +1,4 @@
-import { useRef, type PointerEvent } from "react";
+import { useLayoutEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import { CATALOG } from "@/lib/pneumatics/catalog";
 import type { Circuit, PlacedComponent, RuntimeState, SolveResult } from "@/lib/pneumatics/types";
 import { ComponentGlyph } from "./ComponentGlyph";
@@ -19,6 +19,8 @@ interface CanvasProps {
 }
 
 const GRID = 24;
+const WORLD_ORIGIN_X = 720;
+const WORLD_ORIGIN_Y = 360;
 const snap = (value: number) => Math.round(value / GRID) * GRID;
 const PORT_ROLE = {
   supply: "alimentação/pressão",
@@ -41,10 +43,26 @@ export function Canvas(props: CanvasProps) {
     onDropComponent,
   } = props;
   const areaRef = useRef<HTMLDivElement>(null);
+  const surfaceRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{ id: string; dx: number; dy: number; moved: boolean } | null>(null);
+  const panRef = useRef<{ pointerId: number; x: number; y: number; left: number; top: number } | null>(null);
+  const [panning, setPanning] = useState(false);
+  const worldSize = useMemo(() => ({
+    width: Math.max(2400, ...circuit.components.map((comp) => WORLD_ORIGIN_X + comp.x + CATALOG[comp.type].width + 720)),
+    height: Math.max(1400, ...circuit.components.map((comp) => WORLD_ORIGIN_Y + comp.y + CATALOG[comp.type].height + 420)),
+  }), [circuit.components]);
+
+  useLayoutEffect(() => {
+    const area = areaRef.current;
+    if (!area || area.dataset.panReady) return;
+    area.scrollLeft = WORLD_ORIGIN_X;
+    area.scrollTop = WORLD_ORIGIN_Y;
+    area.dataset.panReady = "true";
+  }, []);
 
   const startDrag = (event: PointerEvent, comp: PlacedComponent) => {
-    const rect = areaRef.current?.getBoundingClientRect();
+    if (event.button !== 0) return;
+    const rect = surfaceRef.current?.getBoundingClientRect();
     if (!rect) return;
     dragRef.current = {
       id: comp.id,
@@ -57,8 +75,15 @@ export function Canvas(props: CanvasProps) {
   };
 
   const handleMove = (event: PointerEvent) => {
+    const area = areaRef.current;
+    const pan = panRef.current;
+    if (area && pan) {
+      area.scrollLeft = pan.left - (event.clientX - pan.x);
+      area.scrollTop = pan.top - (event.clientY - pan.y);
+      return;
+    }
     const drag = dragRef.current;
-    const rect = areaRef.current?.getBoundingClientRect();
+    const rect = surfaceRef.current?.getBoundingClientRect();
     if (!drag || !rect) return;
     drag.moved = true;
     onMove(
@@ -71,6 +96,10 @@ export function Canvas(props: CanvasProps) {
   const movedRef = useRef(false);
 
   const endDrag = () => {
+    if (panRef.current) {
+      panRef.current = null;
+      setPanning(false);
+    }
     movedRef.current = !!dragRef.current?.moved;
     dragRef.current = null;
   };
@@ -92,22 +121,39 @@ export function Canvas(props: CanvasProps) {
   return (
     <div
       ref={areaRef}
+      onPointerDown={(event) => {
+        if (event.button !== 1 || !areaRef.current) return;
+        event.preventDefault();
+        panRef.current = {
+          pointerId: event.pointerId,
+          x: event.clientX,
+          y: event.clientY,
+          left: areaRef.current.scrollLeft,
+          top: areaRef.current.scrollTop,
+        };
+        setPanning(true);
+        areaRef.current.setPointerCapture(event.pointerId);
+      }}
       onPointerMove={handleMove}
       onPointerUp={endDrag}
+      onPointerCancel={endDrag}
       onPointerLeave={endDrag}
+      onAuxClick={(event) => event.preventDefault()}
       onClick={(event) => {
-        if (event.target === areaRef.current) onSelect(null);
+        if (event.target === areaRef.current || event.target === surfaceRef.current) onSelect(null);
       }}
       onDragOver={(event) => event.preventDefault()}
       onDrop={(event) => {
         event.preventDefault();
         const type = event.dataTransfer.getData("text/component");
-        const rect = areaRef.current?.getBoundingClientRect();
+        const rect = surfaceRef.current?.getBoundingClientRect();
         if (!type || !rect) return;
         onDropComponent(type, snap(event.clientX - rect.left - 60), snap(event.clientY - rect.top - 40));
       }}
-      className="grid-plate relative h-full min-h-[560px] w-full overflow-auto bg-background"
+      className={cn("relative h-full min-h-[560px] w-full overflow-auto bg-background", panning && "cursor-grabbing select-none")}
     >
+      <div ref={surfaceRef} className="grid-plate relative" style={{ width: worldSize.width, height: worldSize.height }}>
+      <div className="absolute" style={{ left: WORLD_ORIGIN_X, top: WORLD_ORIGIN_Y, width: worldSize.width - WORLD_ORIGIN_X, height: worldSize.height - WORLD_ORIGIN_Y }}>
       <svg className="pointer-events-none absolute inset-0 h-full w-full">
         {circuit.components
           .filter((comp) => (comp.type === "valve32" || comp.type === "valve52") && comp.actuatorId)
@@ -229,6 +275,8 @@ export function Canvas(props: CanvasProps) {
           </div>
         );
       })}
+      </div>
+      </div>
     </div>
   );
 }
