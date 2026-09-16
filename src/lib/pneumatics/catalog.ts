@@ -1,4 +1,18 @@
-import type { ComponentDef, ComponentType } from "./types";
+import type {
+  ActuationType,
+  ComponentDef,
+  ComponentType,
+  PlacedComponent,
+  PortDef,
+} from "./types";
+
+const pneumaticPort = (
+  id: string,
+  label: string,
+  x: number,
+  y: number,
+  kind: PortDef["kind"],
+): PortDef => ({ id, label, x, y, kind, domain: "pneumatic" });
 
 export const CATALOG: Record<ComponentType, ComponentDef> = {
   source: {
@@ -6,11 +20,11 @@ export const CATALOG: Record<ComponentType, ComponentDef> = {
     name: "Fonte de ar comprimido",
     short: "Fonte",
     description:
-      "Unidade de alimentação que fornece ar pressurizado ao circuito. Todo caminho de pressão parte daqui e deve entrar nas válvulas pela porta 1.",
+      "Unidade de alimentação que fornece ar pressurizado ao circuito. Todo caminho de pressão parte daqui.",
     family: "alimentacao",
     width: 150,
     height: 100,
-    ports: [{ id: "P", label: "1", x: 150, y: 42, kind: "supply" }],
+    ports: [pneumaticPort("P", "1", 150, 42, "supply")],
   },
   valve32: {
     type: "valve32",
@@ -22,9 +36,9 @@ export const CATALOG: Record<ComponentType, ComponentDef> = {
     width: 240,
     height: 129,
     ports: [
-      { id: "A", label: "2", x: 150, y: 0, kind: "work" },
-      { id: "P", label: "1", x: 136, y: 129, kind: "supply" },
-      { id: "R", label: "3", x: 166, y: 112, kind: "exhaust" },
+      pneumaticPort("A", "2", 150, 0, "work"),
+      pneumaticPort("P", "1", 136, 129, "supply"),
+      pneumaticPort("R", "3", 166, 112, "exhaust"),
     ],
   },
   valve52: {
@@ -37,14 +51,13 @@ export const CATALOG: Record<ComponentType, ComponentDef> = {
     width: 288,
     height: 129,
     ports: [
-      { id: "B", label: "4", x: 166, y: 0, kind: "work" },
-      { id: "A", label: "2", x: 210, y: 0, kind: "work" },
-      { id: "R2", label: "5", x: 158, y: 112, kind: "exhaust" },
-      { id: "P", label: "1", x: 186, y: 129, kind: "supply" },
-      { id: "R1", label: "3", x: 216, y: 112, kind: "exhaust" },
+      pneumaticPort("B", "4", 166, 0, "work"),
+      pneumaticPort("A", "2", 210, 0, "work"),
+      pneumaticPort("R2", "5", 158, 112, "exhaust"),
+      pneumaticPort("P", "1", 186, 129, "supply"),
+      pneumaticPort("R1", "3", 216, 112, "exhaust"),
     ],
   },
-
   cylinderSingle: {
     type: "cylinderSingle",
     name: "Cilindro de simples ação",
@@ -54,51 +67,102 @@ export const CATALOG: Record<ComponentType, ComponentDef> = {
     family: "atuacao",
     width: 242,
     height: 100,
-    ports: [{ id: "A", label: "2", x: 40, y: 100, kind: "work" }],
+    ports: [pneumaticPort("A", "2", 40, 100, "work")],
   },
   cylinderDouble: {
     type: "cylinderDouble",
     name: "Cilindro de dupla ação",
     short: "Dupla ação",
     description:
-      "Avança e recua por ar comprimido, com pressão alternada entre as câmaras 2 e 4.",
+      "Avança e recua por ar comprimido, com pressão alternada entre as duas câmaras.",
     family: "atuacao",
     width: 242,
     height: 100,
     ports: [
-      { id: "A", label: "2", x: 40, y: 100, kind: "work" },
-      { id: "B", label: "4", x: 168, y: 100, kind: "work" },
+      pneumaticPort("A", "2", 40, 100, "work"),
+      pneumaticPort("B", "4", 168, 100, "work"),
     ],
   },
   button: {
     type: "button",
-    name: "Botão de comando",
-    short: "Botão",
+    name: "Válvula 3/2 acionada por botão",
+    short: "Botão pneumático",
     description:
-      "Sinal de entrada do operador. Pode ser momentâneo (pulso) ou com trava (liga/desliga).",
+      "Válvula de sinal 3/2 normalmente fechada. Deve receber ar na porta 1 e enviar o sinal pneumático pela porta 2.",
     family: "sinal",
     width: 148,
     height: 110,
-    ports: [],
+    ports: [
+      pneumaticPort("A", "2", 78, 20, "work"),
+      pneumaticPort("P", "1", 68, 102, "supply"),
+      pneumaticPort("R", "3", 90, 92, "exhaust"),
+    ],
   },
   sensor: {
     type: "sensor",
-    name: "Sensor de fim de curso",
-    short: "Sensor",
+    name: "Válvula 3/2 de fim de curso",
+    short: "Fim de curso",
     description:
-      "Detecta o cilindro em posição avançada ou recuada e gera um sinal para acionar uma válvula.",
+      "Válvula de sinal 3/2 acionada mecanicamente pelo cilindro. Gera um sinal pneumático pela porta 2.",
     family: "sinal",
     width: 148,
-    height: 92,
-    ports: [],
+    height: 110,
+    ports: [
+      pneumaticPort("A", "2", 80, 20, "work"),
+      pneumaticPort("P", "1", 70, 102, "supply"),
+      pneumaticPort("R", "3", 92, 92, "exhaust"),
+    ],
   },
 };
+
+const PNEUMATIC_PILOTS = new Set<ActuationType>([
+  "pilotoSimples",
+  "pilotoDuplo",
+  "servoPilotoSimples",
+  "servoPilotoDuplo",
+]);
+
+export const hasPneumaticPilot = (type: ActuationType | undefined) =>
+  type !== undefined && PNEUMATIC_PILOTS.has(type);
+
+const pilotOffset = (type: ActuationType | undefined) => {
+  switch (type) {
+    case "pilotoDuplo":
+    case "servoPilotoSimples":
+      return 48;
+    case "servoPilotoDuplo":
+      return 72;
+    default:
+      return 24;
+  }
+};
+
+/** Retorna as portas visíveis e conectáveis conforme a configuração da válvula. */
+export function portsForComponent(comp: PlacedComponent): PortDef[] {
+  const ports = [...CATALOG[comp.type].ports];
+  if (comp.type !== "valve32" && comp.type !== "valve52") return ports;
+
+  if (hasPneumaticPilot(comp.actuation)) {
+    ports.push(
+      pneumaticPort("14", "14", 72 - pilotOffset(comp.actuation), 61, "control"),
+    );
+  }
+
+  if (hasPneumaticPilot(comp.returnType)) {
+    const rightEdge = comp.type === "valve32" ? 176 : 224;
+    ports.push(
+      pneumaticPort("12", "12", rightEdge + pilotOffset(comp.returnType), 61, "control"),
+    );
+  }
+
+  return ports;
+}
 
 export const FAMILIES: { id: ComponentDef["family"]; label: string }[] = [
   { id: "alimentacao", label: "Alimentação" },
   { id: "comando", label: "Comando" },
   { id: "atuacao", label: "Atuação" },
-  { id: "sinal", label: "Sinais" },
+  { id: "sinal", label: "Sinais pneumáticos" },
 ];
 
 export const CATALOG_LIST = Object.values(CATALOG);
