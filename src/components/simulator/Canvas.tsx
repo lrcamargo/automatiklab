@@ -1,7 +1,8 @@
-import { useLayoutEffect, useMemo, useRef, useState, type PointerEvent } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import { CATALOG, portsForComponent } from "@/lib/pneumatics/catalog";
 import type { Circuit, PlacedComponent, RuntimeState, SolveResult } from "@/lib/pneumatics/types";
 import { ComponentGlyph } from "./ComponentGlyph";
+import { X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface CanvasProps {
@@ -9,11 +10,15 @@ interface CanvasProps {
   runtime: RuntimeState;
   solved: SolveResult;
   selectedId: string | null;
+  selectedTubeId: string | null;
   pendingPort: { componentId: string; portId: string } | null;
   onSelect: (id: string | null) => void;
+  onSelectTube: (id: string | null) => void;
   onMove: (id: string, x: number, y: number) => void;
   onPortClick: (componentId: string, portId: string) => void;
   onActivate: (comp: PlacedComponent) => void;
+  onDeleteComponent: (id: string) => void;
+  onDeleteTube: (id: string) => void;
   blockedId: string | null;
   onDropComponent: (type: string, x: number, y: number) => void;
 }
@@ -35,11 +40,15 @@ export function Canvas(props: CanvasProps) {
     runtime,
     solved,
     selectedId,
+    selectedTubeId,
     pendingPort,
     onSelect,
+    onSelectTube,
     onMove,
     onPortClick,
     onActivate,
+    onDeleteComponent,
+    onDeleteTube,
     blockedId,
     onDropComponent,
   } = props;
@@ -91,6 +100,7 @@ export function Canvas(props: CanvasProps) {
       moved: false,
     };
     onSelect(comp.id);
+    onSelectTube(null);
     (event.target as Element).setPointerCapture?.(event.pointerId);
   };
 
@@ -130,6 +140,29 @@ export function Canvas(props: CanvasProps) {
     onActivate(comp);
   };
 
+  /** Delete/Backspace remove o que estiver selecionado, exceto ao digitar num campo. */
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Delete" && event.key !== "Backspace") return;
+      const target = event.target as HTMLElement | null;
+      if (
+        target?.isContentEditable ||
+        ["INPUT", "TEXTAREA", "SELECT"].includes(target?.tagName ?? "")
+      ) {
+        return;
+      }
+      if (selectedTubeId) {
+        event.preventDefault();
+        onDeleteTube(selectedTubeId);
+      } else if (selectedId) {
+        event.preventDefault();
+        onDeleteComponent(selectedId);
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [selectedId, selectedTubeId, onDeleteComponent, onDeleteTube]);
+
   const portPosition = (componentId: string, portId: string) => {
     const comp = circuit.components.find((c) => c.id === componentId);
     if (!comp) return null;
@@ -160,7 +193,10 @@ export function Canvas(props: CanvasProps) {
       onPointerLeave={endDrag}
       onAuxClick={(event) => event.preventDefault()}
       onClick={(event) => {
-        if (event.target === areaRef.current || event.target === surfaceRef.current) onSelect(null);
+        if (event.target === areaRef.current || event.target === surfaceRef.current) {
+          onSelect(null);
+          onSelectTube(null);
+        }
       }}
       onDragOver={(event) => event.preventDefault()}
       onDrop={(event) => {
@@ -206,6 +242,7 @@ export function Canvas(props: CanvasProps) {
                 solved.conflicts.has(`${tube.to.componentId}:${tube.to.portId}`);
               const middleY = a.y + (b.y - a.y) / 2;
               const path = `M${a.x} ${a.y} V${middleY} H${b.x} V${b.y}`;
+              const isSelected = selectedTubeId === tube.id;
               return (
                 <g key={tube.id}>
                   <defs>
@@ -220,16 +257,39 @@ export function Canvas(props: CanvasProps) {
                       <path d="M0 0 L7 3.5 L0 7 Z" className="fill-air" />
                     </marker>
                   </defs>
+                   {/* faixa invisível e larga: alvo de clique confortável na linha */}
                   <path
                     d={path}
-                    className="fill-none stroke-air-dim"
+                    className="pointer-events-auto cursor-pointer fill-none stroke-transparent"
+                    strokeWidth={16}
+                    strokeLinejoin="round"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      onSelectTube(tube.id);
+                      onSelect(null);
+                    }}
+                  >
+                    <title>Mangueira — clique para selecionar e remover</title>
+                  </path>
+                  {isSelected && (
+                    <path
+                      d={path}
+                      className="pointer-events-none fill-none stroke-primary"
+                      strokeWidth={9}
+                      strokeLinejoin="round"
+                      opacity={0.35}
+                    />
+                  )}
+                  <path
+                    d={path}
+                    className="pointer-events-none fill-none stroke-air-dim"
                     strokeWidth={5}
                     strokeLinejoin="round"
                   />
                   <path
                     d={path}
                     className={cn(
-                      "fill-none",
+                      "pointer-events-none fill-none"
                       conflicted ? "stroke-destructive" : charged ? "stroke-air" : "stroke-muted",
                     )}
                     strokeWidth={3}
@@ -252,6 +312,30 @@ export function Canvas(props: CanvasProps) {
             })}
           </svg>
 
+          {(() => {
+            const tube = circuit.tubes.find((item) => item.id === selectedTubeId);
+            if (!tube) return null;
+            const a = portPosition(tube.from.componentId, tube.from.portId);
+            const b = portPosition(tube.to.componentId, tube.to.portId);
+            if (!a || !b) return null;
+            const midX = b.x;
+            const midY = a.y + (b.y - a.y) / 2;
+            return (
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onDeleteTube(tube.id);
+                }}
+                title="Remover esta mangueira (Delete)"
+                aria-label="Remover esta mangueira"
+                style={{ left: midX - 11, top: midY - 11 }}
+                className="absolute z-10 flex size-[22px] items-center justify-center rounded-full border border-destructive bg-background text-destructive shadow-sm transition-colors hover:bg-destructive hover:text-background"
+              >
+                <X className="size-3.5" />
+              </button>
+            );
+          })()}
           {circuit.components.map((comp) => {
             const def = CATALOG[comp.type];
             const isSignal = comp.type === "button";
@@ -273,6 +357,22 @@ export function Canvas(props: CanvasProps) {
                     "animate-pulse drop-shadow-[0_0_8px_var(--color-destructive)]",
                 )}
               >
+                {selectedId === comp.id && (
+                  <button
+                    type="button"
+                    onPointerDown={(event) => event.stopPropagation()}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      onDeleteComponent(comp.id);
+                    }}
+                    title={`Remover ${comp.label} (Delete)`}
+                    aria-label={`Remover ${comp.label}`}
+                    className="absolute -right-2 -top-2 z-10 flex size-[22px] items-center justify-center rounded-full border border-destructive bg-background text-destructive shadow-sm transition-colors hover:bg-destructive hover:text-background"
+                  >
+                    <X className="size-3.5" />
+                  </button>
+                )}
+
                 <div
                   onPointerDown={(event) => startDrag(event, comp)}
                   onClick={() => handleGlyphClick(comp)}

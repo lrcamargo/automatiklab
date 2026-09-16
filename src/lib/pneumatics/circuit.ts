@@ -71,6 +71,31 @@ export function validateConnection(
   return { valid: true, medium: source.port.domain };
 }
 
+/** Remove um componente e, junto, toda mangueira ligada a ele. */
+export function removeComponent(circuit: Circuit, componentId: string): Circuit {
+  return {
+    components: circuit.components.filter((component) => component.id !== componentId),
+    tubes: circuit.tubes.filter(
+      (tube) => tube.from.componentId !== componentId && tube.to.componentId !== componentId,
+    ),
+  };
+}
+
+/** Remove uma única mangueira, preservando os componentes. */
+export function removeTube(circuit: Circuit, tubeId: string): Circuit {
+  return {
+    ...circuit,
+    tubes: circuit.tubes.filter((tube) => tube.id !== tubeId),
+  };
+}
+
+/** Quantidade de mangueiras conectadas a um componente. */
+export function countAttachedTubes(circuit: Circuit, componentId: string): number {
+  return circuit.tubes.filter(
+    (tube) => tube.from.componentId === componentId || tube.to.componentId === componentId,
+  ).length;
+}
+
 /** Remove linhas órfãs quando uma porta configurável deixa de existir. */
 export function sanitizeCircuit(circuit: Circuit): Circuit {
   const tubes = circuit.tubes.filter(
