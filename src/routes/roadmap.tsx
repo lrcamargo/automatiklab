@@ -25,24 +25,26 @@ export const Route = createFileRoute("/roadmap")({
 
 const DONE = [
   "Bancada com grade, arrastar e soltar e seleção de componentes",
-  "Catálogo com fonte de ar, válvulas 3/2 e 5/2, cilindros de simples e dupla ação, botão e fim de curso",
-  "Conexão de mangueiras porta a porta, com destaque das linhas pressurizadas",
-  "Motor de simulação com propagação de pressão, escapes e movimento contínuo do cilindro",
-  "Painel de propriedades: identificação, acionamento, modo do botão e velocidade de curso",
-  "Dois circuitos de exemplo prontos para estudo",
+  "Catálogo com fonte de ar, válvulas 3/2 e 5/2, cilindros de simples e dupla ação, botão pneumático e fim de curso",
+  "Botões e fins de curso 3/2 com portas pneumáticas reais 1, 2 e 3",
+  "Pilotagem conectável pelas portas 14 e 12, inclusive com memória para duplo piloto",
+  "Propagação topológica de pressão e escape, movimento do cilindro e detecção de ligação direta à atmosfera",
+  "Validação de conexões duplicadas, remoção de mangueiras e identificações técnicas únicas por família",
+  "Dois circuitos de exemplo e testes automatizados do núcleo pneumático",
 ];
 
 const PREPARED = [
   "Salvar projeto e Meus projetos: botões visíveis na barra da bancada, ainda desabilitados por não haver persistência",
-  "Sensores hoje geram sinal a partir da posição do cilindro, mas ainda não há lógica combinacional entre sinais",
+  "Símbolos de solenoide disponíveis, ainda sem portas elétricas ou energização",
 ];
 
 const NEXT = [
-  "Persistência de circuitos e contas de usuário",
-  "Reguladores de fluxo, temporizadores e válvulas de duplo piloto",
-  "Diagrama trajeto-passo sincronizado com a simulação",
-  "Exercícios guiados com verificação automática",
-  "Base eletropneumática e integração com lógica de comando",
+  "Junções em T e edição manual do trajeto das linhas",
+  "Reguladores de fluxo, temporizadores, válvulas lógicas e instrumentos de medição",
+  "Modelo físico de pressão, vazão, força, carga, área do êmbolo e perdas",
+  "Persistência local de circuitos e, posteriormente, contas de usuário",
+  "Exercícios guiados com verificação automática e modo de falhas",
+  "Base eletropneumática e integração futura com lógica de CLP",
 ];
 
 function Section({ title, items, tone }: { title: string; items: string[]; tone: string }) {
@@ -68,15 +70,23 @@ function RoadmapPage() {
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-14">
         <h1 className="text-3xl font-bold">Roadmap e expansão</h1>
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-          Esta página descreve exatamente o que existe hoje e o que ainda não existe. Nada
-          listado em &quot;direções de evolução&quot; está disponível na plataforma, e não há
-          datas comprometidas.
+          Esta página descreve exatamente o que existe hoje e o que ainda não existe. Nada listado
+          em &quot;direções de evolução&quot; está disponível na plataforma, e não há datas
+          comprometidas.
         </p>
 
         <div className="mt-8 grid gap-4">
           <Section title="Disponível agora" items={DONE} tone="text-[var(--color-signal)]" />
-          <Section title="Presente na interface, ainda sem função" items={PREPARED} tone="text-primary" />
-          <Section title="Direções de evolução (não implementado)" items={NEXT} tone="text-muted-foreground" />
+          <Section
+            title="Presente na interface, ainda sem função"
+            items={PREPARED}
+            tone="text-primary"
+          />
+          <Section
+            title="Direções de evolução (não implementado)"
+            items={NEXT}
+            tone="text-muted-foreground"
+          />
         </div>
       </main>
       <SiteFooter />

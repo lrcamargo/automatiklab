@@ -39,15 +39,15 @@ const STEPS = [
   {
     icon: MousePointerClick,
     title: "3. Acione e observe",
-    text: "Botões momentâneos ou com trava comutam as válvulas; o cilindro avança e recua conforme a pressão em cada câmara.",
+    text: "Válvulas de botão enviam ar pela porta 2 aos pilotos 14 ou 12; o cilindro responde à posição realmente comandada.",
   },
 ];
 
 const HIGHLIGHTS = [
   {
     icon: Wind,
-    title: "Pneumática de verdade no centro",
-    text: "O motor de simulação propaga pressão pelo grafo de portas, respeitando posições de válvula e escapes.",
+    title: "Topologia pneumática no centro",
+    text: "O motor propaga pressão por portas e pilotos conectados, respeita escapes e sinaliza alimentação ligada à atmosfera.",
   },
   {
     icon: CircuitBoard,
@@ -78,9 +78,9 @@ function Home() {
                 Aprenda pneumática montando o circuito, não decorando o diagrama.
               </h1>
               <p className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground">
-                O AutoMatikLab é uma bancada de simulação para ensino técnico. Você posiciona
-                os componentes em uma grade, conecta as mangueiras entre as portas e vê o ar
-                percorrer o circuito enquanto o cilindro se move.
+                O AutoMatikLab é uma bancada de simulação para ensino técnico. Você posiciona os
+                componentes em uma grade, conecta as mangueiras entre as portas e vê o ar percorrer
+                o circuito enquanto o cilindro se move.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link
@@ -141,7 +141,10 @@ function Home() {
             <h2 className="text-2xl font-bold">O que já está pronto</h2>
             <div className="mt-8 grid gap-4 md:grid-cols-3">
               {HIGHLIGHTS.map((item) => (
-                <article key={item.title} className="rounded-md border border-border bg-background p-5">
+                <article
+                  key={item.title}
+                  className="rounded-md border border-border bg-background p-5"
+                >
                   <item.icon className="size-5 text-primary" />
                   <h3 className="mt-3 text-base font-semibold">{item.title}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{item.text}</p>

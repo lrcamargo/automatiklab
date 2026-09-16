@@ -1,0 +1,80 @@
+import { portsForComponent } from "./catalog";
+import type { Circuit, ComponentType, PlacedComponent, Tube } from "./types";
+
+export interface PortEndpoint {
+  componentId: string;
+  portId: string;
+}
+
+export type ConnectionValidation =
+  { valid: true; medium: Tube["medium"] } | { valid: false; message: string };
+
+const TECHNICAL_PREFIX: Record<ComponentType, string> = {
+  source: "1P",
+  valve32: "1V",
+  valve52: "1V",
+  cylinderSingle: "1A",
+  cylinderDouble: "1A",
+  button: "1S",
+  sensor: "1S",
+};
+
+export function nextTechnicalLabel(type: ComponentType, components: PlacedComponent[]) {
+  const prefix = TECHNICAL_PREFIX[type];
+  const expression = new RegExp(`^${prefix}(\\d+)$`, "i");
+  const greatest = components.reduce((maximum, component) => {
+    const match = expression.exec(component.label.trim());
+    const value = match?.[1] ? Number(match[1]) : 0;
+    return Math.max(maximum, value);
+  }, 0);
+  return `${prefix}${greatest + 1}`;
+}
+
+export function getPort(circuit: Circuit, endpoint: PortEndpoint) {
+  const component = circuit.components.find((item) => item.id === endpoint.componentId);
+  if (!component) return null;
+  const port = portsForComponent(component).find((item) => item.id === endpoint.portId);
+  return port ? { component, port } : null;
+}
+
+const sameEndpoint = (a: PortEndpoint, b: PortEndpoint) =>
+  a.componentId === b.componentId && a.portId === b.portId;
+
+export function validateConnection(
+  circuit: Circuit,
+  from: PortEndpoint,
+  to: PortEndpoint,
+): ConnectionValidation {
+  if (sameEndpoint(from, to)) {
+    return { valid: false, message: "Selecione uma porta de destino diferente." };
+  }
+
+  const source = getPort(circuit, from);
+  const destination = getPort(circuit, to);
+  if (!source || !destination) {
+    return { valid: false, message: "Uma das portas não existe na configuração atual." };
+  }
+
+  if (source.port.domain !== destination.port.domain) {
+    return { valid: false, message: "As portas pertencem a domínios incompatíveis." };
+  }
+
+  const duplicate = circuit.tubes.some(
+    (tube) =>
+      (sameEndpoint(tube.from, from) && sameEndpoint(tube.to, to)) ||
+      (sameEndpoint(tube.from, to) && sameEndpoint(tube.to, from)),
+  );
+  if (duplicate) {
+    return { valid: false, message: "Estas portas já estão conectadas." };
+  }
+
+  return { valid: true, medium: source.port.domain };
+}
+
+/** Remove linhas órfãs quando uma porta configurável deixa de existir. */
+export function sanitizeCircuit(circuit: Circuit): Circuit {
+  const tubes = circuit.tubes.filter(
+    (tube) => getPort(circuit, tube.from) !== null && getPort(circuit, tube.to) !== null,
+  );
+  return tubes.length === circuit.tubes.length ? circuit : { ...circuit, tubes };
+}

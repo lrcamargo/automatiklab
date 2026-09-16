@@ -6,8 +6,8 @@ export function SiteFooter() {
           AutoMatikLab — laboratório virtual de automação
         </p>
         <p className="text-xs">
-          Projeto educacional independente. Simulação simplificada, sem substituir normas
-          técnicas ou bancadas reais.
+          Projeto educacional independente. Simulação simplificada, sem substituir normas técnicas
+          ou bancadas reais.
         </p>
       </div>
     </footer>

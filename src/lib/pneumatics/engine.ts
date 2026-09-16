@@ -1,135 +1,195 @@
-import { CATALOG } from "./catalog";
+import { hasPneumaticPilot } from "./catalog";
 import { portKey, type Circuit, type RuntimeState, type SolveResult } from "./types";
 
+type Adjacency = Map<string, string[]>;
+
+interface NetworkState {
+  pressurized: Set<string>;
+  vented: Set<string>;
+  conflicts: Set<string>;
+}
+
+const isMainValve = (type: Circuit["components"][number]["type"]) =>
+  type === "valve32" || type === "valve52";
+
+const link = (adjacency: Adjacency, a: string, b: string) => {
+  if (!adjacency.has(a)) adjacency.set(a, []);
+  if (!adjacency.has(b)) adjacency.set(b, []);
+  adjacency.get(a)!.push(b);
+  adjacency.get(b)!.push(a);
+};
+
+const walk = (adjacency: Adjacency, starts: Iterable<string>) => {
+  const visited = new Set<string>();
+  const queue = [...starts];
+  let index = 0;
+
+  while (index < queue.length) {
+    const node = queue[index++];
+    if (node === undefined || visited.has(node)) continue;
+    visited.add(node);
+    for (const neighbor of adjacency.get(node) ?? []) {
+      if (!visited.has(neighbor)) queue.push(neighbor);
+    }
+  }
+
+  return visited;
+};
+
+const sensorActive = (comp: Circuit["components"][number], runtime: RuntimeState) => {
+  if (comp.type !== "sensor") return false;
+  const stroke = runtime.strokes[comp.targetId ?? ""] ?? 0;
+  return comp.trigger === "retracted" ? stroke <= 0.02 : stroke >= 0.98;
+};
+
 /**
- * Resolve o estado pneumático do circuito.
- *
- * Modelo intencionalmente simplificado (adequado a fins didáticos):
- * a pressão se propaga por condutividade a partir das fontes, atravessando
- * tubos e os caminhos internos das válvulas conforme sua posição atual.
+ * Monta o grafo fluídico para uma posição definida das válvulas e resolve
+ * alimentação, escape e conflitos. As linhas são ideais nesta etapa: não há
+ * perda de carga nem cálculo de vazão.
  */
-export function solveCircuit(circuit: Circuit, runtime: RuntimeState): SolveResult {
-  const actuated: Record<string, boolean> = {};
-
-  for (const comp of circuit.components) {
-    if (comp.type !== "valve32" && comp.type !== "valve52") continue;
-    // acionamento manual direto no símbolo da válvula (clique na bancada)
-    const manual = !!runtime.signals[comp.id];
-    const actuator = circuit.components.find((c) => c.id === comp.actuatorId);
-    let fromActuator = false;
-    if (actuator?.type === "button") {
-      fromActuator = !!runtime.signals[actuator.id];
-    } else if (actuator?.type === "sensor") {
-      const stroke = runtime.strokes[actuator.targetId ?? ""] ?? 0;
-      fromActuator = actuator.trigger === "retracted" ? stroke <= 0.02 : stroke >= 0.98;
-    }
-    // o clique manual comuta a posição em relação ao acionamento do circuito
-    actuated[comp.id] = manual !== fromActuator;
-  }
-
-
-  // grafo de portas (arestas externas = mangueiras, internas = caminhos da válvula)
-  type Edge = { to: string; external: boolean };
-  const adjacency = new Map<string, Edge[]>();
-  const link = (a: string, b: string, external = false) => {
-    if (!adjacency.has(a)) adjacency.set(a, []);
-    if (!adjacency.has(b)) adjacency.set(b, []);
-    adjacency.get(a)!.push({ to: b, external });
-    adjacency.get(b)!.push({ to: a, external });
-  };
-
-  /** válvulas só aceitam alimentação externa pela porta 1 (P) */
-  const valvePorts = new Map<string, string>(); // portKey -> portId, apenas válvulas
-  for (const comp of circuit.components) {
-    if (comp.type !== "valve32" && comp.type !== "valve52") continue;
-    for (const port of CATALOG[comp.type].ports) {
-      valvePorts.set(portKey(comp.id, port.id), port.id);
-    }
-  }
-  const acceptsSupply = (node: string) => {
-    const portId = valvePorts.get(node);
-    return portId === undefined || portId === "P";
-  };
+function solveNetwork(
+  circuit: Circuit,
+  runtime: RuntimeState,
+  actuated: Record<string, boolean>,
+): NetworkState {
+  const adjacency: Adjacency = new Map();
+  const sources = new Set<string>();
+  const exhausts = new Set<string>();
 
   for (const tube of circuit.tubes) {
     link(
+      adjacency,
       portKey(tube.from.componentId, tube.from.portId),
       portKey(tube.to.componentId, tube.to.portId),
-      true,
     );
   }
 
-
-  const sources: string[] = [];
-  const vented = new Set<string>();
-
   for (const comp of circuit.components) {
-    const k = (port: string) => portKey(comp.id, port);
+    const key = (port: string) => portKey(comp.id, port);
+
     switch (comp.type) {
       case "source":
-        // pressão zero = fonte fechada, não alimenta o circuito
-        if ((comp.pressure ?? 6) > 0) sources.push(k("P"));
+        if ((comp.pressure ?? 6) > 0) sources.add(key("P"));
         break;
+
+      case "button":
+      case "sensor": {
+        const active =
+          comp.type === "button" ? !!runtime.signals[comp.id] : sensorActive(comp, runtime);
+        exhausts.add(key("R"));
+        if (active) link(adjacency, key("P"), key("A"));
+        else link(adjacency, key("A"), key("R"));
+        break;
+      }
+
       case "valve32":
-        if (actuated[comp.id]) {
-          link(k("P"), k("A"));
-          vented.add(k("R"));
-        } else {
-          link(k("A"), k("R"));
-          vented.add(k("A"));
-          vented.add(k("R"));
-        }
+        exhausts.add(key("R"));
+        if (actuated[comp.id]) link(adjacency, key("P"), key("A"));
+        else link(adjacency, key("A"), key("R"));
         break;
+
       case "valve52":
+        exhausts.add(key("R1"));
+        exhausts.add(key("R2"));
         if (actuated[comp.id]) {
-          // posição acionada normalizada: 1 → 4 e 2 → 3
-          link(k("P"), k("B"));
-          link(k("A"), k("R1"));
-          vented.add(k("A"));
-          vented.add(k("R1"));
-          vented.add(k("R2"));
+          // posição acionada: 1 → 4 e 2 → 3
+          link(adjacency, key("P"), key("B"));
+          link(adjacency, key("A"), key("R1"));
         } else {
-          // posição de repouso normalizada: 1 → 2 e 4 → 5
-          link(k("P"), k("A"));
-          link(k("B"), k("R2"));
-          vented.add(k("B"));
-          vented.add(k("R1"));
-          vented.add(k("R2"));
+          // posição de repouso: 1 → 2 e 4 → 5
+          link(adjacency, key("P"), key("A"));
+          link(adjacency, key("B"), key("R2"));
         }
         break;
+
       default:
         break;
     }
   }
 
-  const pressurized = new Set<string>();
-  const queue = [...sources];
-  while (queue.length) {
-    const node = queue.shift()!;
-    if (pressurized.has(node)) continue;
-    pressurized.add(node);
-    for (const edge of adjacency.get(node) ?? []) {
-      // uma mangueira só entrega pressão a uma válvula pela porta 1 (P);
-      // ligar a fonte em 2, 3, 4 ou 5 não gera pressão útil no circuito
-      if (edge.external && !acceptsSupply(edge.to)) continue;
-      if (!pressurized.has(edge.to)) queue.push(edge.to);
+  const supplied = walk(adjacency, sources);
+  const vented = walk(adjacency, exhausts);
+  const conflicts = new Set([...supplied].filter((node) => vented.has(node)));
+  const pressurized = new Set([...supplied].filter((node) => !vented.has(node)));
+
+  return { pressurized, vented, conflicts };
+}
+
+function nextValvePositions(
+  circuit: Circuit,
+  runtime: RuntimeState,
+  network: NetworkState,
+  previous: Record<string, boolean>,
+) {
+  const next: Record<string, boolean> = {};
+
+  for (const comp of circuit.components) {
+    if (!isMainValve(comp.type)) continue;
+
+    const last = previous[comp.id] ?? runtime.valvePositions[comp.id] ?? false;
+    const manualOverride = !!runtime.signals[comp.id];
+    const pilot14 =
+      hasPneumaticPilot(comp.actuation) && network.pressurized.has(portKey(comp.id, "14"));
+    const pilot12 =
+      hasPneumaticPilot(comp.returnType) && network.pressurized.has(portKey(comp.id, "12"));
+
+    if ((manualOverride || pilot14) && !pilot12) {
+      next[comp.id] = true;
+    } else if (pilot12 && !manualOverride && !pilot14) {
+      next[comp.id] = false;
+    } else if ((manualOverride || pilot14) && pilot12) {
+      // Dois comandos simultâneos não escolhem uma nova posição.
+      next[comp.id] = last;
+    } else if (comp.returnType === "mola" || comp.returnType === "centragemMolas") {
+      next[comp.id] = false;
+    } else if (comp.actuation === "mola" || comp.actuation === "centragemMolas") {
+      next[comp.id] = true;
+    } else if (hasPneumaticPilot(comp.actuation) || hasPneumaticPilot(comp.returnType)) {
+      // Duplo piloto: conserva a última posição quando nenhum piloto está ativo.
+      next[comp.id] = last;
+    } else {
+      // Acionamentos diretos continuam disponíveis para interação na bancada.
+      next[comp.id] = manualOverride;
     }
   }
 
-  // portas ligadas ao escape não retêm pressão
-  const ventedQueue = [...vented];
-  const ventedAll = new Set<string>();
-  while (ventedQueue.length) {
-    const node = ventedQueue.shift()!;
-    if (ventedAll.has(node)) continue;
-    ventedAll.add(node);
-    for (const edge of adjacency.get(node) ?? []) {
-      if (!ventedAll.has(edge.to) && !pressurized.has(edge.to)) ventedQueue.push(edge.to);
+  return next;
+}
+
+const samePositions = (a: Record<string, boolean>, b: Record<string, boolean>) => {
+  const keys = new Set([...Object.keys(a), ...Object.keys(b)]);
+  return [...keys].every((key) => !!a[key] === !!b[key]);
+};
+
+/**
+ * Resolve o estado pneumático do circuito.
+ *
+ * O algoritmo itera entre a propagação de ar e a posição das válvulas para que
+ * um sinal conectado à porta piloto 14/12 possa comutar outra válvula. O modelo
+ * é topológico e determinístico; pressão e vazão quantitativas ficam para a
+ * futura camada física.
+ */
+export function solveCircuit(circuit: Circuit, runtime: RuntimeState): SolveResult {
+  let actuated: Record<string, boolean> = {};
+  for (const comp of circuit.components) {
+    if (isMainValve(comp.type)) {
+      actuated[comp.id] = runtime.valvePositions[comp.id] ?? false;
     }
   }
 
+  let network = solveNetwork(circuit, runtime, actuated);
+  const maxIterations = Math.max(4, circuit.components.length * 2);
 
-  return { pressurized, actuated };
+  for (let iteration = 0; iteration < maxIterations; iteration += 1) {
+    const next = nextValvePositions(circuit, runtime, network, actuated);
+    if (samePositions(actuated, next)) break;
+    actuated = next;
+    network = solveNetwork(circuit, runtime, actuated);
+  }
+
+  // Garante que o grafo devolvido corresponda à última posição calculada.
+  network = solveNetwork(circuit, runtime, actuated);
+  return { ...network, actuated };
 }
 
 /** avança a posição dos cilindros com base nas pressões calculadas */
@@ -169,10 +229,5 @@ export function strokeDirection(
   return 0;
 }
 
-
 export const clamp = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, value));
-
-export function portsOf(type: keyof typeof CATALOG) {
-  return CATALOG[type].ports;
-}
