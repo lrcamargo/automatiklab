@@ -1,5 +1,5 @@
 import { useLayoutEffect, useMemo, useRef, useState, type PointerEvent } from "react";
-import { CATALOG } from "@/lib/pneumatics/catalog";
+import { CATALOG, portsForComponent } from "@/lib/pneumatics/catalog";
 import type { Circuit, PlacedComponent, RuntimeState, SolveResult } from "@/lib/pneumatics/types";
 import { ComponentGlyph } from "./ComponentGlyph";
 import { cn } from "@/lib/utils";
@@ -26,6 +26,7 @@ const PORT_ROLE = {
   supply: "alimentação/pressão",
   work: "trabalho/saída",
   exhaust: "exaustão",
+  control: "pilotagem pneumática",
 } as const;
 
 export function Canvas(props: CanvasProps) {
@@ -45,19 +46,38 @@ export function Canvas(props: CanvasProps) {
   const areaRef = useRef<HTMLDivElement>(null);
   const surfaceRef = useRef<HTMLDivElement>(null);
   const dragRef = useRef<{ id: string; dx: number; dy: number; moved: boolean } | null>(null);
-  const panRef = useRef<{ pointerId: number; x: number; y: number; left: number; top: number } | null>(null);
+  const panRef = useRef<{
+    pointerId: number;
+    x: number;
+    y: number;
+    left: number;
+    top: number;
+  } | null>(null);
   const [panning, setPanning] = useState(false);
-  const worldSize = useMemo(() => ({
-    width: Math.max(2400, ...circuit.components.map((comp) => WORLD_ORIGIN_X + comp.x + CATALOG[comp.type].width + 720)),
-    height: Math.max(1400, ...circuit.components.map((comp) => WORLD_ORIGIN_Y + comp.y + CATALOG[comp.type].height + 420)),
-  }), [circuit.components]);
+  const worldSize = useMemo(
+    () => ({
+      width: Math.max(
+        2400,
+        ...circuit.components.map(
+          (comp) => WORLD_ORIGIN_X + comp.x + CATALOG[comp.type].width + 720,
+        ),
+      ),
+      height: Math.max(
+        1400,
+        ...circuit.components.map(
+          (comp) => WORLD_ORIGIN_Y + comp.y + CATALOG[comp.type].height + 420,
+        ),
+      ),
+    }),
+    [circuit.components],
+  );
 
   useLayoutEffect(() => {
     const area = areaRef.current;
-    if (!area || area.dataset.panReady) return;
+    if (!area || area.dataset["panReady"]) return;
     area.scrollLeft = WORLD_ORIGIN_X;
     area.scrollTop = WORLD_ORIGIN_Y;
-    area.dataset.panReady = "true";
+    area.dataset["panReady"] = "true";
   }, []);
 
   const startDrag = (event: PointerEvent, comp: PlacedComponent) => {
@@ -113,7 +133,7 @@ export function Canvas(props: CanvasProps) {
   const portPosition = (componentId: string, portId: string) => {
     const comp = circuit.components.find((c) => c.id === componentId);
     if (!comp) return null;
-    const port = CATALOG[comp.type].ports.find((p) => p.id === portId);
+    const port = portsForComponent(comp).find((item) => item.id === portId);
     if (!port) return null;
     return { x: comp.x + port.x, y: comp.y + port.y };
   };
@@ -148,134 +168,159 @@ export function Canvas(props: CanvasProps) {
         const type = event.dataTransfer.getData("text/component");
         const rect = surfaceRef.current?.getBoundingClientRect();
         if (!type || !rect) return;
-        onDropComponent(type, snap(event.clientX - rect.left - 60), snap(event.clientY - rect.top - 40));
+        onDropComponent(
+          type,
+          snap(event.clientX - rect.left - WORLD_ORIGIN_X - 60),
+          snap(event.clientY - rect.top - WORLD_ORIGIN_Y - 40),
+        );
       }}
-      className={cn("relative h-full min-h-[560px] w-full overflow-auto bg-background", panning && "cursor-grabbing select-none")}
+      className={cn(
+        "relative h-full min-h-[560px] w-full overflow-auto bg-background",
+        panning && "cursor-grabbing select-none",
+      )}
     >
-      <div ref={surfaceRef} className="grid-plate relative" style={{ width: worldSize.width, height: worldSize.height }}>
-      <div className="absolute" style={{ left: WORLD_ORIGIN_X, top: WORLD_ORIGIN_Y, width: worldSize.width - WORLD_ORIGIN_X, height: worldSize.height - WORLD_ORIGIN_Y }}>
-      <svg className="pointer-events-none absolute inset-0 h-full w-full">
-        {circuit.components
-          .filter((comp) => (comp.type === "valve32" || comp.type === "valve52") && comp.actuatorId)
-          .map((valve) => {
-            const actuator = circuit.components.find((comp) => comp.id === valve.actuatorId);
-            if (!actuator) return null;
-            const actuatorDef = CATALOG[actuator.type];
-            const y1 = actuator.y + actuatorDef.height / 2;
-            const y2 = valve.y + CATALOG[valve.type].height / 2;
-            const x1 = actuator.x + actuatorDef.width;
-            const x2 = valve.x + 8;
-            const middleX = x1 + (x2 - x1) / 2;
-            return (
-              <path
-                key={`pilot-${valve.id}`}
-                d={`M${x1} ${y1} H${middleX} V${y2} H${x2}`}
-                className="fill-none stroke-signal"
-                strokeWidth={1.5}
-                strokeDasharray="5 5"
-              />
-            );
-          })}
-        {circuit.tubes.map((tube) => {
-          const a = portPosition(tube.from.componentId, tube.from.portId);
-          const b = portPosition(tube.to.componentId, tube.to.portId);
-          if (!a || !b) return null;
-          const charged =
-            solved.pressurized.has(`${tube.from.componentId}:${tube.from.portId}`) ||
-            solved.pressurized.has(`${tube.to.componentId}:${tube.to.portId}`);
-          const middleY = a.y + (b.y - a.y) / 2;
-          const path = `M${a.x} ${a.y} V${middleY} H${b.x} V${b.y}`;
-          return (
-            <g key={tube.id}>
-              <defs>
-                <marker id={`flow-${tube.id}`} markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
-                  <path d="M0 0 L7 3.5 L0 7 Z" className="fill-air" />
-                </marker>
-              </defs>
-              <path d={path} className="fill-none stroke-air-dim" strokeWidth={5} strokeLinejoin="round" />
-              <path
-                d={path}
-                className={cn("fill-none", charged ? "stroke-air" : "stroke-muted")}
-                strokeWidth={3}
-                strokeLinejoin="round"
-                strokeDasharray={charged ? "10 8" : undefined}
-                markerEnd={charged ? `url(#flow-${tube.id})` : undefined}
-              >
-                {charged && (
-                  <animate attributeName="stroke-dashoffset" from="18" to="0" dur="0.6s" repeatCount="indefinite" />
-                )}
-              </path>
-            </g>
-          );
-        })}
-      </svg>
-
-      {circuit.components.map((comp) => {
-        const def = CATALOG[comp.type];
-        const isSignal = comp.type === "button";
-        const sensorOn =
-          comp.type === "sensor"
-            ? comp.trigger === "retracted"
-              ? (runtime.strokes[comp.targetId ?? ""] ?? 0) <= 0.02
-              : (runtime.strokes[comp.targetId ?? ""] ?? 0) >= 0.98
-            : false;
-        return (
-          <div
-            key={comp.id}
-            style={{ left: comp.x, top: comp.y, width: def.width, height: def.height }}
-            className={cn(
-              "group absolute select-none transition-[filter]",
-              selectedId === comp.id && "drop-shadow-[0_0_6px_var(--color-primary)]",
-              solved.actuated[comp.id] && "drop-shadow-[0_0_7px_var(--color-signal)]",
-              blockedId === comp.id && "animate-pulse drop-shadow-[0_0_8px_var(--color-destructive)]",
-            )}
-          >
-            <div
-              onPointerDown={(event) => startDrag(event, comp)}
-              onClick={() => handleGlyphClick(comp)}
-              className="size-full cursor-grab active:cursor-grabbing"
-            >
-              <ComponentGlyph
-                comp={comp}
-                stroke={runtime.strokes[comp.id] ?? 0}
-                actuated={!!solved.actuated[comp.id]}
-                signal={isSignal ? !!runtime.signals[comp.id] : sensorOn}
-                pressurizedPorts={solved.pressurized}
-              />
-            </div>
-
-            {def.ports.map((port) => {
-              const key = `${comp.id}:${port.id}`;
-              const active = solved.pressurized.has(key);
-              const pending =
-                pendingPort?.componentId === comp.id && pendingPort.portId === port.id;
+      <div
+        ref={surfaceRef}
+        className="grid-plate relative"
+        style={{ width: worldSize.width, height: worldSize.height }}
+      >
+        <div
+          className="absolute"
+          style={{
+            left: WORLD_ORIGIN_X,
+            top: WORLD_ORIGIN_Y,
+            width: worldSize.width - WORLD_ORIGIN_X,
+            height: worldSize.height - WORLD_ORIGIN_Y,
+          }}
+        >
+          <svg className="pointer-events-none absolute inset-0 h-full w-full">
+            {circuit.tubes.map((tube) => {
+              const a = portPosition(tube.from.componentId, tube.from.portId);
+              const b = portPosition(tube.to.componentId, tube.to.portId);
+              if (!a || !b) return null;
+              const charged =
+                solved.pressurized.has(`${tube.from.componentId}:${tube.from.portId}`) ||
+                solved.pressurized.has(`${tube.to.componentId}:${tube.to.portId}`);
+              const conflicted =
+                solved.conflicts.has(`${tube.from.componentId}:${tube.from.portId}`) ||
+                solved.conflicts.has(`${tube.to.componentId}:${tube.to.portId}`);
+              const middleY = a.y + (b.y - a.y) / 2;
+              const path = `M${a.x} ${a.y} V${middleY} H${b.x} V${b.y}`;
               return (
-                <button
-                  key={port.id}
-                  type="button"
-                  title={`Porta ${port.label} — ${PORT_ROLE[port.kind]}`}
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    onPortClick(comp.id, port.id);
-                  }}
-                  aria-label={`Porta ${port.label}, ${PORT_ROLE[port.kind]}`}
-                  style={{ left: port.x - 7, top: port.y - 7 }}
-                  className={cn(
-                    "absolute size-3.5 rounded-full border-2 transition-colors opacity-75 hover:opacity-100",
-                    pending
-                      ? "border-primary bg-primary"
-                      : active
-                        ? "border-air bg-air"
-                        : "border-steel bg-background hover:border-primary",
-                  )}
-                >
-                </button>
+                <g key={tube.id}>
+                  <defs>
+                    <marker
+                      id={`flow-${tube.id}`}
+                      markerWidth="7"
+                      markerHeight="7"
+                      refX="6"
+                      refY="3.5"
+                      orient="auto"
+                    >
+                      <path d="M0 0 L7 3.5 L0 7 Z" className="fill-air" />
+                    </marker>
+                  </defs>
+                  <path
+                    d={path}
+                    className="fill-none stroke-air-dim"
+                    strokeWidth={5}
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d={path}
+                    className={cn(
+                      "fill-none",
+                      conflicted ? "stroke-destructive" : charged ? "stroke-air" : "stroke-muted",
+                    )}
+                    strokeWidth={3}
+                    strokeLinejoin="round"
+                    strokeDasharray={charged && !conflicted ? "10 8" : undefined}
+                    markerEnd={charged && !conflicted ? `url(#flow-${tube.id})` : undefined}
+                  >
+                    {charged && !conflicted && (
+                      <animate
+                        attributeName="stroke-dashoffset"
+                        from="18"
+                        to="0"
+                        dur="0.6s"
+                        repeatCount="indefinite"
+                      />
+                    )}
+                  </path>
+                </g>
               );
             })}
-          </div>
-        );
-      })}
-      </div>
+          </svg>
+
+          {circuit.components.map((comp) => {
+            const def = CATALOG[comp.type];
+            const isSignal = comp.type === "button";
+            const sensorOn =
+              comp.type === "sensor"
+                ? comp.trigger === "retracted"
+                  ? (runtime.strokes[comp.targetId ?? ""] ?? 0) <= 0.02
+                  : (runtime.strokes[comp.targetId ?? ""] ?? 0) >= 0.98
+                : false;
+            return (
+              <div
+                key={comp.id}
+                style={{ left: comp.x, top: comp.y, width: def.width, height: def.height }}
+                className={cn(
+                  "group absolute select-none transition-[filter]",
+                  selectedId === comp.id && "drop-shadow-[0_0_6px_var(--color-primary)]",
+                  solved.actuated[comp.id] && "drop-shadow-[0_0_7px_var(--color-signal)]",
+                  blockedId === comp.id &&
+                    "animate-pulse drop-shadow-[0_0_8px_var(--color-destructive)]",
+                )}
+              >
+                <div
+                  onPointerDown={(event) => startDrag(event, comp)}
+                  onClick={() => handleGlyphClick(comp)}
+                  className="size-full cursor-grab active:cursor-grabbing"
+                >
+                  <ComponentGlyph
+                    comp={comp}
+                    stroke={runtime.strokes[comp.id] ?? 0}
+                    actuated={!!solved.actuated[comp.id]}
+                    signal={isSignal ? !!runtime.signals[comp.id] : sensorOn}
+                    pressurizedPorts={solved.pressurized}
+                  />
+                </div>
+
+                {portsForComponent(comp).map((port) => {
+                  const key = `${comp.id}:${port.id}`;
+                  const active = solved.pressurized.has(key);
+                  const conflicted = solved.conflicts.has(key);
+                  const pending =
+                    pendingPort?.componentId === comp.id && pendingPort.portId === port.id;
+                  return (
+                    <button
+                      key={port.id}
+                      type="button"
+                      title={`Porta ${port.label} — ${PORT_ROLE[port.kind]}`}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        onPortClick(comp.id, port.id);
+                      }}
+                      aria-label={`Porta ${port.label}, ${PORT_ROLE[port.kind]}`}
+                      style={{ left: port.x - 7, top: port.y - 7 }}
+                      className={cn(
+                        "absolute size-3.5 rounded-full border-2 transition-colors opacity-75 hover:opacity-100",
+                        pending
+                          ? "border-primary bg-primary"
+                          : conflicted
+                            ? "border-destructive bg-destructive"
+                            : active
+                              ? "border-air bg-air"
+                              : "border-steel bg-background hover:border-primary",
+                      )}
+                    ></button>
+                  );
+                })}
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
