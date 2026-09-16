@@ -1,10 +1,4 @@
-import type {
-  ActuationType,
-  ComponentDef,
-  ComponentType,
-  PlacedComponent,
-  PortDef,
-} from "./types";
+import type { ActuationType, ComponentDef, ComponentType, PlacedComponent, PortDef } from "./types";
 
 const pneumaticPort = (
   id: string,
@@ -73,15 +67,11 @@ export const CATALOG: Record<ComponentType, ComponentDef> = {
     type: "cylinderDouble",
     name: "Cilindro de dupla ação",
     short: "Dupla ação",
-    description:
-      "Avança e recua por ar comprimido, com pressão alternada entre as duas câmaras.",
+    description: "Avança e recua por ar comprimido, com pressão alternada entre as duas câmaras.",
     family: "atuacao",
     width: 242,
     height: 100,
-    ports: [
-      pneumaticPort("A", "2", 40, 100, "work"),
-      pneumaticPort("B", "4", 168, 100, "work"),
-    ],
+    ports: [pneumaticPort("A", "2", 40, 100, "work"), pneumaticPort("B", "4", 168, 100, "work")],
   },
   button: {
     type: "button",
@@ -143,16 +133,12 @@ export function portsForComponent(comp: PlacedComponent): PortDef[] {
   if (comp.type !== "valve32" && comp.type !== "valve52") return ports;
 
   if (hasPneumaticPilot(comp.actuation)) {
-    ports.push(
-      pneumaticPort("14", "14", 72 - pilotOffset(comp.actuation), 61, "control"),
-    );
+    ports.push(pneumaticPort("14", "14", 72 - pilotOffset(comp.actuation), 61, "control"));
   }
 
   if (hasPneumaticPilot(comp.returnType)) {
     const rightEdge = comp.type === "valve32" ? 176 : 224;
-    ports.push(
-      pneumaticPort("12", "12", rightEdge + pilotOffset(comp.returnType), 61, "control"),
-    );
+    ports.push(pneumaticPort("12", "12", rightEdge + pilotOffset(comp.returnType), 61, "control"));
   }
 
   return ports;

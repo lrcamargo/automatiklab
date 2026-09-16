@@ -2,13 +2,26 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { solveCircuit, stepStrokes } from "./engine";
 import type { Circuit, RuntimeState, SolveResult } from "./types";
 
-const EMPTY: SolveResult = { pressurized: new Set(), actuated: {} };
+const emptyRuntime = (): RuntimeState => ({
+  strokes: {},
+  signals: {},
+  valvePositions: {},
+});
+
+const emptySolve = (): SolveResult => ({
+  pressurized: new Set(),
+  vented: new Set(),
+  conflicts: new Set(),
+  actuated: {},
+});
 
 export function useSimulation(circuit: Circuit, running: boolean) {
-  const [runtime, setRuntime] = useState<RuntimeState>({ strokes: {}, signals: {} });
-  const [solved, setSolved] = useState<SolveResult>(EMPTY);
+  const [runtime, setRuntime] = useState<RuntimeState>(emptyRuntime);
+  const [solved, setSolved] = useState<SolveResult>(emptySolve);
   const circuitRef = useRef(circuit);
+  const runtimeRef = useRef(runtime);
   circuitRef.current = circuit;
+  runtimeRef.current = runtime;
 
   useEffect(() => {
     if (!running) return;
@@ -16,14 +29,20 @@ export function useSimulation(circuit: Circuit, running: boolean) {
     let last = performance.now();
 
     const tick = (now: number) => {
-      const dt = Math.min(0.05, (now - last) / 1000);
+      const deltaSeconds = Math.min(0.05, (now - last) / 1000);
       last = now;
-      setRuntime((prev) => {
-        const result = solveCircuit(circuitRef.current, prev);
-        const strokes = stepStrokes(circuitRef.current, prev, result, dt);
-        setSolved(result);
-        return { ...prev, strokes };
-      });
+
+      const previous = runtimeRef.current;
+      const result = solveCircuit(circuitRef.current, previous);
+      const next: RuntimeState = {
+        ...previous,
+        strokes: stepStrokes(circuitRef.current, previous, result, deltaSeconds),
+        valvePositions: result.actuated,
+      };
+
+      runtimeRef.current = next;
+      setRuntime(next);
+      setSolved(result);
       frame = requestAnimationFrame(tick);
     };
 
@@ -33,27 +52,53 @@ export function useSimulation(circuit: Circuit, running: boolean) {
 
   useEffect(() => {
     if (running) return;
-    setSolved(solveCircuit(circuit, runtime));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [running, circuit]);
+    const result = solveCircuit(circuit, runtime);
+    setSolved(result);
+  }, [running, circuit, runtime]);
 
-  const setSignal = useCallback((id: string, value: boolean) => {
-    setRuntime((prev) => ({ ...prev, signals: { ...prev.signals, [id]: value } }));
+  const updateRuntime = useCallback((updater: (previous: RuntimeState) => RuntimeState) => {
+    setRuntime((previous) => {
+      const next = updater(previous);
+      runtimeRef.current = next;
+      return next;
+    });
   }, []);
 
-  const toggleSignal = useCallback((id: string) => {
-    setRuntime((prev) => ({ ...prev, signals: { ...prev.signals, [id]: !prev.signals[id] } }));
-  }, []);
+  const setSignal = useCallback(
+    (id: string, value: boolean) => {
+      updateRuntime((previous) => ({
+        ...previous,
+        signals: { ...previous.signals, [id]: value },
+      }));
+    },
+    [updateRuntime],
+  );
 
-  /** move o cilindro para uma posição de curso (usado por interações válidas na bancada) */
-  const setStroke = useCallback((id: string, value: number) => {
-    setRuntime((prev) => ({ ...prev, strokes: { ...prev.strokes, [id]: value } }));
-  }, []);
+  const toggleSignal = useCallback(
+    (id: string) => {
+      updateRuntime((previous) => ({
+        ...previous,
+        signals: { ...previous.signals, [id]: !previous.signals[id] },
+      }));
+    },
+    [updateRuntime],
+  );
 
+  const setStroke = useCallback(
+    (id: string, value: number) => {
+      updateRuntime((previous) => ({
+        ...previous,
+        strokes: { ...previous.strokes, [id]: value },
+      }));
+    },
+    [updateRuntime],
+  );
 
   const reset = useCallback(() => {
-    setRuntime({ strokes: {}, signals: {} });
-    setSolved(EMPTY);
+    const next = emptyRuntime();
+    runtimeRef.current = next;
+    setRuntime(next);
+    setSolved(emptySolve());
   }, []);
 
   return { runtime, solved, setSignal, toggleSignal, setStroke, reset };

@@ -28,9 +28,7 @@ export function Palette({ onAdd }: PaletteProps) {
                   <button
                     type="button"
                     draggable
-                    onDragStart={(event) =>
-                      event.dataTransfer.setData("text/component", item.type)
-                    }
+                    onDragStart={(event) => event.dataTransfer.setData("text/component", item.type)}
                     onClick={() => onAdd(item.type)}
                     className="w-full cursor-grab rounded-sm border border-border bg-surface px-3 py-2 text-left transition-colors hover:border-primary hover:bg-surface-strong"
                   >

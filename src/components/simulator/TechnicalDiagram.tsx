@@ -1,4 +1,4 @@
-import { CATALOG } from "@/lib/pneumatics/catalog";
+import { CATALOG, portsForComponent } from "@/lib/pneumatics/catalog";
 import type { Circuit, RuntimeState, SolveResult } from "@/lib/pneumatics/types";
 import { ComponentGlyph } from "./ComponentGlyph";
 
@@ -11,14 +11,20 @@ interface TechnicalDiagramProps {
 const bounds = (circuit: Circuit) => {
   if (!circuit.components.length) return { width: 960, height: 560 };
   return {
-    width: Math.max(960, ...circuit.components.map((comp) => comp.x + CATALOG[comp.type].width + 70)),
-    height: Math.max(560, ...circuit.components.map((comp) => comp.y + CATALOG[comp.type].height + 70)),
+    width: Math.max(
+      960,
+      ...circuit.components.map((comp) => comp.x + CATALOG[comp.type].width + 70),
+    ),
+    height: Math.max(
+      560,
+      ...circuit.components.map((comp) => comp.y + CATALOG[comp.type].height + 70),
+    ),
   };
 };
 
 const portPosition = (circuit: Circuit, componentId: string, portId: string) => {
   const comp = circuit.components.find((item) => item.id === componentId);
-  const port = comp ? CATALOG[comp.type].ports.find((item) => item.id === portId) : undefined;
+  const port = comp ? portsForComponent(comp).find((item) => item.id === portId) : undefined;
   return comp && port ? { x: comp.x + port.x, y: comp.y + port.y } : null;
 };
 
@@ -38,50 +44,72 @@ export function TechnicalDiagram({ circuit, runtime, solved }: TechnicalDiagramP
           <h1>Esquema técnico do circuito</h1>
         </div>
         <dl>
-          <div><dt>Norma visual</dt><dd>ISO 1219</dd></div>
-          <div><dt>Estado</dt><dd>{solved.pressurized.size > 0 ? "Pressurizado" : "Sem pressão"}</dd></div>
+          <div>
+            <dt>Norma visual</dt>
+            <dd>ISO 1219</dd>
+          </div>
+          <div>
+            <dt>Estado</dt>
+            <dd>
+              {solved.conflicts.size > 0
+                ? "Conflito pressão/escape"
+                : solved.pressurized.size > 0
+                  ? "Pressurizado"
+                  : "Sem pressão"}
+            </dd>
+          </div>
         </dl>
       </header>
 
       <div className="technical-sheet__diagram" style={{ width: size.width, height: size.height }}>
         <svg className="absolute inset-0 size-full" viewBox={`0 0 ${size.width} ${size.height}`}>
           <defs>
-            <marker id="technical-flow-arrow" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto">
+            <marker
+              id="technical-flow-arrow"
+              markerWidth="7"
+              markerHeight="7"
+              refX="6"
+              refY="3.5"
+              orient="auto"
+            >
               <path d="M0 0 L7 3.5 L0 7 Z" className="fill-air" />
             </marker>
           </defs>
-          {circuit.components
-            .filter((comp) => (comp.type === "valve32" || comp.type === "valve52") && comp.actuatorId)
-            .map((valve) => {
-              const actuator = circuit.components.find((comp) => comp.id === valve.actuatorId);
-              if (!actuator) return null;
-              const actuatorDef = CATALOG[actuator.type];
-              const x1 = actuator.x + actuatorDef.width;
-              const y1 = actuator.y + actuatorDef.height / 2;
-              const x2 = valve.x + 8;
-              const y2 = valve.y + CATALOG[valve.type].height / 2;
-              const middleX = x1 + (x2 - x1) / 2;
-              return <path key={`pilot-${valve.id}`} d={`M${x1} ${y1} H${middleX} V${y2} H${x2}`} className="fill-none stroke-steel" strokeWidth={1.3} strokeDasharray="5 5" />;
-            })}
           {circuit.tubes.map((tube) => {
             const a = portPosition(circuit, tube.from.componentId, tube.from.portId);
             const b = portPosition(circuit, tube.to.componentId, tube.to.portId);
             if (!a || !b) return null;
-            const charged = solved.pressurized.has(`${tube.from.componentId}:${tube.from.portId}`) || solved.pressurized.has(`${tube.to.componentId}:${tube.to.portId}`);
+            const charged =
+              solved.pressurized.has(`${tube.from.componentId}:${tube.from.portId}`) ||
+              solved.pressurized.has(`${tube.to.componentId}:${tube.to.portId}`);
+            const conflicted =
+              solved.conflicts.has(`${tube.from.componentId}:${tube.from.portId}`) ||
+              solved.conflicts.has(`${tube.to.componentId}:${tube.to.portId}`);
             return (
               <path
                 key={tube.id}
                 d={orthogonalPath(a, b)}
-                className={charged ? "fill-none stroke-air" : "fill-none stroke-steel"}
-                strokeWidth={charged ? 2.5 : 1.7}
-                markerEnd={charged ? "url(#technical-flow-arrow)" : undefined}
+                className={
+                  conflicted
+                    ? "fill-none stroke-destructive"
+                    : charged
+                      ? "fill-none stroke-air"
+                      : "fill-none stroke-steel"
+                }
+                strokeWidth={charged || conflicted ? 2.5 : 1.7}
+                markerEnd={charged && !conflicted ? "url(#technical-flow-arrow)" : undefined}
               />
             );
           })}
         </svg>
 
         {circuit.components.map((comp) => {
-          const sensorOn = comp.type === "sensor" ? comp.trigger === "retracted" ? (runtime.strokes[comp.targetId ?? ""] ?? 0) <= 0.02 : (runtime.strokes[comp.targetId ?? ""] ?? 0) >= 0.98 : false;
+          const sensorOn =
+            comp.type === "sensor"
+              ? comp.trigger === "retracted"
+                ? (runtime.strokes[comp.targetId ?? ""] ?? 0) <= 0.02
+                : (runtime.strokes[comp.targetId ?? ""] ?? 0) >= 0.98
+              : false;
           return (
             <div key={comp.id} className="absolute" style={{ left: comp.x, top: comp.y }}>
               <ComponentGlyph

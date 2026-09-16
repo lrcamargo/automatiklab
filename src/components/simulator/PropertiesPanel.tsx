@@ -1,4 +1,4 @@
-import { CATALOG } from "@/lib/pneumatics/catalog";
+import { CATALOG, hasPneumaticPilot } from "@/lib/pneumatics/catalog";
 import { ACTUATIONS, ACTUATION_GROUPS } from "@/lib/pneumatics/types";
 import type { Circuit, PlacedComponent, RuntimeState } from "@/lib/pneumatics/types";
 import { Trash2 } from "lucide-react";
@@ -9,11 +9,13 @@ interface PropertiesPanelProps {
   runtime: RuntimeState;
   onChange: (patch: Partial<PlacedComponent>) => void;
   onDelete: () => void;
+  onDeleteTube: (id: string) => void;
 }
 
 const fieldClass =
   "w-full rounded-sm border border-input bg-background px-2 py-1.5 text-sm outline-none focus:border-primary";
-const labelClass = "mb-1 block font-mono text-[10px] uppercase tracking-widest text-muted-foreground";
+const labelClass =
+  "mb-1 block font-mono text-[10px] uppercase tracking-widest text-muted-foreground";
 
 export function PropertiesPanel({
   circuit,
@@ -21,29 +23,31 @@ export function PropertiesPanel({
   runtime,
   onChange,
   onDelete,
+  onDeleteTube,
 }: PropertiesPanelProps) {
   if (!selected) {
     return (
       <div className="p-4 text-sm text-muted-foreground">
         <h2 className="mb-2 font-mono text-xs uppercase tracking-widest">Propriedades</h2>
-        <p>
-          Selecione um componente na bancada para editar rótulo, acionamento e parâmetros.
-        </p>
+        <p>Selecione um componente na bancada para editar rótulo, acionamento e parâmetros.</p>
         <div className="mt-4 rounded-sm border border-border bg-surface p-3 text-xs leading-relaxed">
-          <strong className="text-foreground">Como conectar:</strong> clique em uma porta e
-          depois na porta de destino para criar a mangueira. Clique duas vezes na mesma porta
-          para cancelar.
+          <strong className="text-foreground">Como conectar:</strong> clique em uma porta e depois
+          na porta de destino para criar a mangueira. Clique duas vezes na mesma porta para
+          cancelar.
         </div>
       </div>
     );
   }
 
   const def = CATALOG[selected.type];
-  const actuators = circuit.components.filter(
-    (c) => c.type === "button" || c.type === "sensor",
-  );
   const cylinders = circuit.components.filter(
     (c) => c.type === "cylinderSingle" || c.type === "cylinderDouble",
+  );
+  const connectedTubes = circuit.tubes.filter(
+    (tube) => tube.from.componentId === selected.id || tube.to.componentId === selected.id,
+  );
+  const hasElectricalActuation = [selected.actuation, selected.returnType].some((type) =>
+    type?.toLowerCase().includes("solenoide"),
   );
 
   return (
@@ -84,7 +88,8 @@ export function PropertiesPanel({
             className="w-full accent-[var(--color-primary)]"
           />
           <p className="mt-1 text-[11px] leading-snug text-muted-foreground">
-            Com 0 bar a fonte fica fechada e nenhum atuador se move.
+            Com 0 bar a fonte fica fechada. Nesta etapa, valores acima de zero alimentam o modelo
+            topológico; os efeitos quantitativos da pressão virão com o modelo físico.
           </p>
         </div>
       )}
@@ -140,25 +145,18 @@ export function PropertiesPanel({
         </>
       )}
 
+      {(selected.type === "valve32" || selected.type === "valve52") &&
+        (hasPneumaticPilot(selected.actuation) || hasPneumaticPilot(selected.returnType)) && (
+          <div className="rounded-sm border border-primary/40 bg-primary/5 p-3 text-xs leading-relaxed text-muted-foreground">
+            O acionamento pneumático cria as portas de pilotagem 14 e/ou 12. Conecte a saída 2 da
+            válvula de sinal diretamente à porta piloto correspondente.
+          </div>
+        )}
 
-      {(selected.type === "valve32" || selected.type === "valve52") && (
-        <div>
-          <label className={labelClass} htmlFor="actuator">
-            Acionado por
-          </label>
-          <select
-            id="actuator"
-            className={fieldClass}
-            value={selected.actuatorId ?? ""}
-            onChange={(event) => onChange({ actuatorId: event.target.value || null })}
-          >
-            <option value="">— sem acionamento —</option>
-            {actuators.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.label}
-              </option>
-            ))}
-          </select>
+      {hasElectricalActuation && (
+        <div className="rounded-sm border border-dashed border-border p-3 text-xs leading-relaxed text-muted-foreground">
+          O símbolo elétrico já está disponível para preparar diagramas, mas sua bobina só será
+          energizada quando o domínio eletropneumático for implementado.
         </div>
       )}
 
@@ -238,6 +236,44 @@ export function PropertiesPanel({
           </p>
         </div>
       )}
+
+      <div>
+        <h3 className={labelClass}>Conexões pneumáticas</h3>
+        {connectedTubes.length === 0 ? (
+          <p className="text-xs leading-relaxed text-muted-foreground">
+            Este componente ainda não possui mangueiras.
+          </p>
+        ) : (
+          <ul className="space-y-1.5">
+            {connectedTubes.map((tube) => {
+              const selectedIsFrom = tube.from.componentId === selected.id;
+              const localPort = selectedIsFrom ? tube.from.portId : tube.to.portId;
+              const remote = selectedIsFrom ? tube.to : tube.from;
+              const remoteComponent = circuit.components.find(
+                (component) => component.id === remote.componentId,
+              );
+              return (
+                <li
+                  key={tube.id}
+                  className="flex items-center justify-between gap-2 rounded-sm border border-border px-2 py-1.5 font-mono text-[11px]"
+                >
+                  <span className="min-w-0 truncate text-muted-foreground">
+                    {localPort} → {remoteComponent?.label ?? "?"}:{remote.portId}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => onDeleteTube(tube.id)}
+                    className="shrink-0 text-destructive hover:underline"
+                    aria-label={`Remover conexão da porta ${localPort}`}
+                  >
+                    remover
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </div>
 
       <button
         type="button"

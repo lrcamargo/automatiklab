@@ -1,4 +1,4 @@
-import { CATALOG } from "@/lib/pneumatics/catalog";
+import { CATALOG, portsForComponent } from "@/lib/pneumatics/catalog";
 import type { ActuationType, PlacedComponent } from "@/lib/pneumatics/types";
 
 interface GlyphProps {
@@ -25,7 +25,13 @@ function FlowArrow({ d, active = false }: { d: string; active?: boolean }) {
 
 function Blocked({ x, y, up = true }: { x: number; y: number; up?: boolean }) {
   const end = up ? y - 13 : y + 13;
-  return <path d={`M${x} ${y} V${end} M${x - 6} ${end} H${x + 6}`} className={baseLine} strokeWidth={2} />;
+  return (
+    <path
+      d={`M${x} ${y} V${end} M${x - 6} ${end} H${x + 6}`}
+      className={baseLine}
+      strokeWidth={2}
+    />
+  );
 }
 
 function Spring({ x, y }: { x: number; y: number }) {
@@ -41,7 +47,12 @@ function Spring({ x, y }: { x: number; y: number }) {
 /** número normalizado desenhado à direita da porta, nunca sobre a linha */
 function PortNumber({ x, y, value }: { x: number; y: number; value: string }) {
   return (
-    <text x={x + 6} y={y + 3} textAnchor="start" className="fill-muted-foreground font-mono text-[9px] font-semibold">
+    <text
+      x={x + 6}
+      y={y + 3}
+      textAnchor="start"
+      className="fill-muted-foreground font-mono text-[9px] font-semibold"
+    >
       {value}
     </text>
   );
@@ -77,8 +88,16 @@ function ActuationSymbol({
     width: w,
     height: h,
   });
-  const wall = <path d={`M${p(1, -16)} L${p(1, 16)} M${p(1, -16)} L${p(8, -16)} M${p(1, 16)} L${p(8, 16)}`} className={cls} strokeWidth={1.8} />;
-  const stem = (from: number, to: number) => <path d={`M${p(from)} L${p(to)}`} className={cls} strokeWidth={1.8} />;
+  const wall = (
+    <path
+      d={`M${p(1, -16)} L${p(1, 16)} M${p(1, -16)} L${p(8, -16)} M${p(1, 16)} L${p(8, 16)}`}
+      className={cls}
+      strokeWidth={1.8}
+    />
+  );
+  const stem = (from: number, to: number) => (
+    <path d={`M${p(from)} L${p(to)}`} className={cls} strokeWidth={1.8} />
+  );
 
   const spring = (d0: number) => (
     <path
@@ -93,7 +112,11 @@ function ActuationSymbol({
     const back = px(d0 + 16);
     return (
       <g>
-        <path d={`M${back} ${y - 8} L${tip} ${y} L${back} ${y + 8} Z`} className={soft} strokeWidth={1.6} />
+        <path
+          d={`M${back} ${y - 8} L${tip} ${y} L${back} ${y + 8} Z`}
+          className={soft}
+          strokeWidth={1.6}
+        />
         <path d={`M${p(d0 + 16)} L${p(d0 + 23)}`} className={cls} strokeWidth={1.6} />
       </g>
     );
@@ -118,8 +141,16 @@ function ActuationSymbol({
 
   const manualOverride = (d0: number) => (
     <g>
-      <path d={`M${p(d0, -10)} L${p(d0 + 18, -10)} M${p(d0, 10)} L${p(d0 + 18, 10)}`} className={cls} strokeWidth={1.5} />
-      <path d={`M${p(d0 + 5, -10)} L${p(d0 + 5, 10)} M${p(d0 + 13, -10)} L${p(d0 + 13, 10)}`} className={cls} strokeWidth={1.3} />
+      <path
+        d={`M${p(d0, -10)} L${p(d0 + 18, -10)} M${p(d0, 10)} L${p(d0 + 18, 10)}`}
+        className={cls}
+        strokeWidth={1.5}
+      />
+      <path
+        d={`M${p(d0 + 5, -10)} L${p(d0 + 5, 10)} M${p(d0 + 13, -10)} L${p(d0 + 13, 10)}`}
+        className={cls}
+        strokeWidth={1.3}
+      />
     </g>
   );
 
@@ -171,7 +202,12 @@ function ActuationSymbol({
         <g>
           {wall}
           {stem(1, 28)}
-          <path d={`M${p(28, -5)} H${px(47)}`} className={cls} strokeWidth={5} strokeLinecap="round" />
+          <path
+            d={`M${p(28, -5)} H${px(47)}`}
+            className={cls}
+            strokeWidth={5}
+            strokeLinecap="round"
+          />
         </g>
       );
     case "rolete":
@@ -202,9 +238,20 @@ function ActuationSymbol({
         </g>
       );
     case "servoPilotoSimples":
-      return <g>{pilot(1)}{pilot(25)}</g>;
+      return (
+        <g>
+          {pilot(1)}
+          {pilot(25)}
+        </g>
+      );
     case "servoPilotoDuplo":
-      return <g>{pilot(1)}{pilot(25)}{pilot(49)}</g>;
+      return (
+        <g>
+          {pilot(1)}
+          {pilot(25)}
+          {pilot(49)}
+        </g>
+      );
     case "solenoideSimples":
       return <g>{solenoidBox(1)}</g>;
     case "solenoideDuplo":
@@ -228,12 +275,15 @@ function ActuationSymbol({
         <g>
           {wall}
           {stem(1, 30)}
-          <path d={`M${p(30, -12)} A12 12 0 0 ${dir > 0 ? 1 : 0} ${p(30, 12)}`} className={cls} strokeWidth={1.8} />
+          <path
+            d={`M${p(30, -12)} A12 12 0 0 ${dir > 0 ? 1 : 0} ${p(30, 12)}`}
+            className={cls}
+            strokeWidth={1.8}
+          />
         </g>
       );
   }
 }
-
 
 /** Símbolos técnicos pneumáticos inspirados no padrão didático ISO 1219 dos materiais de referência. */
 export function ComponentGlyph({
@@ -251,7 +301,14 @@ export function ComponentGlyph({
 
   const defs = (
     <defs>
-      <marker id="component-flow-arrow" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto">
+      <marker
+        id="component-flow-arrow"
+        markerWidth="5"
+        markerHeight="5"
+        refX="4"
+        refY="2.5"
+        orient="auto"
+      >
         <path d="M0 0 L5 2.5 L0 5 Z" className="fill-steel" />
       </marker>
     </defs>
@@ -260,14 +317,25 @@ export function ComponentGlyph({
   switch (comp.type) {
     case "source":
       return (
-        <svg width={def.width} height={def.height} viewBox={`0 0 ${def.width} ${def.height}`} aria-label="Fonte de ar comprimido">
+        <svg
+          width={def.width}
+          height={def.height}
+          viewBox={`0 0 ${def.width} ${def.height}`}
+          aria-label="Fonte de ar comprimido"
+        >
           {defs}
-          <text x={12} y={13} className="fill-foreground font-mono text-[10px] font-semibold">{comp.label}</text>
+          <text x={12} y={13} className="fill-foreground font-mono text-[10px] font-semibold">
+            {comp.label}
+          </text>
           <path d="M16 68 V42 H32" className={baseLine} strokeWidth={2} />
           <path d="M12 68 h8 M14 73 h4" className={baseLine} strokeWidth={1.5} />
           <circle cx={54} cy={42} r={22} className="fill-background stroke-steel" strokeWidth={2} />
           <path d="M43 31 L67 42 L43 53 Z" className="fill-air stroke-air" strokeWidth={1.5} />
-          <path d="M76 42 H150" className={live("P") ? "fill-none stroke-air" : baseLine} strokeWidth={2} />
+          <path
+            d="M76 42 H150"
+            className={live("P") ? "fill-none stroke-air" : baseLine}
+            strokeWidth={2}
+          />
           <path d="M101 42 a14 14 0 0 1 28 0" className={baseLine} strokeWidth={1.5} />
           <path d="M115 42 l8 -8" className={baseLine} strokeWidth={1.5} />
           <text x={30} y={92} className="fill-air font-mono text-[11px] font-semibold">
@@ -280,19 +348,55 @@ export function ComponentGlyph({
     case "valve32": {
       const y = 34;
       return (
-        <svg width={def.width} height={def.height} viewBox={`0 0 ${def.width} ${def.height}`} aria-label="Válvula direcional 3/2 normalmente fechada">
+        <svg
+          width={def.width}
+          height={def.height}
+          viewBox={`0 0 ${def.width} ${def.height}`}
+          aria-label="Válvula direcional 3/2 normalmente fechada"
+        >
           {defs}
-          <text x={72} y={13} className="fill-foreground font-mono text-[10px] font-semibold">{comp.label}</text>
-          <rect x={72} y={y} width={52} height={54} className={activeBox(actuated)} strokeWidth={1.7} />
-          <rect x={124} y={y} width={52} height={54} className={activeBox(!actuated)} strokeWidth={1.7} />
+          <text x={72} y={13} className="fill-foreground font-mono text-[10px] font-semibold">
+            {comp.label}
+          </text>
+          <rect
+            x={72}
+            y={y}
+            width={52}
+            height={54}
+            className={activeBox(actuated)}
+            strokeWidth={1.7}
+          />
+          <rect
+            x={124}
+            y={y}
+            width={52}
+            height={54}
+            className={activeBox(!actuated)}
+            strokeWidth={1.7}
+          />
           <FlowArrow d="M86 84 V42 H110" active={actuated} />
           <Blocked x={112} y={84} />
           <FlowArrow d="M150 38 V80 H166" active={!actuated} />
           <Blocked x={136} y={84} />
           <path d="M150 0 V34 M136 88 V129 M166 88 V112" className={baseLine} strokeWidth={1.7} />
-          <path d="M158 124 H174 M161 119 H171 M164 114 H168" className={baseLine} strokeWidth={1.4} />
-          <ActuationSymbol type={comp.actuation ?? "botao"} x={72} y={61} dir={-1} active={signal || actuated} />
+          <path
+            d="M158 124 H174 M161 119 H171 M164 114 H168"
+            className={baseLine}
+            strokeWidth={1.4}
+          />
+          <ActuationSymbol
+            type={comp.actuation ?? "botao"}
+            x={72}
+            y={61}
+            dir={-1}
+            active={signal || actuated}
+          />
           <ActuationSymbol type={comp.returnType ?? "mola"} x={176} y={61} dir={1} active={false} />
+          {portsForComponent(comp)
+            .filter((port) => port.kind === "control")
+            .map((port) => (
+              <PortNumber key={port.id} x={port.x} y={port.y - 10} value={port.label} />
+            ))}
           <PortNumber x={150} y={8} value="2" />
           <PortNumber x={136} y={120} value="1" />
           <PortNumber x={166} y={104} value="3" />
@@ -300,31 +404,69 @@ export function ComponentGlyph({
       );
     }
 
-
     case "valve52": {
       const y = 34;
       return (
-        <svg width={def.width} height={def.height} viewBox={`0 0 ${def.width} ${def.height}`} aria-label="Válvula direcional 5/2 com retorno por mola">
+        <svg
+          width={def.width}
+          height={def.height}
+          viewBox={`0 0 ${def.width} ${def.height}`}
+          aria-label="Válvula direcional 5/2 com retorno por mola"
+        >
           {defs}
-          <text x={72} y={13} className="fill-foreground font-mono text-[10px] font-semibold">{comp.label}</text>
-          <rect x={72} y={y} width={76} height={54} className={activeBox(actuated)} strokeWidth={1.7} />
-          <rect x={148} y={y} width={76} height={54} className={activeBox(!actuated)} strokeWidth={1.7} />
+          <text x={72} y={13} className="fill-foreground font-mono text-[10px] font-semibold">
+            {comp.label}
+          </text>
+          <rect
+            x={72}
+            y={y}
+            width={76}
+            height={54}
+            className={activeBox(actuated)}
+            strokeWidth={1.7}
+          />
+          <rect
+            x={148}
+            y={y}
+            width={76}
+            height={54}
+            className={activeBox(!actuated)}
+            strokeWidth={1.7}
+          />
           <FlowArrow d="M110 84 V62 L90 40" active={actuated} />
           <FlowArrow d="M134 38 V60 L140 84" active={actuated} />
           <Blocked x={138} y={84} />
           <FlowArrow d="M186 84 V62 L210 40" active={!actuated} />
           <FlowArrow d="M166 38 V60 L158 84" active={!actuated} />
           <Blocked x={158} y={84} />
-          <path d="M166 0 V34 M210 0 V34 M158 88 V112 M186 88 V129 M216 88 V112" className={baseLine} strokeWidth={1.7} />
-          <path d="M150 124 H166 M153 119 H163 M156 114 H160 M208 124 H224 M211 119 H221 M214 114 H218" className={baseLine} strokeWidth={1.4} />
-          <ActuationSymbol type={comp.actuation ?? "botao"} x={72} y={61} dir={-1} active={signal || actuated} />
+          <path
+            d="M166 0 V34 M210 0 V34 M158 88 V112 M186 88 V129 M216 88 V112"
+            className={baseLine}
+            strokeWidth={1.7}
+          />
+          <path
+            d="M150 124 H166 M153 119 H163 M156 114 H160 M208 124 H224 M211 119 H221 M214 114 H218"
+            className={baseLine}
+            strokeWidth={1.4}
+          />
+          <ActuationSymbol
+            type={comp.actuation ?? "botao"}
+            x={72}
+            y={61}
+            dir={-1}
+            active={signal || actuated}
+          />
           <ActuationSymbol type={comp.returnType ?? "mola"} x={224} y={61} dir={1} active={false} />
+          {portsForComponent(comp)
+            .filter((port) => port.kind === "control")
+            .map((port) => (
+              <PortNumber key={port.id} x={port.x} y={port.y - 10} value={port.label} />
+            ))}
           <PortNumber x={166} y={8} value="4" />
           <PortNumber x={210} y={8} value="2" />
           <PortNumber x={158} y={104} value="5" />
           <PortNumber x={186} y={120} value="1" />
           <PortNumber x={216} y={104} value="3" />
-
         </svg>
       );
     }
@@ -337,16 +479,70 @@ export function ComponentGlyph({
       const bodyH = 48;
       const pistonX = bodyX + 20 + stroke * 104;
       return (
-        <svg width={def.width} height={def.height} viewBox={`0 0 ${def.width} ${def.height}`} aria-label={`Cilindro de ${comp.type === "cylinderSingle" ? "simples" : "dupla"} ação`}>
-          <text x={20} y={13} className="fill-foreground font-mono text-[10px] font-semibold">{comp.label}</text>
-          <rect x={bodyX} y={bodyY} width={bodyW} height={bodyH} className="fill-background stroke-steel" strokeWidth={2} />
-          {!technical && <rect x={bodyX + 2} y={bodyY + 2} width={Math.max(0, pistonX - bodyX - 3)} height={bodyH - 4} className={live("A") ? "fill-air/30" : "fill-transparent"} />}
-          {!technical && comp.type === "cylinderDouble" && <rect x={pistonX + 3} y={bodyY + 2} width={Math.max(0, bodyX + bodyW - pistonX - 5)} height={bodyH - 4} className={live("B") ? "fill-air/30" : "fill-transparent"} />}
-          <path d={`M${pistonX} ${bodyY} V${bodyY + bodyH}`} className="stroke-steel" strokeWidth={4} />
-          <path d={`M${pistonX + 2} ${bodyY + bodyH / 2} H232`} className="stroke-steel" strokeWidth={4} />
-          {comp.type === "cylinderSingle" && <path d={`M${pistonX + 5} 62 l10 -28 l10 28 l10 -28 l10 28`} className={baseLine} strokeWidth={1.6} />}
-          <path d="M40 72 V100" className={live("A") ? "fill-none stroke-air" : baseLine} strokeWidth={2} />
-          {comp.type === "cylinderDouble" && <path d="M168 72 V100" className={live("B") ? "fill-none stroke-air" : baseLine} strokeWidth={2} />}
+        <svg
+          width={def.width}
+          height={def.height}
+          viewBox={`0 0 ${def.width} ${def.height}`}
+          aria-label={`Cilindro de ${comp.type === "cylinderSingle" ? "simples" : "dupla"} ação`}
+        >
+          <text x={20} y={13} className="fill-foreground font-mono text-[10px] font-semibold">
+            {comp.label}
+          </text>
+          <rect
+            x={bodyX}
+            y={bodyY}
+            width={bodyW}
+            height={bodyH}
+            className="fill-background stroke-steel"
+            strokeWidth={2}
+          />
+          {!technical && (
+            <rect
+              x={bodyX + 2}
+              y={bodyY + 2}
+              width={Math.max(0, pistonX - bodyX - 3)}
+              height={bodyH - 4}
+              className={live("A") ? "fill-air/30" : "fill-transparent"}
+            />
+          )}
+          {!technical && comp.type === "cylinderDouble" && (
+            <rect
+              x={pistonX + 3}
+              y={bodyY + 2}
+              width={Math.max(0, bodyX + bodyW - pistonX - 5)}
+              height={bodyH - 4}
+              className={live("B") ? "fill-air/30" : "fill-transparent"}
+            />
+          )}
+          <path
+            d={`M${pistonX} ${bodyY} V${bodyY + bodyH}`}
+            className="stroke-steel"
+            strokeWidth={4}
+          />
+          <path
+            d={`M${pistonX + 2} ${bodyY + bodyH / 2} H232`}
+            className="stroke-steel"
+            strokeWidth={4}
+          />
+          {comp.type === "cylinderSingle" && (
+            <path
+              d={`M${pistonX + 5} 62 l10 -28 l10 28 l10 -28 l10 28`}
+              className={baseLine}
+              strokeWidth={1.6}
+            />
+          )}
+          <path
+            d="M40 72 V100"
+            className={live("A") ? "fill-none stroke-air" : baseLine}
+            strokeWidth={2}
+          />
+          {comp.type === "cylinderDouble" && (
+            <path
+              d="M168 72 V100"
+              className={live("B") ? "fill-none stroke-air" : baseLine}
+              strokeWidth={2}
+            />
+          )}
           <PortNumber x={40} y={92} value="2" />
           {comp.type === "cylinderDouble" && <PortNumber x={168} y={92} value="4" />}
         </svg>
@@ -355,18 +551,43 @@ export function ComponentGlyph({
 
     case "button":
       return (
-        <svg width={def.width} height={def.height} viewBox={`0 0 ${def.width} ${def.height}`} aria-label="Válvula 3/2 de acionamento manual">
+        <svg
+          width={def.width}
+          height={def.height}
+          viewBox={`0 0 ${def.width} ${def.height}`}
+          aria-label="Válvula 3/2 de acionamento manual"
+        >
           {defs}
-          <text x={22} y={13} className="fill-foreground font-mono text-[10px] font-semibold">{comp.label}</text>
-          <rect x={24} y={34} width={36} height={42} className={activeBox(signal)} strokeWidth={1.6} />
-          <rect x={60} y={34} width={36} height={42} className={activeBox(!signal)} strokeWidth={1.6} />
+          <text x={22} y={13} className="fill-foreground font-mono text-[10px] font-semibold">
+            {comp.label}
+          </text>
+          <rect
+            x={24}
+            y={34}
+            width={36}
+            height={42}
+            className={activeBox(signal)}
+            strokeWidth={1.6}
+          />
+          <rect
+            x={60}
+            y={34}
+            width={36}
+            height={42}
+            className={activeBox(!signal)}
+            strokeWidth={1.6}
+          />
           <FlowArrow d="M34 72 V42 H50" active={signal} />
           <Blocked x={52} y={72} />
           <FlowArrow d="M78 38 V68 H90" active={!signal} />
           <Blocked x={68} y={72} />
           <path d="M78 20 V34 M68 76 V102 M90 76 V92" className={baseLine} strokeWidth={1.6} />
           <path d="M84 104 H96 M86 100 H94 M88 96 H92" className={baseLine} strokeWidth={1.2} />
-          <path d="M12 43 H24 M5 43 H19 M12 28 V43" className={signal ? "fill-none stroke-signal" : baseLine} strokeWidth={2} />
+          <path
+            d="M12 43 H24 M5 43 H19 M12 28 V43"
+            className={signal ? "fill-none stroke-signal" : baseLine}
+            strokeWidth={2}
+          />
           <Spring x={96} y={55} />
           <PortNumber x={78} y={24} value="2" />
           <PortNumber x={68} y={96} value="1" />
@@ -376,18 +597,54 @@ export function ComponentGlyph({
 
     case "sensor":
       return (
-        <svg width={def.width} height={def.height} viewBox={`0 0 ${def.width} ${def.height}`} aria-label="Válvula 3/2 de fim de curso por rolete">
+        <svg
+          width={def.width}
+          height={def.height}
+          viewBox={`0 0 ${def.width} ${def.height}`}
+          aria-label="Válvula 3/2 de fim de curso por rolete"
+        >
           {defs}
-          <text x={28} y={13} className="fill-foreground font-mono text-[10px] font-semibold">{comp.label}</text>
-          <rect x={28} y={36} width={34} height={38} className={activeBox(signal)} strokeWidth={1.5} />
-          <rect x={62} y={36} width={34} height={38} className={activeBox(!signal)} strokeWidth={1.5} />
+          <text x={28} y={13} className="fill-foreground font-mono text-[10px] font-semibold">
+            {comp.label}
+          </text>
+          <rect
+            x={28}
+            y={36}
+            width={34}
+            height={38}
+            className={activeBox(signal)}
+            strokeWidth={1.5}
+          />
+          <rect
+            x={62}
+            y={36}
+            width={34}
+            height={38}
+            className={activeBox(!signal)}
+            strokeWidth={1.5}
+          />
           <FlowArrow d="M38 70 V43 H52" active={signal} />
           <Blocked x={54} y={70} />
           <FlowArrow d="M80 40 V67 H90" active={!signal} />
           <Blocked x={70} y={70} />
-          <circle cx={10} cy={25} r={7} className={signal ? "fill-signal/20 stroke-signal" : "fill-background stroke-steel"} strokeWidth={1.5} />
-          <path d="M15 30 L28 47" className={signal ? "stroke-signal" : "stroke-steel"} strokeWidth={2} />
+          <path d="M80 20 V36 M70 74 V102 M92 74 V92" className={baseLine} strokeWidth={1.6} />
+          <path d="M86 104 H98 M88 100 H96 M90 96 H94" className={baseLine} strokeWidth={1.2} />
+          <circle
+            cx={10}
+            cy={25}
+            r={7}
+            className={signal ? "fill-signal/20 stroke-signal" : "fill-background stroke-steel"}
+            strokeWidth={1.5}
+          />
+          <path
+            d="M15 30 L28 47"
+            className={signal ? "stroke-signal" : "stroke-steel"}
+            strokeWidth={2}
+          />
           <Spring x={96} y={55} />
+          <PortNumber x={80} y={24} value="2" />
+          <PortNumber x={70} y={96} value="1" />
+          <PortNumber x={92} y={86} value="3" />
         </svg>
       );
 

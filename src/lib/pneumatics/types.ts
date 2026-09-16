@@ -1,11 +1,5 @@
 export type ComponentType =
-  | "source"
-  | "valve32"
-  | "valve52"
-  | "cylinderSingle"
-  | "cylinderDouble"
-  | "button"
-  | "sensor";
+  "source" | "valve32" | "valve52" | "cylinderSingle" | "cylinderDouble" | "button" | "sensor";
 
 export type PortDomain = "pneumatic";
 export type PortKind = "supply" | "work" | "exhaust" | "control";
@@ -118,13 +112,7 @@ export const ACTUATIONS: { id: ActuationType; label: string; group: string }[] =
   },
 ];
 
-export const ACTUATION_GROUPS = [
-  "Manual",
-  "Mecânico",
-  "Pneumático",
-  "Elétrico",
-  "Combinado",
-];
+export const ACTUATION_GROUPS = ["Manual", "Mecânico", "Pneumático", "Elétrico", "Combinado"];
 
 export interface Tube {
   id: string;
@@ -159,5 +147,4 @@ export interface SolveResult {
   actuated: Record<string, boolean>;
 }
 
-export const portKey = (componentId: string, portId: string) =>
-  `${componentId}:${portId}`;
+export const portKey = (componentId: string, portId: string) => `${componentId}:${portId}`;

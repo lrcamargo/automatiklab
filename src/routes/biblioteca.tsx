@@ -3,6 +3,13 @@ import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { CATALOG_LIST, FAMILIES } from "@/lib/pneumatics/catalog";
 
+const PORT_KIND_LABEL = {
+  supply: "alimentação",
+  work: "trabalho",
+  exhaust: "exaustão",
+  control: "pilotagem",
+} as const;
+
 export const Route = createFileRoute("/biblioteca")({
   head: () => ({
     meta: [
@@ -31,14 +38,15 @@ function LibraryPage() {
       <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-14">
         <h1 className="text-3xl font-bold">Biblioteca de componentes</h1>
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-          Cada componente da bancada tem portas nomeadas segundo a prática usual da pneumática.
-          A lista abaixo é gerada a partir do mesmo catálogo usado pelo simulador, então nunca
-          fica fora de sincronia com o que você encontra na bancada.
+          Cada componente da bancada tem portas nomeadas segundo a prática usual da pneumática. A
+          lista abaixo é gerada a partir do mesmo catálogo usado pelo simulador, então nunca fica
+          fora de sincronia com o que você encontra na bancada.
         </p>
 
         <p className="mt-5 max-w-3xl border-l-2 border-primary pl-4 font-mono text-xs leading-relaxed text-muted-foreground">
-          Numeração normalizada: 1 (P) = alimentação/pressão · 2 (A) e 4 (B) =
-          trabalho/saída · 3 (R) e 5 (S) = exaustão.
+          Numeração normalizada: 1 (P) = alimentação/pressão · 2 (A) e 4 (B) = trabalho/saída · 3
+          (R) e 5 (S) = exaustão · 14 e 12 = pilotagem pneumática. As portas piloto aparecem quando
+          esse acionamento é escolhido nas propriedades da válvula.
         </p>
 
         {FAMILIES.map((family) => (
@@ -56,9 +64,7 @@ function LibraryPage() {
                   <p className="mt-3 font-mono text-[11px] uppercase tracking-widest text-muted-foreground">
                     {item.ports.length
                       ? `Portas: ${item.ports
-                          .map((p) =>
-                            `${p.label} (${p.kind === "supply" ? "alimentação" : p.kind === "work" ? "trabalho" : "exaustão"})`,
-                          )
+                          .map((port) => `${port.label} (${PORT_KIND_LABEL[port.kind]})`)
                           .join(" · ")}`
                       : "Componente de sinal, sem portas pneumáticas"}
                   </p>
