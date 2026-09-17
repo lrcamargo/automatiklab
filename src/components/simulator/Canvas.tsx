@@ -289,7 +289,7 @@ export function Canvas(props: CanvasProps) {
                   <path
                     d={path}
                     className={cn(
-                      "pointer-events-none fill-none"
+                      "pointer-events-none fill-none",
                       conflicted ? "stroke-destructive" : charged ? "stroke-air" : "stroke-muted",
                     )}
                     strokeWidth={3}
