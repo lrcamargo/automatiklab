@@ -16,7 +16,6 @@ import {
   sanitizeCircuit,
   validateConnection,
 } from "@/lib/pneumatics/circuit";
-import { nextTechnicalLabel, sanitizeCircuit, validateConnection } from "@/lib/pneumatics/circuit";
 import { basicCircuit, springReturnCircuit } from "@/lib/pneumatics/presets";
 import { useSimulation } from "@/lib/pneumatics/useSimulation";
 import { strokeDirection } from "@/lib/pneumatics/engine";
