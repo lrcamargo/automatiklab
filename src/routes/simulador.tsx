@@ -8,6 +8,14 @@ import { PropertiesPanel } from "@/components/simulator/PropertiesPanel";
 import { TechnicalDiagram } from "@/components/simulator/TechnicalDiagram";
 import { Button } from "@/components/ui/button";
 import { CATALOG, hasPneumaticPilot } from "@/lib/pneumatics/catalog";
+import {
+  countAttachedTubes,
+  nextTechnicalLabel,
+  removeComponent,
+  removeTube,
+  sanitizeCircuit,
+  validateConnection,
+} from "@/lib/pneumatics/circuit";
 import { nextTechnicalLabel, sanitizeCircuit, validateConnection } from "@/lib/pneumatics/circuit";
 import { basicCircuit, springReturnCircuit } from "@/lib/pneumatics/presets";
 import { useSimulation } from "@/lib/pneumatics/useSimulation";
@@ -42,6 +50,7 @@ function SimulatorPage() {
   const [circuit, setCircuit] = useState<Circuit>(() => basicCircuit());
   const [running, setRunning] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedTubeId, setSelectedTubeId] = useState<string | null>(null);
   const [pendingPort, setPendingPort] = useState<{ componentId: string; portId: string } | null>(
     null,
   );
@@ -148,15 +157,28 @@ function SimulatorPage() {
       }),
     );
 
+  /** remove um componente e todas as mangueiras ligadas a ele */
+  const deleteComponent = (id: string) => {
+    const target = circuit.components.find((component) => component.id === id);
+    const attached = countAttachedTubes(circuit, id);
+
+    setCircuit((previous) => removeComponent(previous, id));
+
+    if (selectedId === id) setSelectedId(null);
+    if (pendingPort?.componentId === id) setPendingPort(null);
+
+    showMessage(
+      attached > 0
+        ? `${target?.label ?? "Componente"} removido com ${attached} ${
+            attached === 1 ? "mangueira" : "mangueiras"
+          }.`
+        : `${target?.label ?? "Componente"} removido.`,
+    );
+  };
+
   const deleteSelected = () => {
     if (!selectedId) return;
-    setCircuit((prev) => ({
-      components: prev.components.filter((component) => component.id !== selectedId),
-      tubes: prev.tubes.filter(
-        (t) => t.from.componentId !== selectedId && t.to.componentId !== selectedId,
-      ),
-    }));
-    setSelectedId(null);
+    deleteComponent(selectedId);
   };
 
   const handlePortClick = (componentId: string, portId: string) => {
@@ -183,15 +205,15 @@ function SimulatorPage() {
   };
 
   const deleteTube = (id: string) => {
-    setCircuit((previous) => ({
-      ...previous,
-      tubes: previous.tubes.filter((tube) => tube.id !== id),
-    }));
+    setCircuit((previous) => removeTube(previous, id));
+    if (selectedTubeId === id) setSelectedTubeId(null);
+    showMessage("Mangueira removida.");
   };
 
   const loadPreset = (preset: Circuit) => {
     setCircuit(preset);
     setSelectedId(null);
+    setSelectedTubeId(null);
     setPendingPort(null);
     reset();
   };
@@ -200,6 +222,7 @@ function SimulatorPage() {
 
   const printTechnicalDiagram = () => {
     setSelectedId(null);
+    setSelectedTubeId(null);
     setPendingPort(null);
     window.setTimeout(() => window.print(), 80);
   };
@@ -290,8 +313,12 @@ function SimulatorPage() {
             runtime={runtime}
             solved={solved}
             selectedId={selectedId}
+            selectedTubeId={selectedTubeId}
             pendingPort={pendingPort}
             onSelect={setSelectedId}
+            onSelectTube={setSelectedTubeId}
+            onDeleteComponent={deleteComponent}
+            onDeleteTube={deleteTube}
             onMove={moveComponent}
             onPortClick={handlePortClick}
             onActivate={activateComponent}
