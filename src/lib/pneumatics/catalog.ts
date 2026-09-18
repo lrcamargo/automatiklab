@@ -45,11 +45,12 @@ export const CATALOG: Record<ComponentType, ComponentDef> = {
     width: 288,
     height: 129,
     ports: [
-      pneumaticPort("B", "4", 166, 0, "work"),
-      pneumaticPort("A", "2", 210, 0, "work"),
-      pneumaticPort("R2", "5", 158, 112, "exhaust"),
+      // vias numeradas da esquerda para a direita: 2 | 4 em cima, 3 | 1 | 5 embaixo
+      pneumaticPort("A", "2", 166, 0, "work"),
+      pneumaticPort("B", "4", 210, 0, "work"),
+      pneumaticPort("R1", "3", 158, 112, "exhaust"),
       pneumaticPort("P", "1", 186, 129, "supply"),
-      pneumaticPort("R1", "3", 216, 112, "exhaust"),
+      pneumaticPort("R2", "5", 216, 112, "exhaust"),
     ],
   },
   cylinderSingle: {

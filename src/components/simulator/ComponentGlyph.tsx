@@ -12,24 +12,36 @@ interface GlyphProps {
 
 const baseLine = "fill-none stroke-steel";
 
+/**
+ * Via de passagem. O material de referência desenha a seta como um traço
+ * *reto* entre as duas conexões do quadro, com a ponta indicando o sentido do
+ * fluxo — nunca em cotovelo.
+ */
 function FlowArrow({ d, active = false }: { d: string; active?: boolean }) {
   return (
     <path
       d={d}
       className={active ? "fill-none stroke-air" : baseLine}
       strokeWidth={2}
+      strokeLinecap="butt"
       markerEnd="url(#component-flow-arrow)"
     />
   );
 }
 
+/**
+ * Conexão de bloqueio (tampão). Conforme o material de referência, é
+ * identificada "em ângulos retos": a haste encontra um traço transversal
+ * formando um T. Nunca acompanha uma seta na mesma via.
+ */
 function Blocked({ x, y, up = true }: { x: number; y: number; up?: boolean }) {
   const end = up ? y - 13 : y + 13;
   return (
     <path
-      d={`M${x} ${y} V${end} M${x - 6} ${end} H${x + 6}`}
+      d={`M${x} ${y} V${end} M${x - 7} ${end} H${x + 7}`}
       className={baseLine}
       strokeWidth={2}
+      strokeLinecap="butt"
     />
   );
 }
@@ -374,9 +386,11 @@ export function ComponentGlyph({
             className={activeBox(!actuated)}
             strokeWidth={1.7}
           />
-          <FlowArrow d="M86 84 V42 H110" active={actuated} />
-          <Blocked x={112} y={84} />
-          <FlowArrow d="M150 38 V80 H166" active={!actuated} />
+          {/* quadro acionado (deslocado -52): 1 -> 2 reto; a via 3 fica tampada */}
+          <FlowArrow d="M84 84 L98 40" active={actuated} />
+          <Blocked x={114} y={84} />
+          {/* quadro em repouso: 2 -> 3 reto; a via 1 fica tampada */}
+          <FlowArrow d="M150 38 L166 82" active={!actuated} />
           <Blocked x={136} y={84} />
           <path d="M150 0 V34 M136 88 V129 M166 88 V112" className={baseLine} strokeWidth={1.7} />
           <path
@@ -433,12 +447,12 @@ export function ComponentGlyph({
             className={activeBox(!actuated)}
             strokeWidth={1.7}
           />
-          <FlowArrow d="M110 84 V62 L90 40" active={actuated} />
-          <FlowArrow d="M134 38 V60 L140 84" active={actuated} />
-          <Blocked x={138} y={84} />
-          <FlowArrow d="M186 84 V62 L210 40" active={!actuated} />
-          <FlowArrow d="M166 38 V60 L158 84" active={!actuated} />
-          <Blocked x={158} y={84} />
+          {/* quadro acionado (deslocado -76): 1 -> 4 e 2 -> 3, em traço reto */}
+          <FlowArrow d="M110 84 L134 40" active={actuated} />
+          <FlowArrow d="M90 38 L82 82" active={actuated} />
+          {/* quadro em repouso: 1 -> 2 e 4 -> 5, em traço reto */}
+          <FlowArrow d="M186 84 L166 40" active={!actuated} />
+          <FlowArrow d="M210 38 L216 82" active={!actuated} />
           <path
             d="M166 0 V34 M210 0 V34 M158 88 V112 M186 88 V129 M216 88 V112"
             className={baseLine}
@@ -462,11 +476,11 @@ export function ComponentGlyph({
             .map((port) => (
               <PortNumber key={port.id} x={port.x} y={port.y - 10} value={port.label} />
             ))}
-          <PortNumber x={166} y={8} value="4" />
-          <PortNumber x={210} y={8} value="2" />
-          <PortNumber x={158} y={104} value="5" />
+          <PortNumber x={166} y={8} value="2" />
+          <PortNumber x={210} y={8} value="4" />
+          <PortNumber x={158} y={104} value="3" />
           <PortNumber x={186} y={120} value="1" />
-          <PortNumber x={216} y={104} value="3" />
+          <PortNumber x={216} y={104} value="5" />
         </svg>
       );
     }
@@ -577,9 +591,11 @@ export function ComponentGlyph({
             className={activeBox(!signal)}
             strokeWidth={1.6}
           />
-          <FlowArrow d="M34 72 V42 H50" active={signal} />
-          <Blocked x={52} y={72} />
-          <FlowArrow d="M78 38 V68 H90" active={!signal} />
+          {/* acionado (deslocado -36): 1 -> 2 reto; via 3 tampada */}
+          <FlowArrow d="M32 72 L42 42" active={signal} />
+          <Blocked x={54} y={72} />
+          {/* repouso: 2 -> 3 reto; via 1 tampada */}
+          <FlowArrow d="M78 38 L90 70" active={!signal} />
           <Blocked x={68} y={72} />
           <path d="M78 20 V34 M68 76 V102 M90 76 V92" className={baseLine} strokeWidth={1.6} />
           <path d="M84 104 H96 M86 100 H94 M88 96 H92" className={baseLine} strokeWidth={1.2} />
@@ -623,9 +639,11 @@ export function ComponentGlyph({
             className={activeBox(!signal)}
             strokeWidth={1.5}
           />
-          <FlowArrow d="M38 70 V43 H52" active={signal} />
-          <Blocked x={54} y={70} />
-          <FlowArrow d="M80 40 V67 H90" active={!signal} />
+          {/* acionado (deslocado -36): 1 -> 2 reto; via 3 tampada */}
+          <FlowArrow d="M34 70 L44 43" active={signal} />
+          <Blocked x={56} y={70} />
+          {/* repouso: 2 -> 3 reto; via 1 tampada */}
+          <FlowArrow d="M80 40 L92 68" active={!signal} />
           <Blocked x={70} y={70} />
           <path d="M80 20 V36 M70 74 V102 M92 74 V92" className={baseLine} strokeWidth={1.6} />
           <path d="M86 104 H98 M88 100 H96 M90 96 H94" className={baseLine} strokeWidth={1.2} />

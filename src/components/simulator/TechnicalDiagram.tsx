@@ -28,8 +28,12 @@ const portPosition = (circuit: Circuit, componentId: string, portId: string) => 
   return comp && port ? { x: comp.x + port.x, y: comp.y + port.y } : null;
 };
 
-const orthogonalPath = (a: { x: number; y: number }, b: { x: number; y: number }) => {
-  const middleY = a.y + (b.y - a.y) / 2;
+const orthogonalPath = (
+  a: { x: number; y: number },
+  b: { x: number; y: number },
+  midY?: number,
+) => {
+  const middleY = midY ?? a.y + (b.y - a.y) / 2;
   return `M${a.x} ${a.y} V${middleY} H${b.x} V${b.y}`;
 };
 
@@ -88,7 +92,7 @@ export function TechnicalDiagram({ circuit, runtime, solved }: TechnicalDiagramP
             return (
               <path
                 key={tube.id}
-                d={orthogonalPath(a, b)}
+                d={orthogonalPath(a, b, tube.midY)}
                 className={
                   conflicted
                     ? "fill-none stroke-destructive"

@@ -119,6 +119,12 @@ export interface Tube {
   medium: PortDomain;
   from: { componentId: string; portId: string };
   to: { componentId: string; portId: string };
+  /**
+   * Altura (em coordenadas do mundo) do trecho horizontal que liga as duas
+   * pontas. Quando ausente, a mangueira usa o ponto médio entre as portas.
+   * Arrastar a linha na bancada grava um valor aqui.
+   */
+  midY?: number;
 }
 
 export interface Circuit {

@@ -19,8 +19,11 @@ interface CanvasProps {
   onActivate: (comp: PlacedComponent) => void;
   onDeleteComponent: (id: string) => void;
   onDeleteTube: (id: string) => void;
+  onMoveTube: (id: string, midY: number) => void;
   blockedId: string | null;
   onDropComponent: (type: string, x: number, y: number) => void;
+  /** Com a simulação rodando a bancada fica somente para operação. */
+  editable: boolean;
 }
 
 const GRID = 24;
@@ -49,8 +52,10 @@ export function Canvas(props: CanvasProps) {
     onActivate,
     onDeleteComponent,
     onDeleteTube,
+    onMoveTube,
     blockedId,
     onDropComponent,
+    editable,
   } = props;
   const areaRef = useRef<HTMLDivElement>(null);
   const surfaceRef = useRef<HTMLDivElement>(null);
@@ -62,6 +67,7 @@ export function Canvas(props: CanvasProps) {
     left: number;
     top: number;
   } | null>(null);
+  const tubeDragRef = useRef<{ id: string; offset: number; moved: boolean } | null>(null);
   const [panning, setPanning] = useState(false);
   const worldSize = useMemo(
     () => ({
@@ -90,7 +96,7 @@ export function Canvas(props: CanvasProps) {
   }, []);
 
   const startDrag = (event: PointerEvent, comp: PlacedComponent) => {
-    if (event.button !== 0) return;
+    if (event.button !== 0 || !editable) return;
     const rect = surfaceRef.current?.getBoundingClientRect();
     if (!rect) return;
     dragRef.current = {
@@ -112,6 +118,13 @@ export function Canvas(props: CanvasProps) {
       area.scrollTop = pan.top - (event.clientY - pan.y);
       return;
     }
+    const tubeDrag = tubeDragRef.current;
+    const surface = surfaceRef.current?.getBoundingClientRect();
+    if (tubeDrag && surface) {
+      tubeDrag.moved = true;
+      onMoveTube(tubeDrag.id, snap(event.clientY - surface.top - WORLD_ORIGIN_Y - tubeDrag.offset));
+      return;
+    }
     const drag = dragRef.current;
     const rect = surfaceRef.current?.getBoundingClientRect();
     if (!drag || !rect) return;
@@ -130,8 +143,9 @@ export function Canvas(props: CanvasProps) {
       panRef.current = null;
       setPanning(false);
     }
-    movedRef.current = !!dragRef.current?.moved;
+    movedRef.current = !!dragRef.current?.moved || !!tubeDragRef.current?.moved;
     dragRef.current = null;
+    tubeDragRef.current = null;
   };
 
   /** clique curto (sem arrastar) aciona o componente na bancada */
@@ -144,6 +158,7 @@ export function Canvas(props: CanvasProps) {
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key !== "Delete" && event.key !== "Backspace") return;
+      if (!editable) return;
       const target = event.target as HTMLElement | null;
       if (
         target?.isContentEditable ||
@@ -161,7 +176,7 @@ export function Canvas(props: CanvasProps) {
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [selectedId, selectedTubeId, onDeleteComponent, onDeleteTube]);
+  }, [selectedId, selectedTubeId, onDeleteComponent, onDeleteTube, editable]);
 
   const portPosition = (componentId: string, portId: string) => {
     const comp = circuit.components.find((c) => c.id === componentId);
@@ -186,6 +201,17 @@ export function Canvas(props: CanvasProps) {
         };
         setPanning(true);
         areaRef.current.setPointerCapture(event.pointerId);
+      }}
+      onMouseDown={(event) => {
+        // impede o autoscroll nativo do botão do meio, que sequestra o arrasto
+        if (event.button === 1) event.preventDefault();
+      }}
+      onWheel={(event) => {
+        const area = areaRef.current;
+        if (!area) return;
+        // roda pura → rolagem horizontal da bancada; Shift/trackpad mantêm o eixo natural
+        if (event.shiftKey || Math.abs(event.deltaX) > Math.abs(event.deltaY)) return;
+        area.scrollLeft += event.deltaY;
       }}
       onPointerMove={handleMove}
       onPointerUp={endDrag}
@@ -240,7 +266,7 @@ export function Canvas(props: CanvasProps) {
               const conflicted =
                 solved.conflicts.has(`${tube.from.componentId}:${tube.from.portId}`) ||
                 solved.conflicts.has(`${tube.to.componentId}:${tube.to.portId}`);
-              const middleY = a.y + (b.y - a.y) / 2;
+              const middleY = tube.midY ?? a.y + (b.y - a.y) / 2;
               const path = `M${a.x} ${a.y} V${middleY} H${b.x} V${b.y}`;
               const isSelected = selectedTubeId === tube.id;
               return (
@@ -257,19 +283,39 @@ export function Canvas(props: CanvasProps) {
                       <path d="M0 0 L7 3.5 L0 7 Z" className="fill-air" />
                     </marker>
                   </defs>
-                   {/* faixa invisível e larga: alvo de clique confortável na linha */}
+                  {/* faixa invisível e larga: alvo de clique confortável na linha */}
                   <path
                     d={path}
-                    className="pointer-events-auto cursor-pointer fill-none stroke-transparent"
+                    className={cn(
+                      "pointer-events-auto fill-none stroke-transparent",
+                      editable ? "cursor-ns-resize" : "cursor-pointer",
+                    )}
                     strokeWidth={16}
                     strokeLinejoin="round"
+                    onPointerDown={(event) => {
+                      if (event.button !== 0 || !editable) return;
+                      const surface = surfaceRef.current?.getBoundingClientRect();
+                      if (!surface) return;
+                      event.stopPropagation();
+                      tubeDragRef.current = {
+                        id: tube.id,
+                        offset: event.clientY - surface.top - WORLD_ORIGIN_Y - middleY,
+                        moved: false,
+                      };
+                      (event.target as Element).setPointerCapture?.(event.pointerId);
+                    }}
                     onClick={(event) => {
                       event.stopPropagation();
+                      if (movedRef.current) return;
                       onSelectTube(tube.id);
                       onSelect(null);
                     }}
                   >
-                    <title>Mangueira — clique para selecionar e remover</title>
+                    <title>
+                      {editable
+                        ? "Mangueira — clique para selecionar, arraste para reposicionar"
+                        : "Mangueira — pare a simulação para editar"}
+                    </title>
                   </path>
                   {isSelected && (
                     <path
@@ -312,14 +358,16 @@ export function Canvas(props: CanvasProps) {
             })}
           </svg>
 
+          {/* botão de remoção da mangueira selecionada, ancorado no cotovelo da linha */}
           {(() => {
+            if (!editable) return null;
             const tube = circuit.tubes.find((item) => item.id === selectedTubeId);
             if (!tube) return null;
             const a = portPosition(tube.from.componentId, tube.from.portId);
             const b = portPosition(tube.to.componentId, tube.to.portId);
             if (!a || !b) return null;
             const midX = b.x;
-            const midY = a.y + (b.y - a.y) / 2;
+            const midY = tube.midY ?? a.y + (b.y - a.y) / 2;
             return (
               <button
                 type="button"
@@ -336,6 +384,7 @@ export function Canvas(props: CanvasProps) {
               </button>
             );
           })()}
+
           {circuit.components.map((comp) => {
             const def = CATALOG[comp.type];
             const isSignal = comp.type === "button";
@@ -357,7 +406,7 @@ export function Canvas(props: CanvasProps) {
                     "animate-pulse drop-shadow-[0_0_8px_var(--color-destructive)]",
                 )}
               >
-                {selectedId === comp.id && (
+                {selectedId === comp.id && editable && (
                   <button
                     type="button"
                     onPointerDown={(event) => event.stopPropagation()}
@@ -376,7 +425,10 @@ export function Canvas(props: CanvasProps) {
                 <div
                   onPointerDown={(event) => startDrag(event, comp)}
                   onClick={() => handleGlyphClick(comp)}
-                  className="size-full cursor-grab active:cursor-grabbing"
+                  className={cn(
+                    "size-full",
+                    editable ? "cursor-grab active:cursor-grabbing" : "cursor-pointer",
+                  )}
                 >
                   <ComponentGlyph
                     comp={comp}
@@ -397,7 +449,12 @@ export function Canvas(props: CanvasProps) {
                     <button
                       key={port.id}
                       type="button"
-                      title={`Porta ${port.label} — ${PORT_ROLE[port.kind]}`}
+                      title={
+                        editable
+                          ? `Porta ${port.label} — ${PORT_ROLE[port.kind]}`
+                          : "Pare a simulação para ligar mangueiras"
+                      }
+                      disabled={!editable}
                       onClick={(event) => {
                         event.stopPropagation();
                         onPortClick(comp.id, port.id);

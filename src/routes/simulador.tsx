@@ -121,6 +121,10 @@ function SimulatorPage() {
   );
 
   const addComponent = (type: ComponentType, x = 96, y = 96) => {
+    if (running) {
+      showMessage("Pause a simulação para montar o circuito.");
+      return;
+    }
     const def = CATALOG[type];
     const id = nextId(type);
     const comp: PlacedComponent = {
@@ -158,6 +162,10 @@ function SimulatorPage() {
 
   /** remove um componente e todas as mangueiras ligadas a ele */
   const deleteComponent = (id: string) => {
+    if (running) {
+      showMessage("Pause a simulação para remover componentes.");
+      return;
+    }
     const target = circuit.components.find((component) => component.id === id);
     const attached = countAttachedTubes(circuit, id);
 
@@ -181,6 +189,10 @@ function SimulatorPage() {
   };
 
   const handlePortClick = (componentId: string, portId: string) => {
+    if (running) {
+      showMessage("Pause a simulação para ligar mangueiras.");
+      return;
+    }
     if (!pendingPort) {
       setPendingPort({ componentId, portId });
       return;
@@ -204,10 +216,21 @@ function SimulatorPage() {
   };
 
   const deleteTube = (id: string) => {
+    if (running) {
+      showMessage("Pause a simulação para remover mangueiras.");
+      return;
+    }
     setCircuit((previous) => removeTube(previous, id));
     if (selectedTubeId === id) setSelectedTubeId(null);
     showMessage("Mangueira removida.");
   };
+
+  /** reposiciona o trecho horizontal da mangueira arrastada na bancada */
+  const moveTube = (id: string, midY: number) =>
+    setCircuit((previous) => ({
+      ...previous,
+      tubes: previous.tubes.map((tube) => (tube.id === id ? { ...tube, midY } : tube)),
+    }));
 
   const loadPreset = (preset: Circuit) => {
     setCircuit(preset);
@@ -303,7 +326,7 @@ function SimulatorPage() {
 
       <div className="editor-only flex min-h-0 flex-1">
         <aside className="hidden w-64 shrink-0 border-r border-border bg-sidebar lg:block">
-          <Palette onAdd={(type) => addComponent(type)} />
+          <Palette onAdd={(type) => addComponent(type)} editable={!running} />
         </aside>
 
         <main className="relative min-w-0 flex-1">
@@ -318,6 +341,8 @@ function SimulatorPage() {
             onSelectTube={setSelectedTubeId}
             onDeleteComponent={deleteComponent}
             onDeleteTube={deleteTube}
+            onMoveTube={moveTube}
+            editable={!running}
             onMove={moveComponent}
             onPortClick={handlePortClick}
             onActivate={activateComponent}
@@ -356,6 +381,7 @@ function SimulatorPage() {
             onChange={patchSelected}
             onDelete={deleteSelected}
             onDeleteTube={deleteTube}
+            editable={!running}
           />
           <div className="border-t border-border p-4">
             <h3 className="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">

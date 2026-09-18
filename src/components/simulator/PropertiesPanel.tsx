@@ -10,6 +10,8 @@ interface PropertiesPanelProps {
   onChange: (patch: Partial<PlacedComponent>) => void;
   onDelete: () => void;
   onDeleteTube: (id: string) => void;
+  /** Com a simulação rodando o painel fica somente leitura. */
+  editable: boolean;
 }
 
 const fieldClass =
@@ -24,6 +26,7 @@ export function PropertiesPanel({
   onChange,
   onDelete,
   onDeleteTube,
+  editable,
 }: PropertiesPanelProps) {
   if (!selected) {
     return (
@@ -34,6 +37,11 @@ export function PropertiesPanel({
           <strong className="text-foreground">Como conectar:</strong> clique em uma porta e depois
           na porta de destino para criar a mangueira. Clique duas vezes na mesma porta para
           cancelar.
+        </div>
+        <div className="mt-2 rounded-sm border border-border bg-surface p-3 text-xs leading-relaxed">
+          <strong className="text-foreground">Como remover:</strong> clique em um componente ou em
+          uma mangueira para selecioná-lo e use o botão × que aparece, ou a tecla Delete. Remover um
+          componente também remove as mangueiras ligadas a ele.
         </div>
       </div>
     );
@@ -51,7 +59,10 @@ export function PropertiesPanel({
   );
 
   return (
-    <div className="space-y-4 p-4">
+    <fieldset
+      disabled={!editable}
+      className="space-y-4 border-0 p-4 disabled:opacity-60 [&:disabled_button]:cursor-not-allowed"
+    >
       <div>
         <h2 className="font-mono text-xs uppercase tracking-widest text-muted-foreground">
           Propriedades
@@ -59,6 +70,12 @@ export function PropertiesPanel({
         <p className="mt-1 text-sm font-semibold">{def.name}</p>
         <p className="mt-1 text-xs leading-snug text-muted-foreground">{def.description}</p>
       </div>
+
+      {!editable && (
+        <p className="rounded-sm border border-border bg-surface px-2 py-1.5 text-xs text-muted-foreground">
+          Simulação em execução: pause para editar ou remover.
+        </p>
+      )}
 
       <div>
         <label className={labelClass} htmlFor="label">
@@ -282,6 +299,6 @@ export function PropertiesPanel({
       >
         <Trash2 className="size-4" /> Remover componente
       </button>
-    </div>
+    </fieldset>
   );
 }
