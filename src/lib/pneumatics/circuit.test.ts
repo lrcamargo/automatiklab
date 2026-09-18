@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { portsForComponent } from "./catalog";
-import { nextTechnicalLabel, sanitizeCircuit, validateConnection } from "./circuit";
+import { nextTechnicalLabel, sanitizeCircuit, tubePath, validateConnection } from "./circuit";
 import { springReturnCircuit } from "./presets";
 import type { PlacedComponent } from "./types";
 
@@ -62,5 +62,30 @@ describe("modelo de circuito", () => {
     const sanitized = sanitizeCircuit(changed);
     expect(sanitized.tubes.some((tube) => tube.to.portId === "14")).toBe(false);
     expect(sanitized.tubes).toHaveLength(circuit.tubes.length - 1);
+  });
+});
+
+describe("tubePath", () => {
+  const a = { x: 100, y: 0 };
+  const b = { x: 300, y: 200 };
+
+  it("usa a altura média e desce sobre a porta de destino sem ajustes", () => {
+    expect(tubePath(a, b)).toBe("M100 0 V100 H300 V200");
+  });
+
+  it("respeita a altura manual do trecho horizontal", () => {
+    expect(tubePath(a, b, 40)).toBe("M100 0 V40 H300 V200");
+  });
+
+  it("cria um degrau lateral quando midX sai de cima do destino", () => {
+    expect(tubePath(a, b, 40, 220)).toBe("M100 0 V40 H220 V200 H300");
+  });
+
+  it("volta ao traçado simples quando midX coincide com o destino", () => {
+    expect(tubePath(a, b, 40, 300)).toBe("M100 0 V40 H300 V200");
+  });
+
+  it("aceita coordenadas negativas (bancada à esquerda da origem)", () => {
+    expect(tubePath({ x: -240, y: -120 }, { x: -40, y: 0 })).toBe("M-240 -120 V-60 H-40 V0");
   });
 });

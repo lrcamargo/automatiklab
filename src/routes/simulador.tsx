@@ -225,11 +225,11 @@ function SimulatorPage() {
     showMessage("Mangueira removida.");
   };
 
-  /** reposiciona o trecho horizontal da mangueira arrastada na bancada */
-  const moveTube = (id: string, midY: number) =>
+  /** reposiciona os cotovelos da mangueira arrastada na bancada */
+  const moveTube = (id: string, midY: number, midX: number) =>
     setCircuit((previous) => ({
       ...previous,
-      tubes: previous.tubes.map((tube) => (tube.id === id ? { ...tube, midY } : tube)),
+      tubes: previous.tubes.map((tube) => (tube.id === id ? { ...tube, midY, midX } : tube)),
     }));
 
   const loadPreset = (preset: Circuit) => {

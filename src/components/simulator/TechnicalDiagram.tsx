@@ -1,4 +1,5 @@
 import { CATALOG, portsForComponent } from "@/lib/pneumatics/catalog";
+import { tubePath } from "@/lib/pneumatics/circuit";
 import type { Circuit, RuntimeState, SolveResult } from "@/lib/pneumatics/types";
 import { ComponentGlyph } from "./ComponentGlyph";
 
@@ -28,14 +29,7 @@ const portPosition = (circuit: Circuit, componentId: string, portId: string) => 
   return comp && port ? { x: comp.x + port.x, y: comp.y + port.y } : null;
 };
 
-const orthogonalPath = (
-  a: { x: number; y: number },
-  b: { x: number; y: number },
-  midY?: number,
-) => {
-  const middleY = midY ?? a.y + (b.y - a.y) / 2;
-  return `M${a.x} ${a.y} V${middleY} H${b.x} V${b.y}`;
-};
+const orthogonalPath = tubePath;
 
 export function TechnicalDiagram({ circuit, runtime, solved }: TechnicalDiagramProps) {
   const size = bounds(circuit);
@@ -92,7 +86,7 @@ export function TechnicalDiagram({ circuit, runtime, solved }: TechnicalDiagramP
             return (
               <path
                 key={tube.id}
-                d={orthogonalPath(a, b, tube.midY)}
+                d={orthogonalPath(a, b, tube.midY, tube.midX)}
                 className={
                   conflicted
                     ? "fill-none stroke-destructive"

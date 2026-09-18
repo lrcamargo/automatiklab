@@ -103,3 +103,24 @@ export function sanitizeCircuit(circuit: Circuit): Circuit {
   );
   return tubes.length === circuit.tubes.length ? circuit : { ...circuit, tubes };
 }
+
+/**
+ * Traçado ortogonal de uma mangueira entre duas portas.
+ *
+ * Sem ajuste manual a linha sai reto da origem, corre na horizontal na altura
+ * média e desce reto até o destino. `midY` levanta ou abaixa esse trecho
+ * horizontal; `midX` desloca lateralmente o primeiro cotovelo, criando um
+ * degrau que permite contornar componentes.
+ */
+export function tubePath(
+  a: { x: number; y: number },
+  b: { x: number; y: number },
+  midY?: number,
+  midX?: number,
+): string {
+  const y = midY ?? a.y + (b.y - a.y) / 2;
+  // sem ajuste lateral a coluna vertical fica sobre a porta de destino
+  const x = midX ?? b.x;
+  if (x === b.x) return `M${a.x} ${a.y} V${y} H${b.x} V${b.y}`;
+  return `M${a.x} ${a.y} V${y} H${x} V${b.y} H${b.x}`;
+}

@@ -447,12 +447,14 @@ export function ComponentGlyph({
             className={activeBox(!actuated)}
             strokeWidth={1.7}
           />
-          {/* quadro acionado (deslocado -76): 1 -> 4 e 2 -> 3, em traço reto */}
+          {/* quadro acionado (deslocado -76): 1 -> 4 e 2 -> 3; a via 5 fica tampada */}
           <FlowArrow d="M110 84 L134 40" active={actuated} />
           <FlowArrow d="M90 38 L82 82" active={actuated} />
-          {/* quadro em repouso: 1 -> 2 e 4 -> 5, em traço reto */}
+          <Blocked x={140} y={84} />
+          {/* quadro em repouso: 1 -> 2 e 4 -> 5; a via 3 fica tampada */}
           <FlowArrow d="M186 84 L166 40" active={!actuated} />
           <FlowArrow d="M210 38 L216 82" active={!actuated} />
+          <Blocked x={158} y={84} />
           <path
             d="M166 0 V34 M210 0 V34 M158 88 V112 M186 88 V129 M216 88 V112"
             className={baseLine}

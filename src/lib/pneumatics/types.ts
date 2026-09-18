@@ -125,6 +125,11 @@ export interface Tube {
    * Arrastar a linha na bancada grava um valor aqui.
    */
   midY?: number;
+  /**
+   * Deslocamento lateral do primeiro cotovelo. Quando ausente, a mangueira
+   * sai reto da porta de origem. Arrastar a linha na horizontal grava aqui.
+   */
+  midX?: number;
 }
 
 export interface Circuit {

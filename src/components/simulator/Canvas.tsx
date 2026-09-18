@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent } from "react";
 import { CATALOG, portsForComponent } from "@/lib/pneumatics/catalog";
+import { tubePath } from "@/lib/pneumatics/circuit";
 import type { Circuit, PlacedComponent, RuntimeState, SolveResult } from "@/lib/pneumatics/types";
 import { ComponentGlyph } from "./ComponentGlyph";
 import { X } from "lucide-react";
@@ -19,7 +20,7 @@ interface CanvasProps {
   onActivate: (comp: PlacedComponent) => void;
   onDeleteComponent: (id: string) => void;
   onDeleteTube: (id: string) => void;
-  onMoveTube: (id: string, midY: number) => void;
+  onMoveTube: (id: string, midY: number, midX: number) => void;
   blockedId: string | null;
   onDropComponent: (type: string, x: number, y: number) => void;
   /** Com a simulação rodando a bancada fica somente para operação. */
@@ -67,33 +68,64 @@ export function Canvas(props: CanvasProps) {
     left: number;
     top: number;
   } | null>(null);
-  const tubeDragRef = useRef<{ id: string; offset: number; moved: boolean } | null>(null);
+  const tubeDragRef = useRef<{
+    id: string;
+    offsetX: number;
+    offsetY: number;
+    moved: boolean;
+  } | null>(null);
   const [panning, setPanning] = useState(false);
+
+  /**
+   * A margem antes da origem cresce junto com o componente mais à esquerda (ou
+   * mais acima), para que coordenadas negativas continuem alcançáveis. Sem
+   * isso a bancada parecia ter uma parede no lado esquerdo.
+   */
+  const origin = useMemo(() => {
+    const minX = Math.min(0, ...circuit.components.map((comp) => comp.x));
+    const minY = Math.min(0, ...circuit.components.map((comp) => comp.y));
+    return {
+      x: Math.max(WORLD_ORIGIN_X, -minX + 480),
+      y: Math.max(WORLD_ORIGIN_Y, -minY + 240),
+    };
+  }, [circuit.components]);
+
   const worldSize = useMemo(
     () => ({
       width: Math.max(
         2400,
-        ...circuit.components.map(
-          (comp) => WORLD_ORIGIN_X + comp.x + CATALOG[comp.type].width + 720,
-        ),
+        ...circuit.components.map((comp) => origin.x + comp.x + CATALOG[comp.type].width + 720),
       ),
       height: Math.max(
         1400,
-        ...circuit.components.map(
-          (comp) => WORLD_ORIGIN_Y + comp.y + CATALOG[comp.type].height + 420,
-        ),
+        ...circuit.components.map((comp) => origin.y + comp.y + CATALOG[comp.type].height + 420),
       ),
     }),
-    [circuit.components],
+    [circuit.components, origin],
   );
+
+  const prevOrigin = useRef(origin);
 
   useLayoutEffect(() => {
     const area = areaRef.current;
     if (!area || area.dataset["panReady"]) return;
-    area.scrollLeft = WORLD_ORIGIN_X;
-    area.scrollTop = WORLD_ORIGIN_Y;
+    area.scrollLeft = origin.x;
+    area.scrollTop = origin.y;
     area.dataset["panReady"] = "true";
+    prevOrigin.current = origin;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  /** Ao crescer a margem, compensa o scroll para a bancada não "pular". */
+  useLayoutEffect(() => {
+    const area = areaRef.current;
+    const previous = prevOrigin.current;
+    if (area && (previous.x !== origin.x || previous.y !== origin.y)) {
+      area.scrollLeft += origin.x - previous.x;
+      area.scrollTop += origin.y - previous.y;
+    }
+    prevOrigin.current = origin;
+  }, [origin]);
 
   const startDrag = (event: PointerEvent, comp: PlacedComponent) => {
     if (event.button !== 0 || !editable) return;
@@ -122,17 +154,22 @@ export function Canvas(props: CanvasProps) {
     const surface = surfaceRef.current?.getBoundingClientRect();
     if (tubeDrag && surface) {
       tubeDrag.moved = true;
-      onMoveTube(tubeDrag.id, snap(event.clientY - surface.top - WORLD_ORIGIN_Y - tubeDrag.offset));
+      onMoveTube(
+        tubeDrag.id,
+        snap(event.clientY - surface.top - origin.y - tubeDrag.offsetY),
+        snap(event.clientX - surface.left - origin.x - tubeDrag.offsetX),
+      );
       return;
     }
     const drag = dragRef.current;
     const rect = surfaceRef.current?.getBoundingClientRect();
     if (!drag || !rect) return;
     drag.moved = true;
+    // coordenadas livres: a bancada cresce para os quatro lados
     onMove(
       drag.id,
-      Math.max(0, snap(event.clientX - rect.left - drag.dx)),
-      Math.max(0, snap(event.clientY - rect.top - drag.dy)),
+      snap(event.clientX - rect.left - drag.dx),
+      snap(event.clientY - rect.top - drag.dy),
     );
   };
 
@@ -232,8 +269,8 @@ export function Canvas(props: CanvasProps) {
         if (!type || !rect) return;
         onDropComponent(
           type,
-          snap(event.clientX - rect.left - WORLD_ORIGIN_X - 60),
-          snap(event.clientY - rect.top - WORLD_ORIGIN_Y - 40),
+          snap(event.clientX - rect.left - origin.x - 60),
+          snap(event.clientY - rect.top - origin.y - 40),
         );
       }}
       className={cn(
@@ -249,10 +286,10 @@ export function Canvas(props: CanvasProps) {
         <div
           className="absolute"
           style={{
-            left: WORLD_ORIGIN_X,
-            top: WORLD_ORIGIN_Y,
-            width: worldSize.width - WORLD_ORIGIN_X,
-            height: worldSize.height - WORLD_ORIGIN_Y,
+            left: origin.x,
+            top: origin.y,
+            width: worldSize.width - origin.x,
+            height: worldSize.height - origin.y,
           }}
         >
           <svg className="pointer-events-none absolute inset-0 h-full w-full">
@@ -267,7 +304,7 @@ export function Canvas(props: CanvasProps) {
                 solved.conflicts.has(`${tube.from.componentId}:${tube.from.portId}`) ||
                 solved.conflicts.has(`${tube.to.componentId}:${tube.to.portId}`);
               const middleY = tube.midY ?? a.y + (b.y - a.y) / 2;
-              const path = `M${a.x} ${a.y} V${middleY} H${b.x} V${b.y}`;
+              const path = tubePath(a, b, tube.midY, tube.midX);
               const isSelected = selectedTubeId === tube.id;
               return (
                 <g key={tube.id}>
@@ -288,7 +325,7 @@ export function Canvas(props: CanvasProps) {
                     d={path}
                     className={cn(
                       "pointer-events-auto fill-none stroke-transparent",
-                      editable ? "cursor-ns-resize" : "cursor-pointer",
+                      editable ? "cursor-move" : "cursor-pointer",
                     )}
                     strokeWidth={16}
                     strokeLinejoin="round"
@@ -299,7 +336,8 @@ export function Canvas(props: CanvasProps) {
                       event.stopPropagation();
                       tubeDragRef.current = {
                         id: tube.id,
-                        offset: event.clientY - surface.top - WORLD_ORIGIN_Y - middleY,
+                        offsetY: event.clientY - surface.top - origin.y - middleY,
+                        offsetX: event.clientX - surface.left - origin.x - (tube.midX ?? b.x),
                         moved: false,
                       };
                       (event.target as Element).setPointerCapture?.(event.pointerId);
@@ -366,7 +404,7 @@ export function Canvas(props: CanvasProps) {
             const a = portPosition(tube.from.componentId, tube.from.portId);
             const b = portPosition(tube.to.componentId, tube.to.portId);
             if (!a || !b) return null;
-            const midX = b.x;
+            const midX = tube.midX ?? b.x;
             const midY = tube.midY ?? a.y + (b.y - a.y) / 2;
             return (
               <button
