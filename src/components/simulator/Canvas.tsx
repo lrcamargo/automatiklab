@@ -82,13 +82,21 @@ export function Canvas(props: CanvasProps) {
    * isso a bancada parecia ter uma parede no lado esquerdo.
    */
   const origin = useMemo(() => {
-    const minX = Math.min(0, ...circuit.components.map((comp) => comp.x));
-    const minY = Math.min(0, ...circuit.components.map((comp) => comp.y));
+    const minX = Math.min(
+      0,
+      ...circuit.components.map((comp) => comp.x),
+      ...circuit.tubes.map((tube) => tube.midX ?? 0),
+    );
+    const minY = Math.min(
+      0,
+      ...circuit.components.map((comp) => comp.y),
+      ...circuit.tubes.map((tube) => tube.midY ?? 0),
+    );
     return {
       x: Math.max(WORLD_ORIGIN_X, -minX + 480),
       y: Math.max(WORLD_ORIGIN_Y, -minY + 240),
     };
-  }, [circuit.components]);
+  }, [circuit.components, circuit.tubes]);
 
   const worldSize = useMemo(
     () => ({
@@ -308,18 +316,6 @@ export function Canvas(props: CanvasProps) {
               const isSelected = selectedTubeId === tube.id;
               return (
                 <g key={tube.id}>
-                  <defs>
-                    <marker
-                      id={`flow-${tube.id}`}
-                      markerWidth="7"
-                      markerHeight="7"
-                      refX="6"
-                      refY="3.5"
-                      orient="auto"
-                    >
-                      <path d="M0 0 L7 3.5 L0 7 Z" className="fill-air" />
-                    </marker>
-                  </defs>
                   {/* faixa invisível e larga: alvo de clique confortável na linha */}
                   <path
                     d={path}
@@ -379,7 +375,6 @@ export function Canvas(props: CanvasProps) {
                     strokeWidth={3}
                     strokeLinejoin="round"
                     strokeDasharray={charged && !conflicted ? "10 8" : undefined}
-                    markerEnd={charged && !conflicted ? `url(#flow-${tube.id})` : undefined}
                   >
                     {charged && !conflicted && (
                       <animate

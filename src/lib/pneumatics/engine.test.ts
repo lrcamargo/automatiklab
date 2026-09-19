@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { solveCircuit, stepStrokes, strokeDirection } from "./engine";
+import { solveCircuit, stepStrokes, stepTimers, strokeDirection } from "./engine";
 import { basicCircuit, springReturnCircuit } from "./presets";
 import { portKey, type Circuit, type RuntimeState } from "./types";
 
@@ -138,5 +138,135 @@ describe("motor pneumático topológico", () => {
 
     expect(strokeDirection(circuit.components[3]!, solved)).toBe(1);
     expect(stepStrokes(circuit, state, solved, 1)["cil1"]).toBe(1);
+  });
+});
+
+describe("elementos de processamento de sinal", () => {
+  const base = (extra: Circuit["components"], tubes: Circuit["tubes"]): Circuit => ({
+    components: [{ id: "src", type: "source", x: 0, y: 0, label: "1P1", pressure: 6 }, ...extra],
+    tubes,
+  });
+  const run = (circuit: Circuit) =>
+    solveCircuit(circuit, { strokes: {}, signals: {}, valvePositions: {} });
+
+  it("OU: entrega sinal quando qualquer entrada é pressurizada", () => {
+    const circuit = base(
+      [
+        { id: "or", type: "valveOr", x: 0, y: 0, label: "1V1" },
+        { id: "esc", type: "exhaust", x: 0, y: 0, label: "0Z1" },
+      ],
+      [
+        {
+          id: "t1",
+          medium: "pneumatic",
+          from: { componentId: "src", portId: "P" },
+          to: { componentId: "or", portId: "P1" },
+        },
+        {
+          id: "t2",
+          medium: "pneumatic",
+          from: { componentId: "or", portId: "P2" },
+          to: { componentId: "esc", portId: "R" },
+        },
+      ],
+    );
+    expect(run(circuit).pressurized.has("or:A")).toBe(true);
+  });
+
+  it("E: exige as duas entradas pressurizadas", () => {
+    const oneInput = base(
+      [{ id: "and", type: "valveAnd", x: 0, y: 0, label: "1V1" }],
+      [
+        {
+          id: "t1",
+          medium: "pneumatic",
+          from: { componentId: "src", portId: "P" },
+          to: { componentId: "and", portId: "P1" },
+        },
+      ],
+    );
+    expect(run(oneInput).pressurized.has("and:A")).toBe(false);
+
+    const bothInputs = base(
+      [
+        { id: "and", type: "valveAnd", x: 0, y: 0, label: "1V1" },
+        { id: "src2", type: "source", x: 0, y: 0, label: "1P2", pressure: 6 },
+      ],
+      [
+        {
+          id: "t1",
+          medium: "pneumatic",
+          from: { componentId: "src", portId: "P" },
+          to: { componentId: "and", portId: "P1" },
+        },
+        {
+          id: "t2",
+          medium: "pneumatic",
+          from: { componentId: "src2", portId: "P" },
+          to: { componentId: "and", portId: "P2" },
+        },
+      ],
+    );
+    expect(run(bothInputs).pressurized.has("and:A")).toBe(true);
+  });
+
+  it("temporizadora só libera a saída depois do retardo", () => {
+    const circuit = base(
+      [{ id: "tm", type: "valveTimer", x: 0, y: 0, label: "1V1", delay: 1 }],
+      [
+        {
+          id: "t1",
+          medium: "pneumatic",
+          from: { componentId: "src", portId: "P" },
+          to: { componentId: "tm", portId: "P" },
+        },
+      ],
+    );
+    const waiting = solveCircuit(circuit, {
+      strokes: {},
+      signals: {},
+      valvePositions: {},
+      timers: { tm: false },
+    });
+    expect(waiting.pressurized.has("tm:A")).toBe(false);
+
+    const elapsed = solveCircuit(circuit, {
+      strokes: {},
+      signals: {},
+      valvePositions: {},
+      timers: { tm: true },
+    });
+    expect(elapsed.pressurized.has("tm:A")).toBe(true);
+  });
+
+  it("stepTimers zera a contagem quando o sinal em 12 some", () => {
+    const circuit = base(
+      [{ id: "tm", type: "valveTimer", x: 0, y: 0, label: "1V1", delay: 1 }],
+      [],
+    );
+    const solved = run(circuit);
+    const out = stepTimers(
+      circuit,
+      { strokes: {}, signals: {}, valvePositions: {}, timerElapsed: { tm: 0.8 } },
+      solved,
+      0.5,
+    );
+    expect(out.timerElapsed["tm"]).toBe(0);
+    expect(out.timers["tm"]).toBe(false);
+  });
+
+  it("escape descarrega a linha ligada a ele", () => {
+    const circuit = base(
+      [{ id: "esc", type: "exhaust", x: 0, y: 0, label: "0Z1" }],
+      [
+        {
+          id: "t1",
+          medium: "pneumatic",
+          from: { componentId: "src", portId: "P" },
+          to: { componentId: "esc", portId: "R" },
+        },
+      ],
+    );
+    expect(run(circuit).conflicts.size).toBeGreaterThan(0);
   });
 });

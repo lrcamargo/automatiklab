@@ -104,6 +104,109 @@ export const CATALOG: Record<ComponentType, ComponentDef> = {
       pneumaticPort("R", "3", 92, 92, "exhaust"),
     ],
   },
+  exhaust: {
+    type: "exhaust",
+    name: "Escape para a atmosfera",
+    short: "Escape",
+    description:
+      "Silenciador de exaustão. Liga uma via de escape à atmosfera, descarregando a linha.",
+    family: "alimentacao",
+    width: 72,
+    height: 84,
+    ports: [pneumaticPort("R", "3", 36, 0, "exhaust")],
+  },
+  valveOr: {
+    type: "valveOr",
+    name: "Válvula alternadora (OU)",
+    short: "Elemento OU",
+    description:
+      "Recebe sinais em 1 e 1' e envia o de maior pressão para 2. Só falta sinal em 2 quando as duas entradas estão despressurizadas.",
+    family: "sinal",
+    width: 120,
+    height: 110,
+    ports: [
+      pneumaticPort("A", "2", 60, 0, "work"),
+      pneumaticPort("P1", "1", 24, 110, "supply"),
+      pneumaticPort("P2", "1'", 96, 110, "supply"),
+    ],
+  },
+  valveAnd: {
+    type: "valveAnd",
+    name: "Válvula de simultaneidade (E)",
+    short: "Elemento E",
+    description:
+      "Só envia sinal para 2 quando as duas entradas 1 e 1' estão pressurizadas ao mesmo tempo. Usada em comando bimanual de segurança.",
+    family: "sinal",
+    width: 120,
+    height: 110,
+    ports: [
+      pneumaticPort("A", "2", 60, 0, "work"),
+      pneumaticPort("P1", "1", 24, 110, "supply"),
+      pneumaticPort("P2", "1'", 96, 110, "supply"),
+    ],
+  },
+  valveTimer: {
+    type: "valveTimer",
+    name: "Válvula temporizadora",
+    short: "Temporizadora",
+    description:
+      "Retarda o sinal pneumático: a saída 2 só é liberada depois do tempo ajustado com sinal presente em 12.",
+    family: "sinal",
+    width: 168,
+    height: 129,
+    ports: [
+      pneumaticPort("A", "2", 104, 0, "work"),
+      pneumaticPort("Z", "12", 0, 61, "control"),
+      pneumaticPort("P", "1", 90, 129, "supply"),
+      pneumaticPort("R", "3", 120, 112, "exhaust"),
+    ],
+  },
+  checkValve: {
+    type: "checkValve",
+    name: "Válvula de retenção",
+    short: "Retenção",
+    description: "Permite a passagem do ar em um sentido e bloqueia o sentido contrário.",
+    family: "sinal",
+    width: 120,
+    height: 72,
+    ports: [pneumaticPort("P", "1", 0, 36, "supply"), pneumaticPort("A", "2", 120, 36, "work")],
+  },
+  quickExhaust: {
+    type: "quickExhaust",
+    name: "Válvula de escape rápido",
+    short: "Escape rápido",
+    description:
+      "Descarrega a câmara do cilindro direto para a atmosfera pela via 3, acelerando o movimento.",
+    family: "atuacao",
+    width: 132,
+    height: 110,
+    ports: [
+      pneumaticPort("P", "1", 0, 46, "supply"),
+      pneumaticPort("A", "2", 132, 46, "work"),
+      pneumaticPort("R", "3", 66, 110, "exhaust"),
+    ],
+  },
+  throttleOneWay: {
+    type: "throttleOneWay",
+    name: "Reguladora de fluxo unidirecional",
+    short: "Fluxo unidirecional",
+    description:
+      "Estrangula o ar em um sentido e libera passagem plena no outro, pela retenção em paralelo. Controla a velocidade do cilindro.",
+    family: "atuacao",
+    width: 132,
+    height: 96,
+    ports: [pneumaticPort("P", "1", 0, 48, "supply"), pneumaticPort("A", "2", 132, 48, "work")],
+  },
+  throttle: {
+    type: "throttle",
+    name: "Reguladora de fluxo bidirecional",
+    short: "Fluxo bidirecional",
+    description: "Estrangula a passagem nos dois sentidos, com ajuste único de abertura.",
+    family: "atuacao",
+    width: 120,
+    height: 84,
+    ports: [pneumaticPort("P", "1", 0, 42, "supply"), pneumaticPort("A", "2", 120, 42, "work")],
+  },
 };
 
 const PNEUMATIC_PILOTS = new Set<ActuationType>([

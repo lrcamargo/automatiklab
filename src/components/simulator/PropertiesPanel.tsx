@@ -254,6 +254,48 @@ export function PropertiesPanel({
         </div>
       )}
 
+      {selected.type === "valveTimer" && (
+        <div>
+          <label className={labelClass} htmlFor="delay">
+            Retardo ({(selected.delay ?? 2).toFixed(1)} s)
+          </label>
+          <input
+            id="delay"
+            type="range"
+            min={0.2}
+            max={10}
+            step={0.1}
+            value={selected.delay ?? 2}
+            onChange={(event) => onChange({ delay: Number(event.target.value) })}
+            className="w-full accent-[var(--color-primary)]"
+          />
+          <p className="mt-1 font-mono text-[11px] text-muted-foreground">
+            Contagem: {(runtime.timerElapsed?.[selected.id] ?? 0).toFixed(1)} s
+          </p>
+        </div>
+      )}
+
+      {(selected.type === "throttle" || selected.type === "throttleOneWay") && (
+        <div>
+          <label className={labelClass} htmlFor="restriction">
+            Abertura ({Math.round((selected.restriction ?? 1) * 100)}%)
+          </label>
+          <input
+            id="restriction"
+            type="range"
+            min={0.05}
+            max={1}
+            step={0.05}
+            value={selected.restriction ?? 1}
+            onChange={(event) => onChange({ restriction: Number(event.target.value) })}
+            className="w-full accent-[var(--color-primary)]"
+          />
+          <p className="mt-1 text-[11px] leading-snug text-muted-foreground">
+            A abertura reduz a velocidade dos cilindros ligados a jusante.
+          </p>
+        </div>
+      )}
+
       <div>
         <h3 className={labelClass}>Conexões pneumáticas</h3>
         {connectedTubes.length === 0 ? (

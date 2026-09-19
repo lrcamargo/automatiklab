@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { solveCircuit, stepStrokes } from "./engine";
+import { solveCircuit, stepStrokes, stepTimers } from "./engine";
 import type { Circuit, RuntimeState, SolveResult } from "./types";
 
 const emptyRuntime = (): RuntimeState => ({
   strokes: {},
   signals: {},
   valvePositions: {},
+  timers: {},
+  timerElapsed: {},
 });
 
 const emptySolve = (): SolveResult => ({
@@ -34,10 +36,13 @@ export function useSimulation(circuit: Circuit, running: boolean) {
 
       const previous = runtimeRef.current;
       const result = solveCircuit(circuitRef.current, previous);
+      const timing = stepTimers(circuitRef.current, previous, result, deltaSeconds);
       const next: RuntimeState = {
         ...previous,
         strokes: stepStrokes(circuitRef.current, previous, result, deltaSeconds),
         valvePositions: result.actuated,
+        timers: timing.timers,
+        timerElapsed: timing.timerElapsed,
       };
 
       runtimeRef.current = next;

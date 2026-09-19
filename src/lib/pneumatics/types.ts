@@ -1,5 +1,19 @@
 export type ComponentType =
-  "source" | "valve32" | "valve52" | "cylinderSingle" | "cylinderDouble" | "button" | "sensor";
+  | "source"
+  | "valve32"
+  | "valve52"
+  | "cylinderSingle"
+  | "cylinderDouble"
+  | "button"
+  | "sensor"
+  | "exhaust"
+  | "valveOr"
+  | "valveAnd"
+  | "valveTimer"
+  | "checkValve"
+  | "quickExhaust"
+  | "throttleOneWay"
+  | "throttle";
 
 export type PortDomain = "pneumatic";
 export type PortKind = "supply" | "work" | "exhaust" | "control";
@@ -45,6 +59,10 @@ export interface PlacedComponent {
   actuation?: ActuationType | undefined;
   /** válvula: tipo de retorno / acionamento do lado direito */
   returnType?: ActuationType | undefined;
+  /** temporizadora: retardo em segundos entre o sinal em 12 e a saída 2 */
+  delay?: number | undefined;
+  /** reguladora de fluxo: abertura de 0,05 a 1 (1 = totalmente aberta) */
+  restriction?: number | undefined;
 }
 
 export type ActuationType =
@@ -145,6 +163,10 @@ export interface RuntimeState {
   signals: Record<string, boolean>;
   /** memória da última posição estável das válvulas */
   valvePositions: Record<string, boolean>;
+  /** temporizadoras que já cumpriram o retardo e estão comutadas */
+  timers?: Record<string, boolean>;
+  /** tempo acumulado de sinal em cada temporizadora, em segundos */
+  timerElapsed?: Record<string, number>;
 }
 
 export interface SolveResult {

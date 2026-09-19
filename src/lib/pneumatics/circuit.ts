@@ -17,6 +17,15 @@ const TECHNICAL_PREFIX: Record<ComponentType, string> = {
   cylinderDouble: "1A",
   button: "1S",
   sensor: "1S",
+  // escape e elementos de processamento seguem a notação da apostila
+  exhaust: "0Z",
+  valveOr: "1V",
+  valveAnd: "1V",
+  valveTimer: "1V",
+  checkValve: "1V",
+  quickExhaust: "1Y",
+  throttleOneWay: "1Y",
+  throttle: "1Y",
 };
 
 export function nextTechnicalLabel(type: ComponentType, components: PlacedComponent[]) {

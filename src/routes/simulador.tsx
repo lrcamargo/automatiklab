@@ -139,6 +139,8 @@ function SimulatorPage() {
       returnType: type === "valve32" || type === "valve52" ? "mola" : undefined,
       speed: type.startsWith("cylinder") ? 1 : undefined,
       trigger: type === "sensor" ? "extended" : undefined,
+      delay: type === "valveTimer" ? 2 : undefined,
+      restriction: type === "throttle" || type === "throttleOneWay" ? 1 : undefined,
     };
     setCircuit((prev) => ({ ...prev, components: [...prev.components, comp] }));
     setSelectedId(id);
