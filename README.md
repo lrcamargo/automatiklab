@@ -1,26 +1,41 @@
 # AutoMatikLab
 
-Crie uma plataforma web de simulação educacional inspirada na navegação e proposta de https://gvensino.com.br/sim/plc/, mas com identidade e implementação próprias. O diferencial central deve ser permitir montar e usar pneumática no simulador, com base preparada para evolução futura. Comece por uma experiência inicial polida em português (PT-BR): página inicial com explicação e acesso ao simulador; uma área de simulador com painel de componentes pneumáticos (fonte de ar, válvula direcional, cilindro simples e dupla ação, botões/sensores), área de montagem em grade e painel de propriedades/controles. Implemente uma simulação inicial visual e interativa de um circuito básico, mostrando fluxo/estado e movimento do cilindro quando controles forem acionados. Inclua estrutura de biblioteca de componentes, projetos/salvar como experiência preparada na interface e seções de roadmap/expansão sem prometer recursos inexistentes. Priorize arquitetura escalável, UX clara e aparência profissional industrial/educacional. Use placeholders honestos para funcionalidades futuras. Não copie textos, marca ou ativos do site de referência.
+Plataforma web de simulação educacional de **pneumática industrial**, em português (PT-BR).
+O objetivo é permitir que estudantes e instrutores montem circuitos livremente numa bancada
+virtual — arrastando componentes, ligando mangueiras porta a porta e vendo o ar, os pilotos e
+os cilindros responderem — em vez de apenas rodar exemplos prontos.
 
+**Aplicação publicada**: https://automatiklab.lovable.app
 
-This project was built with [Lovable](https://lovable.dev).
+## Como este projeto é desenvolvido
 
-**Live app**: https://automatiklab.lovable.app
+Todo o desenvolvimento do AutoMatikLab é feito com **Lovable** em conjunto com um **assistente
+de IA**: as funcionalidades são especificadas em linguagem natural, implementadas em par com o
+assistente e sincronizadas com este repositório. Não há etapa de codificação manual fora desse
+fluxo — o que está aqui foi construído inteiramente dessa forma.
 
-## Build with Lovable
+## O que já funciona
 
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/b5b692bb-cadc-4a1b-956f-75fcf43ea2c7).
+- Bancada com grade, arrastar e soltar, deslocamento livre e exclusão por clique.
+- Biblioteca com fonte de ar, unidade de conservação (Lubrifil), escape/silenciador,
+  válvulas direcionais 3/2, 4/2, 5/2 e 5/3 de centro fechado, cilindros de simples e dupla
+  ação, fim de curso, elementos lógicos OU e E, temporizadora, contador pneumático,
+  retenção, escape rápido e reguladoras de fluxo uni e bidirecional.
+- Acionamentos configuráveis por válvula (botão, alavanca, pedal, rolete, mola, piloto simples
+  e duplo, servopiloto, solenoide) conforme a ISO 1219.
+- Pilotagem pneumática real pelas portas 14 e 12, com memória nas válvulas de duplo piloto.
+- Propagação topológica de alimentação e escape, movimento dos cilindros, detecção de conflito
+  e de ligação direta à atmosfera.
+- Vista de diagrama técnico e impressão/PDF.
+- Circuitos de exemplo e testes automatizados do núcleo pneumático.
 
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
+## Desenvolvimento
 
-## Development
-O projeto requer **Node.js 22.12 ou superior**. Com npm:
+O projeto requer **Node.js 22.12 ou superior**.
 
 ```sh
-git clone <this-repository-url>
-cd <repository-name>
+git clone <url-deste-repositorio>
+cd automatiklab
 npm install
 npm run dev
 ```
@@ -36,6 +51,26 @@ npm run build
 
 ## Núcleo pneumático
 
-O simulador usa inicialmente um modelo topológico leve: linhas ideais propagam alimentação e escape por portas conectadas, enquanto válvulas de sinal comandam pilotos 14/12. Pressão, vazão, força e perdas quantitativas ainda não fazem parte desta etapa.
+O simulador usa um modelo topológico leve: linhas ideais propagam alimentação e escape entre
+portas conectadas, enquanto as válvulas de sinal comandam os pilotos 14 e 12. Pressão, vazão,
+força e perdas quantitativas ainda não fazem parte desta etapa — o foco é a lógica de comando,
+que é o que os materiais didáticos de pneumática exercitam.
 
-As principais camadas ficam em `src/lib/pneumatics`: catálogo e portas, modelo de circuito, motor, presets e testes. A bancada e os símbolos SVG ficam em `src/components/simulator`.
+As principais camadas ficam em `src/lib/pneumatics`:
+
+| Arquivo | Responsabilidade |
+| --- | --- |
+| `types.ts` | Tipos de componente, portas e estado de runtime |
+| `catalog.ts` | Dimensões, famílias e coordenadas das portas de cada símbolo |
+| `circuit.ts` | Modelo do circuito, rotas das mangueiras, rótulos técnicos e validações |
+| `engine.ts` | Solucionador topológico, posições das válvulas, temporizadores e contadores |
+| `presets.ts` | Circuitos de exemplo |
+| `useSimulation.ts` | Laço de simulação em React |
+
+A bancada e a simbologia SVG ficam em `src/components/simulator`.
+
+## Referências
+
+A simbologia segue a ISO 1219 e o material didático de pneumática do SENAI utilizado como
+referência técnica (numeração DIN ISO 5599-3: `1` alimentação, `2`/`4` utilização, `3`/`5`
+escapes, `10`/`12`/`14` pilotos).
