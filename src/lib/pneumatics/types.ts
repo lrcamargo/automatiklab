@@ -17,7 +17,9 @@ export type ComponentType =
   | "throttle"
   | "counter"
   | "lubrifil"
-  | "conservationUnit";
+  | "conservationUnit"
+  | "rotaryMotor"
+  | "rotaryOscillator";
 
 export type PortDomain = "pneumatic";
 export type PortKind = "supply" | "work" | "exhaust" | "control";
@@ -54,6 +56,18 @@ export interface PlacedComponent {
   momentary?: boolean | undefined;
   /** cilindro: velocidade relativa de avanço (0.2 – 2) */
   speed?: number | undefined;
+  /**
+   * Cilindro de simples ação: lado em que a mola trabalha.
+   * "retornoMola" = ar na traseira, mola recua (repouso recuado);
+   * "avancoMola"  = ar na dianteira, mola avança (repouso avançado).
+   */
+  springAction?: "retornoMola" | "avancoMola" | undefined;
+  /** cilindro de dupla ação: haste passante nos dois lados */
+  throughRod?: boolean | undefined;
+  /** cilindro: amortecimento de fim de curso */
+  cushioning?: "nenhum" | "fixo" | "regulavel" | undefined;
+  /** atuador rotativo: sentido de giro observado pelo fim de curso */
+  rotation?: number | undefined;
   /** fim de curso: cilindro observado e posição de disparo */
   targetId?: string | null | undefined;
   trigger?: "extended" | "retracted" | undefined;

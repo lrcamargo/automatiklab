@@ -145,6 +145,28 @@ export const CATALOG: Record<ComponentType, ComponentDef> = {
     height: 100,
     ports: [pneumaticPort("A", "2", 40, 100, "work"), pneumaticPort("B", "4", 168, 100, "work")],
   },
+  rotaryMotor: {
+    type: "rotaryMotor",
+    name: "Motor pneumático",
+    short: "Motor",
+    description:
+      "Atuador rotativo reversível de deslocamento fixo, com dois sentidos de escoamento e de rotação.",
+    family: "atuacao",
+    width: 132,
+    height: 132,
+    ports: [pneumaticPort("A", "2", 66, 0, "work"), pneumaticPort("B", "4", 66, 132, "work")],
+  },
+  rotaryOscillator: {
+    type: "rotaryOscillator",
+    name: "Atuador de giro controlado",
+    short: "Oscilador",
+    description:
+      "Oscilador com ângulo de rotação limitado e dois sentidos de giro, comandado pelas duas entradas.",
+    family: "atuacao",
+    width: 156,
+    height: 108,
+    ports: [pneumaticPort("A", "2", 0, 40, "work"), pneumaticPort("B", "4", 0, 74, "work")],
+  },
   sensor: {
     type: "sensor",
     name: "Válvula 3/2 de fim de curso",

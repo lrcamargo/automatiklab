@@ -1,7 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { solveCircuit, stepStrokes, stepTimers, strokeDirection } from "./engine";
 import { basicCircuit, springReturnCircuit } from "./presets";
-import { portKey, type Circuit, type RuntimeState } from "./types";
+import {
+  portKey,
+  type Circuit,
+  type PlacedComponent,
+  type RuntimeState,
+  type SolveResult,
+} from "./types";
 
 const runtime = (patch: Partial<RuntimeState> = {}): RuntimeState => ({
   strokes: {},
@@ -284,5 +290,49 @@ describe("elementos de processamento de sinal", () => {
       ],
     );
     expect(run(circuit).conflicts.size).toBeGreaterThan(0);
+  });
+});
+
+describe("variantes de atuador", () => {
+  const cyl = (extra: Partial<PlacedComponent>): PlacedComponent => ({
+    id: "cyl",
+    type: "cylinderSingle",
+    x: 0,
+    y: 0,
+    label: "1A1",
+    ...extra,
+  });
+
+  const solvedWith = (pressurized: string[]): SolveResult => ({
+    pressurized: new Set(pressurized),
+    vented: new Set(),
+    conflicts: new Set(),
+    actuated: {},
+  });
+
+  it("cilindro de simples ação com retorno por mola avança com ar em A", () => {
+    const comp = cyl({ springAction: "retornoMola" });
+    expect(strokeDirection(comp, solvedWith(["cyl:A"]))).toBe(1);
+    expect(strokeDirection(comp, solvedWith([]))).toBe(-1);
+  });
+
+  it("cilindro com avanço por mola inverte: o ar recua e a mola avança", () => {
+    const comp = cyl({ springAction: "avancoMola" });
+    expect(strokeDirection(comp, solvedWith(["cyl:A"]))).toBe(-1);
+    expect(strokeDirection(comp, solvedWith([]))).toBe(1);
+  });
+
+  it("motor pneumático gira nos dois sentidos e para sem pressão", () => {
+    const motor: PlacedComponent = { id: "m", type: "rotaryMotor", x: 0, y: 0, label: "1A1" };
+    expect(strokeDirection(motor, solvedWith(["m:A"]))).toBe(1);
+    expect(strokeDirection(motor, solvedWith(["m:B"]))).toBe(-1);
+    expect(strokeDirection(motor, solvedWith([]))).toBe(0);
+    expect(strokeDirection(motor, solvedWith(["m:A", "m:B"]))).toBe(0);
+  });
+
+  it("oscilador responde às duas entradas", () => {
+    const osc: PlacedComponent = { id: "o", type: "rotaryOscillator", x: 0, y: 0, label: "1A1" };
+    expect(strokeDirection(osc, solvedWith(["o:A"]))).toBe(1);
+    expect(strokeDirection(osc, solvedWith(["o:B"]))).toBe(-1);
   });
 });

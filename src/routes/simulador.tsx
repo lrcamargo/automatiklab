@@ -145,7 +145,12 @@ function SimulatorPage() {
             ? "centragemMolas"
             : undefined,
       preset: type === "counter" ? 1 : undefined,
-      speed: type.startsWith("cylinder") ? 1 : undefined,
+      speed:
+        type.startsWith("cylinder") || type === "rotaryMotor" || type === "rotaryOscillator"
+          ? 1
+          : undefined,
+      springAction: type === "cylinderSingle" ? "retornoMola" : undefined,
+      cushioning: type.startsWith("cylinder") ? "nenhum" : undefined,
       trigger: type === "sensor" ? "extended" : undefined,
       delay: type === "valveTimer" ? 2 : undefined,
       restriction: type === "throttle" || type === "throttleOneWay" ? 1 : undefined,

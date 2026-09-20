@@ -234,7 +234,70 @@ export function PropertiesPanel({
         </>
       )}
 
+      {/*
+        Variantes do cilindro (Quadro 6 da apostila). Em vez de um tipo de
+        componente para cada desenho, a paleta traz só simples e dupla ação e
+        as variações são configuradas aqui.
+      */}
+      {selected.type === "cylinderSingle" && (
+        <div>
+          <label className={labelClass} htmlFor="springAction">
+            Ação da mola
+          </label>
+          <select
+            id="springAction"
+            className={fieldClass}
+            value={selected.springAction ?? "retornoMola"}
+            onChange={(event) =>
+              onChange({ springAction: event.target.value as "retornoMola" | "avancoMola" })
+            }
+          >
+            <option value="retornoMola">
+              Retorno por mola — entrada traseira (repouso recuado)
+            </option>
+            <option value="avancoMola">
+              Avanço por mola — entrada dianteira (repouso avançado)
+            </option>
+          </select>
+        </div>
+      )}
+
+      {selected.type === "cylinderDouble" && (
+        <label className="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            checked={selected.throughRod === true}
+            onChange={(event) => onChange({ throughRod: event.target.checked })}
+            className="size-4 accent-[var(--color-primary)]"
+          />
+          Haste passante (sai pelos dois lados)
+        </label>
+      )}
+
       {(selected.type === "cylinderSingle" || selected.type === "cylinderDouble") && (
+        <div>
+          <label className={labelClass} htmlFor="cushioning">
+            Amortecimento de fim de curso
+          </label>
+          <select
+            id="cushioning"
+            className={fieldClass}
+            value={selected.cushioning ?? "nenhum"}
+            onChange={(event) =>
+              onChange({ cushioning: event.target.value as "nenhum" | "fixo" | "regulavel" })
+            }
+          >
+            <option value="nenhum">Sem amortecimento</option>
+            <option value="fixo">Amortecimento fixo (sem regulagem)</option>
+            <option value="regulavel">Amortecimento regulável</option>
+          </select>
+        </div>
+      )}
+
+      {(selected.type === "cylinderSingle" ||
+        selected.type === "cylinderDouble" ||
+        selected.type === "rotaryMotor" ||
+        selected.type === "rotaryOscillator") && (
         <div>
           <label className={labelClass} htmlFor="speed">
             Velocidade de curso ({(selected.speed ?? 1).toFixed(1)}×)

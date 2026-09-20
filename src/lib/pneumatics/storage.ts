@@ -57,6 +57,10 @@ const componentSchema = z.object({
   delay: z.number().finite().optional(),
   restriction: z.number().finite().optional(),
   preset: z.number().int().min(1).max(99999).optional(),
+  springAction: z.enum(["retornoMola", "avancoMola"]).optional(),
+  throughRod: z.boolean().optional(),
+  cushioning: z.enum(["nenhum", "fixo", "regulavel"]).optional(),
+  rotation: z.number().finite().optional(),
 });
 
 const endpointSchema = z.object({

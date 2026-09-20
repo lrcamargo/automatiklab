@@ -102,13 +102,6 @@ function ActuationSymbol({
     width: w,
     height: h,
   });
-  const wall = (
-    <path
-      d={`M${p(1, -16)} L${p(1, 16)} M${p(1, -16)} L${p(8, -16)} M${p(1, 16)} L${p(8, 16)}`}
-      className={cls}
-      strokeWidth={1.8}
-    />
-  );
   const stem = (from: number, to: number) => (
     <path d={`M${p(from)} L${p(to)}`} className={cls} strokeWidth={1.8} />
   );
@@ -136,12 +129,20 @@ function ActuationSymbol({
     );
   };
 
-  const solenoidBox = (d0: number) => {
+  /**
+   * Solenoide (Quadro 12): retângulo com uma diagonal para uma bobina e duas
+   * diagonais cruzadas em X para duas bobinas — não dois retângulos lado a
+   * lado. `coils` escolhe entre as duas formas.
+   */
+  const solenoidBox = (d0: number, coils: 1 | 2 = 1) => {
     const r = rectAt(d0, 26, 30);
     return (
       <g>
         <rect {...r} className={soft} strokeWidth={1.8} />
         <path d={`M${p(d0 + 3, 12)} L${p(d0 + 23, -12)}`} className={cls} strokeWidth={1.8} />
+        {coils === 2 && (
+          <path d={`M${p(d0 + 3, -12)} L${p(d0 + 23, 12)}`} className={cls} strokeWidth={1.8} />
+        )}
       </g>
     );
   };
@@ -169,77 +170,81 @@ function ActuationSymbol({
   );
 
   switch (type) {
+    // A mola é apenas o ziguezague encostado na caixa: não leva traço de topo.
     case "mola":
-      return (
-        <g>
-          {spring(2)}
-          <path d={`M${p(48, -14)} L${p(48, 14)}`} className={cls} strokeWidth={1.8} />
-        </g>
-      );
+      return <g>{spring(2)}</g>;
     case "centragemMolas":
-      return (
-        <g>
-          {wall}
-          {spring(4)}
-          <path d={`M${p(50, -16)} L${p(50, 16)}`} className={cls} strokeWidth={1.8} />
-        </g>
-      );
+      return <g>{spring(2)}</g>;
     case "manual":
       return (
         <g>
-          {wall}
           {stem(1, 34)}
           <path d={`M${p(34, -11)} L${p(34, 11)}`} className={cls} strokeWidth={2.2} />
         </g>
       );
+    // Alavanca (Quadro 10): haste inclinada com um pequeno círculo na ponta.
     case "alavanca":
       return (
         <g>
-          {wall}
-          {stem(1, 24)}
-          <circle cx={px(24)} cy={y} r={3} className={soft} strokeWidth={1.5} />
-          <path d={`M${p(26)} L${p(38, -26)}`} className={cls} strokeWidth={2.4} />
-          <circle cx={px(40)} cy={y - 30} r={6} className={filled} strokeWidth={1.5} />
+          {stem(1, 30)}
+          <path d={`M${p(30)} L${p(30, -22)}`} className={cls} strokeWidth={1.8} />
+          <circle cx={px(30)} cy={y - 28} r={5} className={soft} strokeWidth={1.6} />
         </g>
       );
+    // Pedal (Quadro 10): placa inclinada apoiada sobre a haste.
     case "pedal":
       return (
         <g>
-          {wall}
-          {stem(1, 22)}
-          <path d={`M${p(16, -14)} L${p(48, -7)}`} className={cls} strokeWidth={3} />
-          <path d={`M${p(22)} L${p(22, -12)}`} className={cls} strokeWidth={1.6} />
+          {stem(1, 24)}
+          <path d={`M${p(24)} L${p(24, -14)}`} className={cls} strokeWidth={1.7} />
+          <path d={`M${p(12, -20)} L${p(46, -10)}`} className={cls} strokeWidth={2.4} />
         </g>
       );
+    /*
+     * Came: o ressalto é arredondado — uma meia-lua cheia sobre a haste,
+     * que é o perfil que empurra o êmbolo ao passar.
+     */
+    /*
+     * Pino adaptador / came (Quadro 11): haste de ponta arredondada — um
+     * retângulo fechado por uma semicircunferência, não um ressalto cheio.
+     */
     case "came":
       return (
         <g>
-          {wall}
-          {stem(1, 28)}
           <path
-            d={`M${p(28, -5)} H${px(47)}`}
+            d={`M${p(1, -9)} L${p(24, -9)} A9 9 0 0 ${dir > 0 ? 1 : 0} ${p(24, 9)} L${p(1, 9)}`}
             className={cls}
-            strokeWidth={5}
-            strokeLinecap="round"
+            strokeWidth={1.8}
+            fill="none"
           />
+          <path d={`M${p(1, -9)} L${p(1, 9)}`} className={cls} strokeWidth={1.8} />
         </g>
       );
     case "rolete":
       return (
         <g>
-          {wall}
           {stem(1, 28)}
           {roller(35)}
         </g>
       );
+    /*
+     * Rolete articulado / escamoteável (Quadro 11): dois círculos ligados pelo
+     * braço inclinado, com a seta indicando o único sentido que aciona.
+     */
     case "roleteEscamoteavel":
       return (
         <g>
-          {wall}
-          {stem(1, 18)}
-          <path d={`M${p(18)} L${p(30, -13)} L${p(42, -13)}`} className={cls} strokeWidth={1.8} />
-          <circle cx={px(30)} cy={y - 13} r={3} className={soft} strokeWidth={1.5} />
-          {roller(49, y - 13)}
+          {stem(1, 14)}
+          <path d={`M${p(14)} L${p(34, -20)}`} className={cls} strokeWidth={1.8} />
+          <circle cx={px(16)} cy={y - 2} r={6} className={soft} strokeWidth={1.6} />
+          <circle cx={px(34)} cy={y - 22} r={6} className={soft} strokeWidth={1.6} />
+          <path d={`M${p(22, -30)} L${p(46, -30)}`} className={cls} strokeWidth={1.5} />
+          <path
+            d={`M${p(40, -34)} L${p(46, -30)} L${p(40, -26)}`}
+            className={cls}
+            strokeWidth={1.4}
+            fill="none"
+          />
         </g>
       );
     case "pilotoSimples":
@@ -269,12 +274,7 @@ function ActuationSymbol({
     case "solenoideSimples":
       return <g>{solenoidBox(1)}</g>;
     case "solenoideDuplo":
-      return (
-        <g>
-          {solenoidBox(1)}
-          {solenoidBox(28)}
-        </g>
-      );
+      return <g>{solenoidBox(1, 2)}</g>;
     case "servoSolenoideDuploManual":
       return (
         <g>
@@ -283,15 +283,18 @@ function ActuationSymbol({
           {pilot(47)}
         </g>
       );
+    /*
+     * Botão pulsador: um semicírculo fechado sobre a haste — a face plana
+     * encosta na haste e a curva é a cabeça do botão.
+     */
     case "botao":
     default:
       return (
         <g>
-          {wall}
-          {stem(1, 30)}
+          {stem(1, 28)}
           <path
-            d={`M${p(30, -12)} A12 12 0 0 ${dir > 0 ? 1 : 0} ${p(30, 12)}`}
-            className={cls}
+            d={`M${p(28, -12)} L${p(28, 12)} A12 12 0 0 ${dir > 0 ? 0 : 1} ${p(28, -12)} Z`}
+            className={soft}
             strokeWidth={1.8}
           />
         </g>
@@ -342,17 +345,23 @@ export function ComponentGlyph({
           <text x={12} y={13} className="fill-foreground font-mono text-[10px] font-semibold">
             {comp.label}
           </text>
+          {/*
+            Compressor (Quadro 4): círculo com o triângulo cheio de admissão
+            e, à direita, o eixo motriz com a seta — foi este eixo, e não o
+            semicírculo, que a norma traz.
+          */}
           <path d="M16 68 V42 H32" className={baseLine} strokeWidth={2} />
           <path d="M12 68 h8 M14 73 h4" className={baseLine} strokeWidth={1.5} />
           <circle cx={54} cy={42} r={22} className="fill-background stroke-steel" strokeWidth={2} />
           <path d="M43 31 L67 42 L43 53 Z" className="fill-air stroke-air" strokeWidth={1.5} />
+          <path d="M70 30 H86 M70 38 H86" className={baseLine} strokeWidth={1.5} />
+          <path d="M78 30 L88 18" className={baseLine} strokeWidth={1.5} />
+          <path d="M88 18 L80 21 M88 18 L85 26" className={baseLine} strokeWidth={1.4} />
           <path
             d="M76 42 H150"
             className={live("P") ? "fill-none stroke-air" : baseLine}
             strokeWidth={2}
           />
-          <path d="M101 42 a14 14 0 0 1 28 0" className={baseLine} strokeWidth={1.5} />
-          <path d="M115 42 l8 -8" className={baseLine} strokeWidth={1.5} />
           <text x={30} y={92} className="fill-air font-mono text-[11px] font-semibold">
             {(comp.pressure ?? 6).toFixed(1)} bar
           </text>
@@ -490,19 +499,52 @@ export function ComponentGlyph({
       );
     }
 
+    /*
+     * Cilindros — ISO 1219 (Quadro 6 da apostila SENAI).
+     *
+     * Um único símbolo cobre todas as variantes, escolhidas no painel:
+     *  - simples ação com retorno por mola (ar atrás, repouso recuado);
+     *  - simples ação com avanço por mola (ar na frente, repouso avançado);
+     *  - dupla ação, opcionalmente com haste passante;
+     *  - amortecimento de fim de curso fixo ou regulável.
+     *
+     * A mola é o ziguezague que ocupa a câmara do lado contra o qual ela
+     * empurra; o amortecimento é o retângulo estreito junto ao fundo, com a
+     * seta diagonal quando é regulável.
+     */
     case "cylinderSingle":
     case "cylinderDouble": {
       const bodyX = 20;
       const bodyY = 24;
       const bodyW = 168;
       const bodyH = 48;
+      const single = comp.type === "cylinderSingle";
+      const frontSpring = single && comp.springAction === "avancoMola";
+      const throughRod = !single && comp.throughRod === true;
+      const cushioning = comp.cushioning ?? "nenhum";
       const pistonX = bodyX + 20 + stroke * 104;
+      const midY = bodyY + bodyH / 2;
+
+      /** ziguezague da mola entre dois x, preenchendo a câmara */
+      const springPath = (from: number, to: number) => {
+        const span = Math.max(0, to - from);
+        const coils = 6;
+        const step = span / (coils * 2);
+        const top = bodyY + 6;
+        const bottom = bodyY + bodyH - 6;
+        let d = `M${from} ${midY}`;
+        for (let i = 0; i < coils * 2; i += 1) {
+          d += ` L${from + step * (i + 0.5)} ${i % 2 === 0 ? top : bottom}`;
+        }
+        return `${d} L${to} ${midY}`;
+      };
+
       return (
         <svg
           width={def.width}
           height={def.height}
           viewBox={`0 0 ${def.width} ${def.height}`}
-          aria-label={`Cilindro de ${comp.type === "cylinderSingle" ? "simples" : "dupla"} ação`}
+          aria-label={`Cilindro de ${single ? "simples" : "dupla"} ação`}
         >
           <text x={20} y={13} className="fill-foreground font-mono text-[10px] font-semibold">
             {comp.label}
@@ -524,7 +566,7 @@ export function ComponentGlyph({
               className={live("A") ? "fill-air/30" : "fill-transparent"}
             />
           )}
-          {!technical && comp.type === "cylinderDouble" && (
+          {!technical && !single && (
             <rect
               x={pistonX + 3}
               y={bodyY + 2}
@@ -533,37 +575,163 @@ export function ComponentGlyph({
               className={live("B") ? "fill-air/30" : "fill-transparent"}
             />
           )}
+          {/* êmbolo */}
           <path
             d={`M${pistonX} ${bodyY} V${bodyY + bodyH}`}
             className="stroke-steel"
             strokeWidth={4}
           />
-          <path
-            d={`M${pistonX + 2} ${bodyY + bodyH / 2} H232`}
-            className="stroke-steel"
-            strokeWidth={4}
-          />
-          {comp.type === "cylinderSingle" && (
-            <path
-              d={`M${pistonX + 5} 62 l10 -28 l10 28 l10 -28 l10 28`}
-              className={baseLine}
-              strokeWidth={1.6}
-            />
+          {/* haste dianteira, sempre presente */}
+          <path d={`M${pistonX + 2} ${midY} H232`} className="stroke-steel" strokeWidth={4} />
+          {/* haste passante: sai também pelo fundo */}
+          {throughRod && (
+            <path d={`M0 ${midY} H${pistonX - 2}`} className="stroke-steel" strokeWidth={4} />
           )}
+          {/* mola: à frente do êmbolo (avanço por mola) ou atrás (retorno) */}
+          {single &&
+            (frontSpring ? (
+              <path
+                d={springPath(bodyX + 2, pistonX - 2)}
+                className={baseLine}
+                strokeWidth={1.6}
+                fill="none"
+              />
+            ) : (
+              <path
+                d={springPath(pistonX + 2, bodyX + bodyW - 2)}
+                className={baseLine}
+                strokeWidth={1.6}
+                fill="none"
+              />
+            ))}
+          {/* amortecimento de fim de curso */}
+          {cushioning !== "nenhum" && (
+            <>
+              <rect
+                x={bodyX + 6}
+                y={bodyY + 8}
+                width={14}
+                height={bodyH - 16}
+                className={baseLine}
+                strokeWidth={1.4}
+                fill="none"
+              />
+              {cushioning === "regulavel" && (
+                <>
+                  <path
+                    d={`M${bodyX + 2} ${bodyY + bodyH - 4} L${bodyX + 26} ${bodyY + 4}`}
+                    className={baseLine}
+                    strokeWidth={1.5}
+                  />
+                  <path
+                    d={`M${bodyX + 26} ${bodyY + 4} L${bodyX + 18} ${bodyY + 7} M${bodyX + 26} ${bodyY + 4} L${bodyX + 23} ${bodyY + 12}`}
+                    className={baseLine}
+                    strokeWidth={1.4}
+                  />
+                </>
+              )}
+            </>
+          )}
+          {/* entradas de ar */}
           <path
-            d="M40 72 V100"
+            d={`M40 ${bodyY + bodyH} V100`}
             className={live("A") ? "fill-none stroke-air" : baseLine}
             strokeWidth={2}
           />
-          {comp.type === "cylinderDouble" && (
+          {!single && (
             <path
-              d="M168 72 V100"
+              d={`M168 ${bodyY + bodyH} V100`}
               className={live("B") ? "fill-none stroke-air" : baseLine}
               strokeWidth={2}
             />
           )}
           <PortNumber x={40} y={92} value="2" />
-          {comp.type === "cylinderDouble" && <PortNumber x={168} y={92} value="4" />}
+          {!single && <PortNumber x={168} y={92} value="4" />}
+        </svg>
+      );
+    }
+
+    /*
+     * Motor pneumático — Quadro 7. Círculo com dois triângulos cheios de
+     * escoamento apontando para dentro (reversível) e o eixo com as setas
+     * dos dois sentidos de rotação.
+     */
+    case "rotaryMotor": {
+      const a = live("A");
+      const b = live("B");
+      return (
+        <svg
+          width={def.width}
+          height={def.height}
+          viewBox={`0 0 ${def.width} ${def.height}`}
+          aria-label="Motor pneumático reversível"
+        >
+          {defs}
+          <text x={4} y={13} className="fill-foreground font-mono text-[10px] font-semibold">
+            {comp.label}
+          </text>
+          <circle cx={66} cy={66} r={38} className={activeBox(a || b)} strokeWidth={2} />
+          {/* triângulos de escoamento, apontando para dentro do círculo */}
+          <path
+            d="M56 34 L76 34 L66 52 Z"
+            className={a ? "fill-air stroke-air" : "fill-steel stroke-steel"}
+            strokeWidth={1.4}
+          />
+          <path
+            d="M56 98 L76 98 L66 80 Z"
+            className={b ? "fill-air stroke-air" : "fill-steel stroke-steel"}
+            strokeWidth={1.4}
+          />
+          <path d="M66 0 V28" className={a ? "fill-none stroke-air" : baseLine} strokeWidth={2} />
+          <path
+            d="M66 104 V132"
+            className={b ? "fill-none stroke-air" : baseLine}
+            strokeWidth={2}
+          />
+          {/* eixo com os dois sentidos de rotação */}
+          <path d="M104 58 H128 M104 74 H128" className={baseLine} strokeWidth={1.7} />
+          <path d="M120 46 L130 52 L120 58" className={baseLine} strokeWidth={1.6} fill="none" />
+          <path d="M120 86 L130 80 L120 74" className={baseLine} strokeWidth={1.6} fill="none" />
+          <PortNumber x={70} y={20} value="2" />
+          <PortNumber x={70} y={124} value="4" />
+        </svg>
+      );
+    }
+
+    /*
+     * Atuador de giro controlado (oscilador) — Quadro 7. Semicírculo de
+     * ângulo limitado, alimentado pelas duas entradas, com o eixo saindo pela
+     * direita.
+     */
+    case "rotaryOscillator": {
+      const a = live("A");
+      const b = live("B");
+      return (
+        <svg
+          width={def.width}
+          height={def.height}
+          viewBox={`0 0 ${def.width} ${def.height}`}
+          aria-label="Atuador rotativo de giro controlado"
+        >
+          {defs}
+          <text x={4} y={13} className="fill-foreground font-mono text-[10px] font-semibold">
+            {comp.label}
+          </text>
+          {/* semicírculo: corpo do oscilador */}
+          <path
+            d="M74 20 A38 38 0 0 1 74 96"
+            className={activeBox(a || b)}
+            strokeWidth={2}
+            fill="none"
+          />
+          <path d="M74 20 V96" className={activeBox(a || b)} strokeWidth={2} />
+          <path d="M0 40 H74" className={a ? "fill-none stroke-air" : baseLine} strokeWidth={2} />
+          <path d="M0 74 H74" className={b ? "fill-none stroke-air" : baseLine} strokeWidth={2} />
+          {/* eixo */}
+          <path d="M112 58 H156" className={baseLine} strokeWidth={2} />
+          <path d="M140 46 L152 52 L140 58" className={baseLine} strokeWidth={1.6} fill="none" />
+          <PortNumber x={4} y={32} value="2" />
+          <PortNumber x={4} y={66} value="4" />
         </svg>
       );
     }
@@ -642,7 +810,6 @@ export function ComponentGlyph({
             strokeWidth={2}
           />
           <path d="M20 34 L52 34 L36 62 Z" className={baseLine} strokeWidth={2} />
-          <path d="M24 70 H48 M28 76 H44 M32 82 H40" className={baseLine} strokeWidth={1.5} />
           <PortNumber x={36} y={22} value="3" />
         </svg>
       );
@@ -829,68 +996,44 @@ export function ComponentGlyph({
     }
 
     /*
-     * Escape rápido — ISO 1219: corpo com entrada 1, saída 2 e escape 3.
-     * Um obturador desliza: com pressão em 1 ele fecha o escape; sem
-     * pressão, 2 descarrega direto pelo triângulo em 3.
-     */
-    case "quickExhaust": {
-      const fed = live("P");
-      return (
-        <svg
-          width={def.width}
-          height={def.height}
-          viewBox={`0 0 ${def.width} ${def.height}`}
-          aria-label="Válvula de escape rápido"
-        >
-          {defs}
-          <text x={4} y={13} className="fill-foreground font-mono text-[10px] font-semibold">
-            {comp.label}
-          </text>
-          <rect
-            x={30}
-            y={24}
-            width={72}
-            height={44}
-            className={activeBox(live("A"))}
-            strokeWidth={1.8}
-          />
-          <path d="M0 46 H30" className={fed ? "fill-none stroke-air" : baseLine} strokeWidth={2} />
-          <path
-            d="M102 46 H132"
-            className={live("A") ? "fill-none stroke-air" : baseLine}
-            strokeWidth={2}
-          />
-          {/* assentos: o obturador fecha um ou outro conforme a pressão */}
-          <path d="M30 24 L48 46 L30 68" className={baseLine} strokeWidth={1.5} fill="none" />
-          <circle
-            cx={fed ? 78 : 60}
-            cy={46}
-            r={9}
-            className={fed ? "fill-air/30 stroke-air" : "fill-background stroke-steel"}
-            strokeWidth={1.8}
-          />
-          {/* escape 3 para a atmosfera */}
-          <path d="M66 68 V82" className={baseLine} strokeWidth={1.8} />
-          <path d="M52 82 L80 82 L66 104 Z" className={baseLine} strokeWidth={1.8} fill="none" />
-          <PortNumber x={4} y={38} value="1" />
-          <PortNumber x={112} y={38} value="2" />
-          <PortNumber x={70} y={92} value="3" />
-        </svg>
-      );
-    }
-
-    /*
      * Reguladoras de fluxo — ISO 1219.
-     * Bidirecional: dois arcos opostos formando o estrangulamento, com a seta
-     * inclinada da regulagem atravessando o símbolo.
-     * Unidirecional: o mesmo estrangulamento em paralelo com uma retenção,
-     * ambos dentro do quadro tracejado que agrupa o conjunto.
+     *
+     * O estrangulamento é desenhado como dois arcos que se aproximam da linha
+     * de fluxo pelo topo e pela base, formando uma garganta (perfil de
+     * Venturi). A seta diagonal atravessando o conjunto indica que a
+     * restrição é ajustável.
+     *
+     * Na bidirecional o estrangulamento fica sozinho sobre a linha. Na
+     * unidirecional ele é montado em paralelo com uma retenção, e o par fica
+     * dentro do invólucro tracejado que identifica o conjunto: o ar é
+     * estrangulado num sentido e passa livre pela retenção no sentido oposto.
      */
     case "throttle":
     case "throttleOneWay": {
       const oneWay = comp.type === "throttleOneWay";
       const flowing = live("A");
       const liveLine = flowing ? "fill-none stroke-air" : baseLine;
+      /** garganta do estrangulamento entre x0 e x1, centrada em cy */
+      const throat = (x0: number, x1: number, cy: number, gap: number) => {
+        const mid = (x0 + x1) / 2;
+        const h = 20;
+        return (
+          <>
+            <path
+              d={`M${x0} ${cy - h} Q${mid} ${cy - h} ${mid} ${cy - gap} Q${mid} ${cy - h} ${x1} ${cy - h}`}
+              className={baseLine}
+              strokeWidth={1.9}
+              fill="none"
+            />
+            <path
+              d={`M${x0} ${cy + h} Q${mid} ${cy + h} ${mid} ${cy + gap} Q${mid} ${cy + h} ${x1} ${cy + h}`}
+              className={baseLine}
+              strokeWidth={1.9}
+              fill="none"
+            />
+          </>
+        );
+      };
       return (
         <svg
           width={def.width}
@@ -907,71 +1050,39 @@ export function ComponentGlyph({
           {oneWay ? (
             <>
               <rect
-                x={26}
+                x={24}
                 y={18}
-                width={80}
-                height={60}
+                width={84}
+                height={62}
                 className="fill-none stroke-steel"
                 strokeWidth={1}
                 strokeDasharray="5 4"
               />
-              <path d="M0 48 H26" className={liveLine} strokeWidth={2} />
-              <path d="M106 48 H132" className={liveLine} strokeWidth={2} />
-              {/* ramo superior: estrangulamento com dois arcos opostos */}
-              <path d="M26 48 V32 H48" className={baseLine} strokeWidth={1.6} />
-              <path d="M84 32 H106 V48" className={baseLine} strokeWidth={1.6} />
-              <path
-                d="M54 22 a9 10 0 0 1 0 20"
-                className={baseLine}
-                strokeWidth={1.8}
-                fill="none"
-              />
-              <path
-                d="M78 22 a9 10 0 0 0 0 20"
-                className={baseLine}
-                strokeWidth={1.8}
-                fill="none"
-              />
-              {/* ramo inferior: retenção liberando o sentido contrário */}
-              <path d="M26 48 V64 H50" className={baseLine} strokeWidth={1.6} />
-              <path d="M78 64 H106 V48" className={baseLine} strokeWidth={1.6} />
-              <path d="M62 54 L62 74" className={baseLine} strokeWidth={1.8} />
-              <path d="M62 54 L74 64 L62 74" className={baseLine} strokeWidth={1.6} fill="none" />
-              <circle
-                cx={55}
-                cy={64}
-                r={6}
-                className="fill-background stroke-steel"
-                strokeWidth={1.5}
-              />
-              {/* seta inclinada da regulagem */}
-              <path d="M98 88 L40 12" className={baseLine} strokeWidth={1.8} />
-              <path d="M40 12 L49 21 M40 12 L51 15" className={baseLine} strokeWidth={1.6} />
+              <path d="M0 48 H24" className={liveLine} strokeWidth={2} />
+              <path d="M108 48 H132" className={liveLine} strokeWidth={2} />
+              {/* ramo superior: estrangulamento ajustável */}
+              <path d="M24 48 V30 H48" className={baseLine} strokeWidth={1.6} />
+              <path d="M84 30 H108 V48" className={baseLine} strokeWidth={1.6} />
+              {throat(48, 84, 30, 6)}
+              {/* ramo inferior: retenção, livre no sentido oposto */}
+              <path d="M24 48 V66 H48" className={baseLine} strokeWidth={1.6} />
+              <path d="M78 66 H108 V48" className={baseLine} strokeWidth={1.6} />
+              <path d="M66 56 L66 76" className={baseLine} strokeWidth={1.8} />
+              <path d="M78 66 L62 58 L62 74 Z" className={baseLine} strokeWidth={1.5} fill="none" />
+              {/* seta diagonal da regulagem */}
+              <path d="M100 92 L34 8" className={baseLine} strokeWidth={1.8} />
+              <path d="M34 8 L44 17 M34 8 L46 11" className={baseLine} strokeWidth={1.6} />
             </>
           ) : (
             <>
               <path d="M0 42 H120" className={liveLine} strokeWidth={2} />
-              {/* estrangulamento simétrico: arcos acima e abaixo da linha */}
-              <path d="M46 16 a11 13 0 0 1 0 24" className={baseLine} strokeWidth={2} fill="none" />
-              <path d="M74 16 a11 13 0 0 0 0 24" className={baseLine} strokeWidth={2} fill="none" />
-              <path
-                d="M46 68 a11 -13 0 0 0 0 -24"
-                className={baseLine}
-                strokeWidth={2}
-                fill="none"
-              />
-              <path
-                d="M74 68 a11 -13 0 0 1 0 -24"
-                className={baseLine}
-                strokeWidth={2}
-                fill="none"
-              />
-              {/* seta inclinada da regulagem */}
+              {throat(36, 84, 42, 7)}
+              {/* seta diagonal da regulagem */}
               <path d="M98 74 L28 10" className={baseLine} strokeWidth={1.8} />
               <path d="M28 10 L38 18 M28 10 L39 13" className={baseLine} strokeWidth={1.6} />
             </>
           )}
-          <text x={4} y={oneWay ? 92 : 80} className="fill-air font-mono text-[10px] font-semibold">
+          <text x={4} y={oneWay ? 94 : 80} className="fill-air font-mono text-[10px] font-semibold">
             {Math.round((comp.restriction ?? 1) * 100)}%
           </text>
           <PortNumber x={0} y={oneWay ? 40 : 34} value="1" />
@@ -1188,9 +1299,23 @@ export function ComponentGlyph({
       );
     }
 
-    /* Lubrifil: filtro, regulador com manômetro e lubrificador. */
+    /*
+     * Unidade de conservação — ISO 1219.
+     *
+     * Forma detalhada: três elementos em série dentro do invólucro tracejado.
+     *  - Filtro: losango com a linha tracejada vertical (elemento filtrante)
+     *    e o dreno em V pendurado no vértice de baixo.
+     *  - Regulador: retângulo com a seta diagonal do ajuste, a mola de um lado
+     *    e o manômetro (círculo com ponteiro) acima.
+     *  - Lubrificador: losango com a linha tracejada e a gota no topo.
+     *
+     * O losango de filtro e de lubrificador é o mesmo símbolo base; o que os
+     * distingue é o dreno (filtro) e a gota (lubrificador).
+     */
     case "lubrifil": {
       const flowing = live("A");
+      const diamond = (cx: number, cy: number) =>
+        `M${cx} ${cy - 20} L${cx + 22} ${cy} L${cx} ${cy + 20} L${cx - 22} ${cy} Z`;
       return (
         <svg
           width={def.width}
@@ -1203,9 +1328,9 @@ export function ComponentGlyph({
             {comp.label}
           </text>
           <rect
-            x={14}
-            y={20}
-            width={200}
+            x={12}
+            y={18}
+            width={204}
             height={84}
             className="fill-none stroke-steel"
             strokeWidth={1}
@@ -1216,37 +1341,94 @@ export function ComponentGlyph({
             className={flowing ? "fill-none stroke-air" : baseLine}
             strokeWidth={2}
           />
-          {/* filtro: losango com dreno */}
-          <path
-            d="M46 32 L70 52 L46 72 L22 52 Z"
-            className={baseLine}
-            strokeWidth={1.5}
-            fill="none"
-          />
-          <path d="M46 52 V72" className={baseLine} strokeWidth={1} strokeDasharray="3 3" />
-          <path d="M46 72 V90 M34 90 H58" className={baseLine} strokeWidth={1.4} />
-          {/* regulador: seta inclinada com mola e manômetro */}
-          <path d="M96 72 L124 32" className={baseLine} strokeWidth={1.8} />
-          <path d="M124 32 L114 36 M124 32 L120 42" className={baseLine} strokeWidth={1.5} />
+          {/* filtro */}
+          <path d={diamond(44, 52)} className={baseLine} strokeWidth={1.6} fill="none" />
+          <path d="M44 32 V72" className={baseLine} strokeWidth={1.2} strokeDasharray="3 3" />
+          <path d="M34 78 L44 92 L54 78" className={baseLine} strokeWidth={1.5} fill="none" />
+          {/* regulador com manômetro */}
+          <rect x={98} y={36} width={34} height={32} className={baseLine} strokeWidth={1.6} />
+          <path d="M102 66 L128 40" className={baseLine} strokeWidth={1.8} />
+          <path d="M128 40 L118 42 M128 40 L126 50" className={baseLine} strokeWidth={1.5} />
           <circle
-            cx={132}
+            cx={115}
             cy={26}
             r={8}
             className="fill-background stroke-steel"
             strokeWidth={1.4}
           />
-          <path d="M132 26 L137 21" className={baseLine} strokeWidth={1.2} />
-          {/* lubrificador: losango com gota */}
+          <path d="M115 26 L120 21" className={baseLine} strokeWidth={1.2} />
+          <path d="M115 34 V36" className={baseLine} strokeWidth={1.2} />
+          {/* lubrificador */}
+          <path d={diamond(184, 52)} className={baseLine} strokeWidth={1.6} fill="none" />
+          <path d="M184 32 V72" className={baseLine} strokeWidth={1.2} strokeDasharray="3 3" />
           <path
-            d="M180 32 L204 52 L180 72 L156 52 Z"
+            d="M184 24 L190 34 A7 7 0 1 1 178 34 Z"
             className={baseLine}
-            strokeWidth={1.5}
+            strokeWidth={1.4}
             fill="none"
           />
-          <path d="M180 38 a6 6 0 1 0 0.1 0" className={baseLine} strokeWidth={1.3} fill="none" />
-          <path d="M180 52 V72" className={baseLine} strokeWidth={1} strokeDasharray="3 3" />
-          <PortNumber x={0} y={44} value="1" />
-          <PortNumber x={210} y={44} value="2" />
+          <PortNumber x={2} y={44} value="1" />
+          <PortNumber x={212} y={44} value="2" />
+        </svg>
+      );
+    }
+
+    /*
+     * Unidade de preparação simplificada — Quadro 5 da apostila.
+     *
+     * Não é um losango solto: é um retângulo atravessado pela linha de fluxo,
+     * com o losango do filtro com dreno (1) inscrito, o manômetro (2) no topo
+     * e o lubrificador (3) — a seta do dreno aponta para baixo, fora do corpo.
+     */
+    case "conservationUnit": {
+      const flowing = live("A");
+      return (
+        <svg
+          width={def.width}
+          height={def.height}
+          viewBox={`0 0 ${def.width} ${def.height}`}
+          aria-label="Unidade de preparação simplificada"
+        >
+          {defs}
+          <text x={4} y={13} className="fill-foreground font-mono text-[10px] font-semibold">
+            {comp.label}
+          </text>
+          <path
+            d="M0 52 H120"
+            className={flowing ? "fill-none stroke-air" : baseLine}
+            strokeWidth={2}
+          />
+          {/* corpo compacto */}
+          <rect
+            x={30}
+            y={28}
+            width={60}
+            height={48}
+            className={activeBox(flowing)}
+            strokeWidth={1.8}
+          />
+          {/* losango do filtro inscrito */}
+          <path
+            d="M60 32 L84 52 L60 72 L36 52 Z"
+            className={baseLine}
+            strokeWidth={1.4}
+            fill="none"
+          />
+          <path d="M60 32 V72" className={baseLine} strokeWidth={1.1} strokeDasharray="3 3" />
+          {/* manômetro */}
+          <circle
+            cx={60}
+            cy={52}
+            r={9}
+            className="fill-background stroke-steel"
+            strokeWidth={1.4}
+          />
+          <path d="M60 52 L65 47" className={baseLine} strokeWidth={1.2} />
+          {/* dreno apontando para baixo */}
+          <path d="M42 76 V92" className={baseLine} strokeWidth={1.5} />
+          <path d="M38 86 L42 94 L46 86" className={baseLine} strokeWidth={1.5} fill="none" />
+          <PortNumber x={2} y={44} value="1" />
+          <PortNumber x={104} y={44} value="2" />
         </svg>
       );
     }

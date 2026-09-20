@@ -418,7 +418,13 @@ export function stepStrokes(
   };
 
   for (const comp of circuit.components) {
-    if (comp.type !== "cylinderSingle" && comp.type !== "cylinderDouble") continue;
+    if (
+      comp.type !== "cylinderSingle" &&
+      comp.type !== "cylinderDouble" &&
+      comp.type !== "rotaryMotor" &&
+      comp.type !== "rotaryOscillator"
+    )
+      continue;
     const current = next[comp.id] ?? 0;
     const speed = (comp.speed ?? 1) * restrictionFor(comp.id) * deltaSeconds;
     const direction = strokeDirection(comp, solved);
@@ -436,10 +442,25 @@ export function strokeDirection(
   comp: Circuit["components"][number],
   solved: SolveResult,
 ): -1 | 0 | 1 {
+  if (comp.type === "rotaryMotor" || comp.type === "rotaryOscillator") {
+    const a = solved.pressurized.has(portKey(comp.id, "A"));
+    const b = solved.pressurized.has(portKey(comp.id, "B"));
+    if (a && !b) return 1;
+    if (b && !a) return -1;
+    return 0;
+  }
   if (comp.type !== "cylinderSingle" && comp.type !== "cylinderDouble") return 0;
   const a = solved.pressurized.has(portKey(comp.id, "A"));
   const b = comp.type === "cylinderDouble" && solved.pressurized.has(portKey(comp.id, "B"));
-  if (comp.type === "cylinderSingle") return a ? 1 : -1;
+  if (comp.type === "cylinderSingle") {
+    /*
+     * Com avanço por mola (entrada dianteira) a lógica se inverte: a mola
+     * mantém a haste avançada e o ar comprimido é quem a recua. O repouso
+     * desse cilindro é avançado, não recuado.
+     */
+    if (comp.springAction === "avancoMola") return a ? -1 : 1;
+    return a ? 1 : -1;
+  }
   if (a && !b) return 1;
   if (b && !a) return -1;
   return 0;
