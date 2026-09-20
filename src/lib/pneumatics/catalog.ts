@@ -189,9 +189,10 @@ export const CATALOG: Record<ComponentType, ComponentDef> = {
     description:
       "Silenciador de exaustão. Liga uma via de escape à atmosfera, descarregando a linha.",
     family: "alimentacao",
-    width: 72,
-    height: 84,
-    ports: [pneumaticPort("R", "3", 36, 0, "exhaust")],
+    // menor que os demais componentes: é só o triângulo de exaustão
+    width: 48,
+    height: 56,
+    ports: [pneumaticPort("R", "3", 24, 0, "exhaust")],
   },
   valveOr: {
     type: "valveOr",
@@ -297,13 +298,19 @@ const PNEUMATIC_PILOTS = new Set<ActuationType>([
 export const hasPneumaticPilot = (type: ActuationType | undefined) =>
   type !== undefined && PNEUMATIC_PILOTS.has(type);
 
+/*
+ * Distância da porta de piloto até a borda da caixa.
+ *
+ * O piloto simples e o duplo desenham um único triângulo por lado (a dupla
+ * pilotagem vem de haver piloto nos dois lados, não de dois triângulos
+ * empilhados), então ocupam a mesma largura. O servo-piloto desenha o
+ * pré-comando em série e por isso precisa de mais espaço.
+ */
 const pilotOffset = (type: ActuationType | undefined) => {
   switch (type) {
-    case "pilotoDuplo":
     case "servoPilotoSimples":
-      return 48;
     case "servoPilotoDuplo":
-      return 72;
+      return 56;
     default:
       return 24;
   }

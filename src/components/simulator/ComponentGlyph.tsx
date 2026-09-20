@@ -135,13 +135,14 @@ function ActuationSymbol({
    * lado. `coils` escolhe entre as duas formas.
    */
   const solenoidBox = (d0: number, coils: 1 | 2 = 1) => {
-    const r = rectAt(d0, 26, 30);
+    // retângulo deitado: a norma usa uma caixa mais larga que alta
+    const r = rectAt(d0, 34, 24);
     return (
       <g>
         <rect {...r} className={soft} strokeWidth={1.8} />
-        <path d={`M${p(d0 + 3, 12)} L${p(d0 + 23, -12)}`} className={cls} strokeWidth={1.8} />
+        <path d={`M${p(d0 + 3, 9)} L${p(d0 + 31, -9)}`} className={cls} strokeWidth={1.8} />
         {coils === 2 && (
-          <path d={`M${p(d0 + 3, -12)} L${p(d0 + 23, 12)}`} className={cls} strokeWidth={1.8} />
+          <path d={`M${p(d0 + 3, -9)} L${p(d0 + 31, 9)}`} className={cls} strokeWidth={1.8} />
         )}
       </g>
     );
@@ -247,28 +248,27 @@ function ActuationSymbol({
           />
         </g>
       );
+    /*
+     * Pilotagem pneumática.
+     *
+     * "Piloto duplo" descreve a válvula inteira — pilotada dos DOIS lados —
+     * e não dois triângulos empilhados de um lado só. Por isso cada lado
+     * desenha apenas o seu piloto; é a combinação entre acionamento e retorno
+     * que produz a dupla pilotagem.
+     *
+     * O servo-piloto (piloto positivo interno) acrescenta o pré-comando: um
+     * piloto menor alimentando o piloto principal, desenhados em série.
+     */
     case "pilotoSimples":
-      return <g>{pilot(1)}</g>;
     case "pilotoDuplo":
-      return (
-        <g>
-          {pilot(1)}
-          {pilot(25)}
-        </g>
-      );
+      return <g>{pilot(1)}</g>;
     case "servoPilotoSimples":
-      return (
-        <g>
-          {pilot(1)}
-          {pilot(25)}
-        </g>
-      );
     case "servoPilotoDuplo":
       return (
         <g>
           {pilot(1)}
-          {pilot(25)}
-          {pilot(49)}
+          <path d={`M${p(24)} L${p(31)}`} className={cls} strokeWidth={1.6} />
+          {pilot(31)}
         </g>
       );
     case "solenoideSimples":
@@ -805,12 +805,12 @@ export function ComponentGlyph({
             {comp.label}
           </text>
           <path
-            d="M36 0 V34"
+            d="M24 0 V24"
             className={live("R") ? "fill-none stroke-air" : baseLine}
             strokeWidth={2}
           />
-          <path d="M20 34 L52 34 L36 62 Z" className={baseLine} strokeWidth={2} />
-          <PortNumber x={36} y={22} value="3" />
+          <path d="M11 24 L37 24 L24 46 Z" className={baseLine} strokeWidth={2} />
+          <PortNumber x={24} y={16} value="3" />
         </svg>
       );
 
@@ -1312,61 +1312,107 @@ export function ComponentGlyph({
      * O losango de filtro e de lubrificador é o mesmo símbolo base; o que os
      * distingue é o dreno (filtro) e a gota (lubrificador).
      */
+    /*
+     * Unidade de conservação COMPLETA — Quadro 5 da apostila.
+     *
+     * Envoltória tracejada contendo, da esquerda para a direita:
+     *   (1) filtro com dreno — losango com linha tracejada vertical e a seta
+     *       do dreno apontando para baixo;
+     *   (2) válvula reguladora de pressão — corpo com mola e a seta inclinada
+     *       da regulagem;
+     *   (3) manômetro — círculo com ponteiro, derivado da linha;
+     *   (4) lubrificador — losango com a gota no topo.
+     * A linha de fluxo entra pela esquerda e sai pela direita.
+     */
     case "lubrifil": {
       const flowing = live("A");
       const diamond = (cx: number, cy: number) =>
-        `M${cx} ${cy - 20} L${cx + 22} ${cy} L${cx} ${cy + 20} L${cx - 22} ${cy} Z`;
+        `M${cx} ${cy - 18} L${cx + 20} ${cy} L${cx} ${cy + 18} L${cx - 20} ${cy} Z`;
+      const numeral = (x: number, yy: number, value: string) => (
+        <text x={x} y={yy} className="fill-muted-foreground font-mono text-[9px]">
+          {value}
+        </text>
+      );
       return (
         <svg
           width={def.width}
           height={def.height}
           viewBox={`0 0 ${def.width} ${def.height}`}
-          aria-label="Unidade de conservação: filtro, regulador e lubrificador"
+          aria-label="Unidade de conservação completa: filtro, regulador, manômetro e lubrificador"
         >
           {defs}
           <text x={4} y={13} className="fill-foreground font-mono text-[10px] font-semibold">
             {comp.label}
           </text>
+
+          {/* envoltória tracejada da unidade */}
           <rect
-            x={12}
-            y={18}
-            width={204}
-            height={84}
+            x={14}
+            y={20}
+            width={200}
+            height={82}
             className="fill-none stroke-steel"
             strokeWidth={1}
             strokeDasharray="5 4"
           />
+
+          {/* linha de fluxo atravessando a unidade */}
           <path
             d="M0 52 H228"
             className={flowing ? "fill-none stroke-air" : baseLine}
             strokeWidth={2}
           />
-          {/* filtro */}
-          <path d={diamond(44, 52)} className={baseLine} strokeWidth={1.6} fill="none" />
-          <path d="M44 32 V72" className={baseLine} strokeWidth={1.2} strokeDasharray="3 3" />
-          <path d="M34 78 L44 92 L54 78" className={baseLine} strokeWidth={1.5} fill="none" />
-          {/* regulador com manômetro */}
-          <rect x={98} y={36} width={34} height={32} className={baseLine} strokeWidth={1.6} />
-          <path d="M102 66 L128 40" className={baseLine} strokeWidth={1.8} />
-          <path d="M128 40 L118 42 M128 40 L126 50" className={baseLine} strokeWidth={1.5} />
+
+          {/* (1) filtro com dreno */}
+          <path d={diamond(46, 52)} className="fill-background stroke-steel" strokeWidth={1.6} />
+          <path d="M46 34 V70" className={baseLine} strokeWidth={1.2} strokeDasharray="3 3" />
+          <path d="M46 70 V88" className={baseLine} strokeWidth={1.3} />
+          <path d="M41 81 L46 90 L51 81" className={baseLine} strokeWidth={1.3} fill="none" />
+          {numeral(42, 32, "1")}
+
+          {/* (2) válvula reguladora de pressão: corpo, mola e seta de regulagem */}
+          <rect
+            x={96}
+            y={38}
+            width={30}
+            height={28}
+            className="fill-background stroke-steel"
+            strokeWidth={1.6}
+          />
+          <path d="M111 66 V80" className={baseLine} strokeWidth={1.2} />
+          <path
+            d="M105 70 L117 72 L105 75 L117 77"
+            className={baseLine}
+            strokeWidth={1.2}
+            fill="none"
+          />
+          <path d="M92 70 L128 34" className={baseLine} strokeWidth={1.6} />
+          <path d="M128 34 L118 36 M128 34 L126 44" className={baseLine} strokeWidth={1.4} />
+          {numeral(98, 34, "2")}
+
+          {/* (3) manômetro derivado da linha */}
+          <path d="M154 52 V34" className={baseLine} strokeWidth={1.2} />
           <circle
-            cx={115}
+            cx={154}
             cy={26}
             r={8}
             className="fill-background stroke-steel"
             strokeWidth={1.4}
           />
-          <path d="M115 26 L120 21" className={baseLine} strokeWidth={1.2} />
-          <path d="M115 34 V36" className={baseLine} strokeWidth={1.2} />
-          {/* lubrificador */}
-          <path d={diamond(184, 52)} className={baseLine} strokeWidth={1.6} fill="none" />
-          <path d="M184 32 V72" className={baseLine} strokeWidth={1.2} strokeDasharray="3 3" />
+          <path d="M154 26 L159 21" className={baseLine} strokeWidth={1.2} />
+          {numeral(164, 24, "3")}
+
+          {/* (4) lubrificador */}
+          <path d={diamond(190, 52)} className="fill-background stroke-steel" strokeWidth={1.6} />
+          <path d="M190 34 V70" className={baseLine} strokeWidth={1.2} strokeDasharray="3 3" />
           <path
-            d="M184 24 L190 34 A7 7 0 1 1 178 34 Z"
+            d="M190 28 L195 38 A6 6 0 1 1 185 38 Z"
             className={baseLine}
-            strokeWidth={1.4}
+            strokeWidth={1.3}
             fill="none"
           />
+          {numeral(198, 70, "4")}
+
           <PortNumber x={2} y={44} value="1" />
           <PortNumber x={212} y={44} value="2" />
         </svg>
@@ -1374,11 +1420,12 @@ export function ComponentGlyph({
     }
 
     /*
-     * Unidade de preparação simplificada — Quadro 5 da apostila.
+     * Unidade de conservação SIMPLIFICADA — Quadro 5 da apostila.
      *
-     * Não é um losango solto: é um retângulo atravessado pela linha de fluxo,
-     * com o losango do filtro com dreno (1) inscrito, o manômetro (2) no topo
-     * e o lubrificador (3) — a seta do dreno aponta para baixo, fora do corpo.
+     * É um retângulo de traço contínuo atravessado pela linha de fluxo, com
+     * uma linha tracejada vertical no meio, o manômetro no centro, os
+     * algarismos 1/2/3 acima do corpo (filtro, regulador e lubrificador
+     * reunidos num único símbolo) e a seta do dreno abaixo da caixa.
      */
     case "conservationUnit": {
       const flowing = live("A");
@@ -1387,35 +1434,34 @@ export function ComponentGlyph({
           width={def.width}
           height={def.height}
           viewBox={`0 0 ${def.width} ${def.height}`}
-          aria-label="Unidade de preparação simplificada"
+          aria-label="Unidade de conservação simplificada"
         >
           {defs}
           <text x={4} y={13} className="fill-foreground font-mono text-[10px] font-semibold">
             {comp.label}
           </text>
+
+          {/* linha de fluxo */}
           <path
             d="M0 52 H120"
             className={flowing ? "fill-none stroke-air" : baseLine}
             strokeWidth={2}
           />
-          {/* corpo compacto */}
+
+          {/* corpo: retângulo de traço contínuo */}
           <rect
-            x={30}
-            y={28}
-            width={60}
-            height={48}
+            x={28}
+            y={30}
+            width={64}
+            height={44}
             className={activeBox(flowing)}
             strokeWidth={1.8}
           />
-          {/* losango do filtro inscrito */}
-          <path
-            d="M60 32 L84 52 L60 72 L36 52 Z"
-            className={baseLine}
-            strokeWidth={1.4}
-            fill="none"
-          />
-          <path d="M60 32 V72" className={baseLine} strokeWidth={1.1} strokeDasharray="3 3" />
-          {/* manômetro */}
+
+          {/* divisória tracejada vertical */}
+          <path d="M60 30 V74" className={baseLine} strokeWidth={1.2} strokeDasharray="3 3" />
+
+          {/* manômetro no centro */}
           <circle
             cx={60}
             cy={52}
@@ -1424,9 +1470,22 @@ export function ComponentGlyph({
             strokeWidth={1.4}
           />
           <path d="M60 52 L65 47" className={baseLine} strokeWidth={1.2} />
-          {/* dreno apontando para baixo */}
-          <path d="M42 76 V92" className={baseLine} strokeWidth={1.5} />
-          <path d="M38 86 L42 94 L46 86" className={baseLine} strokeWidth={1.5} fill="none" />
+
+          {/* algarismos dos três elementos reunidos */}
+          <text x={30} y={26} className="fill-muted-foreground font-mono text-[9px]">
+            1
+          </text>
+          <text x={57} y={26} className="fill-muted-foreground font-mono text-[9px]">
+            2
+          </text>
+          <text x={84} y={26} className="fill-muted-foreground font-mono text-[9px]">
+            3
+          </text>
+
+          {/* dreno abaixo do corpo */}
+          <path d="M60 74 V90" className={baseLine} strokeWidth={1.3} />
+          <path d="M55 83 L60 92 L65 83" className={baseLine} strokeWidth={1.3} fill="none" />
+
           <PortNumber x={2} y={44} value="1" />
           <PortNumber x={104} y={44} value="2" />
         </svg>

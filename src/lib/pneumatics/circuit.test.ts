@@ -37,12 +37,12 @@ describe("modelo de circuito", () => {
     const circuit = springReturnCircuit();
     const duplicate = validateConnection(
       circuit,
-      { componentId: "src1", portId: "P" },
+      { componentId: "z1", portId: "A" },
       { componentId: "v1", portId: "P" },
     );
     const valid = validateConnection(
       circuit,
-      { componentId: "btn1", portId: "R" },
+      { componentId: "s1", portId: "R" },
       { componentId: "v1", portId: "R" },
     );
 

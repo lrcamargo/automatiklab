@@ -25,9 +25,9 @@ describe("motor pneumático topológico", () => {
     expect(idle.vented.has(portKey("v1", "14"))).toBe(true);
     expect(idle.pressurized.has(portKey("cil1", "A"))).toBe(false);
 
-    const commanded = solveCircuit(circuit, runtime({ signals: { btn1: true } }));
+    const commanded = solveCircuit(circuit, runtime({ signals: { s1: true } }));
     expect(commanded.actuated["v1"]).toBe(true);
-    expect(commanded.pressurized.has(portKey("btn1", "A"))).toBe(true);
+    expect(commanded.pressurized.has(portKey("s1", "A"))).toBe(true);
     expect(commanded.pressurized.has(portKey("v1", "14"))).toBe(true);
     expect(commanded.pressurized.has(portKey("cil1", "A"))).toBe(true);
   });
@@ -41,7 +41,7 @@ describe("motor pneumático topológico", () => {
 
   it("comuta a válvula 5/2 e pressuriza a câmara correspondente", () => {
     const circuit = basicCircuit();
-    const commanded = solveCircuit(circuit, runtime({ signals: { btn1: true } }));
+    const commanded = solveCircuit(circuit, runtime({ signals: { s1: true } }));
 
     expect(commanded.actuated["v1"]).toBe(true);
     expect(commanded.pressurized.has(portKey("cil1", "B"))).toBe(true);
@@ -155,10 +155,11 @@ describe("motor pneumático topológico", () => {
 
   it("move o cilindro sem ultrapassar os limites do curso", () => {
     const circuit = springReturnCircuit();
-    const state = runtime({ strokes: { cil1: 0.9 }, signals: { btn1: true } });
+    const state = runtime({ strokes: { cil1: 0.9 }, signals: { s1: true } });
     const solved = solveCircuit(circuit, state);
 
-    expect(strokeDirection(circuit.components[3]!, solved)).toBe(1);
+    const cylinder = circuit.components.find((component) => component.id === "cil1")!;
+    expect(strokeDirection(cylinder, solved)).toBe(1);
     expect(stepStrokes(circuit, state, solved, 1)["cil1"]).toBe(1);
   });
 });
