@@ -96,15 +96,6 @@ function SimulatorPage() {
       }
       return;
     }
-    if (comp.type === "button") {
-      if (comp.momentary) {
-        setSignal(comp.id, true);
-        setTimeout(() => setSignal(comp.id, false), 700);
-      } else {
-        toggleSignal(comp.id);
-      }
-      return;
-    }
     if (comp.type === "cylinderSingle" || comp.type === "cylinderDouble") {
       const direction = strokeDirection(comp, solved);
       if (direction === 0) {
@@ -133,10 +124,21 @@ function SimulatorPage() {
       x,
       y,
       label: nextTechnicalLabel(type, circuit.components),
-      momentary: type === "button" ? true : undefined,
+      momentary: type === "valve32" || type === "valve52" ? true : undefined,
       pressure: type === "source" ? 6 : undefined,
-      actuation: type === "valve32" || type === "valve52" ? "botao" : undefined,
-      returnType: type === "valve32" || type === "valve52" ? "mola" : undefined,
+      actuation:
+        type === "valve32" || type === "valve52" || type === "valve42"
+          ? "botao"
+          : type === "valve53"
+            ? "pilotoDuplo"
+            : undefined,
+      returnType:
+        type === "valve32" || type === "valve52" || type === "valve42"
+          ? "mola"
+          : type === "valve53"
+            ? "centragemMolas"
+            : undefined,
+      preset: type === "counter" ? 1 : undefined,
       speed: type.startsWith("cylinder") ? 1 : undefined,
       trigger: type === "sensor" ? "extended" : undefined,
       delay: type === "valveTimer" ? 2 : undefined,

@@ -53,6 +53,66 @@ export const CATALOG: Record<ComponentType, ComponentDef> = {
       pneumaticPort("R2", "5", 216, 112, "exhaust"),
     ],
   },
+  valve42: {
+    type: "valve42",
+    name: "Válvula direcional 4/2",
+    short: "4/2 vias",
+    description:
+      "Quatro vias e duas posições. Comanda cilindro de dupla ação sem parada intermediária, com escape único.",
+    family: "comando",
+    width: 264,
+    height: 129,
+    ports: [
+      pneumaticPort("A", "2", 166, 0, "work"),
+      pneumaticPort("B", "4", 210, 0, "work"),
+      pneumaticPort("R", "3", 166, 112, "exhaust"),
+      pneumaticPort("P", "1", 210, 129, "supply"),
+    ],
+  },
+  valve53: {
+    type: "valve53",
+    name: "Válvula direcional 5/3 centro fechado",
+    short: "5/3 centro fechado",
+    description:
+      "Cinco vias e três posições. No centro todas as vias ficam bloqueadas, permitindo parada intermediária do cilindro.",
+    family: "comando",
+    width: 372,
+    height: 129,
+    ports: [
+      pneumaticPort("A", "2", 208, 0, "work"),
+      pneumaticPort("B", "4", 252, 0, "work"),
+      pneumaticPort("R1", "3", 200, 112, "exhaust"),
+      pneumaticPort("P", "1", 228, 129, "supply"),
+      pneumaticPort("R2", "5", 258, 112, "exhaust"),
+    ],
+  },
+  counter: {
+    type: "counter",
+    name: "Contador pneumático",
+    short: "Contador",
+    description:
+      "Conta pulsos na porta Z e emite sinal em A ao atingir o valor pré-ajustado. A porta Y zera a contagem.",
+    family: "sinal",
+    width: 168,
+    height: 120,
+    ports: [
+      pneumaticPort("A", "2", 168, 40, "work"),
+      pneumaticPort("Z", "12", 0, 40, "control"),
+      pneumaticPort("Y", "10", 0, 86, "control"),
+      pneumaticPort("P", "1", 84, 120, "supply"),
+    ],
+  },
+  lubrifil: {
+    type: "lubrifil",
+    name: "Unidade de conservação (Lubrifil)",
+    short: "Lubrifil",
+    description:
+      "Filtro, regulador de pressão com manômetro e lubrificador. Condiciona o ar antes de entrar no circuito.",
+    family: "alimentacao",
+    width: 228,
+    height: 120,
+    ports: [pneumaticPort("P", "1", 0, 52, "supply"), pneumaticPort("A", "2", 228, 52, "work")],
+  },
   cylinderSingle: {
     type: "cylinderSingle",
     name: "Cilindro de simples ação",
@@ -73,21 +133,6 @@ export const CATALOG: Record<ComponentType, ComponentDef> = {
     width: 242,
     height: 100,
     ports: [pneumaticPort("A", "2", 40, 100, "work"), pneumaticPort("B", "4", 168, 100, "work")],
-  },
-  button: {
-    type: "button",
-    name: "Válvula 3/2 acionada por botão",
-    short: "Botão pneumático",
-    description:
-      "Válvula de sinal 3/2 normalmente fechada. Deve receber ar na porta 1 e enviar o sinal pneumático pela porta 2.",
-    family: "sinal",
-    width: 148,
-    height: 110,
-    ports: [
-      pneumaticPort("A", "2", 78, 20, "work"),
-      pneumaticPort("P", "1", 68, 102, "supply"),
-      pneumaticPort("R", "3", 90, 92, "exhaust"),
-    ],
   },
   sensor: {
     type: "sensor",

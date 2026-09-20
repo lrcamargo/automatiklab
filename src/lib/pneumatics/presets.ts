@@ -7,7 +7,9 @@ export function basicCircuit(): Circuit {
       { id: "src1", type: "source", x: 10, y: 450, label: "1P1", pressure: 6 },
       {
         id: "btn1",
-        type: "button",
+        type: "valve32",
+        actuation: "botao",
+        returnType: "mola",
         x: 0,
         y: 190,
         label: "1S1",
@@ -73,7 +75,9 @@ export function springReturnCircuit(): Circuit {
       { id: "src1", type: "source", x: 10, y: 450, label: "1P1", pressure: 6 },
       {
         id: "btn1",
-        type: "button",
+        type: "valve32",
+        actuation: "botao",
+        returnType: "mola",
         x: 0,
         y: 190,
         label: "1S1",

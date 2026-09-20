@@ -300,7 +300,22 @@ export function Canvas(props: CanvasProps) {
             height: worldSize.height - origin.y,
           }}
         >
-          <svg className="pointer-events-none absolute inset-0 h-full w-full">
+          {/*
+            O SVG precisa de um viewBox deslocado: sem ele o desenho começa em
+            (0,0) e tudo que estiver em coordenada negativa é recortado — era a
+            "parede" que cortava as mangueiras mas não os componentes, já que
+            estes são divs absolutos e vazam para fora do container.
+          */}
+          <svg
+            className="pointer-events-none absolute"
+            style={{
+              left: -origin.x,
+              top: -origin.y,
+              width: worldSize.width,
+              height: worldSize.height,
+            }}
+            viewBox={`${-origin.x} ${-origin.y} ${worldSize.width} ${worldSize.height}`}
+          >
             {circuit.tubes.map((tube) => {
               const a = portPosition(tube.from.componentId, tube.from.portId);
               const b = portPosition(tube.to.componentId, tube.to.portId);
@@ -420,7 +435,7 @@ export function Canvas(props: CanvasProps) {
 
           {circuit.components.map((comp) => {
             const def = CATALOG[comp.type];
-            const isSignal = comp.type === "button";
+            const isSignal = comp.type === "valve32" || comp.type === "valve52";
             const sensorOn =
               comp.type === "sensor"
                 ? comp.trigger === "retracted"
@@ -469,6 +484,7 @@ export function Canvas(props: CanvasProps) {
                     actuated={!!solved.actuated[comp.id]}
                     signal={isSignal ? !!runtime.signals[comp.id] : sensorOn}
                     pressurizedPorts={solved.pressurized}
+                    count={runtime.counts?.[comp.id] ?? 0}
                   />
                 </div>
 

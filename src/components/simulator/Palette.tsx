@@ -7,6 +7,12 @@ interface PaletteProps {
   editable: boolean;
 }
 
+/**
+ * Paleta em grade: cada componente é um quadrado com a sigla técnica em
+ * destaque e o nome curto abaixo. A lista vertical crescia demais conforme a
+ * biblioteca aumentava; a grade mostra o dobro de itens na mesma altura e o
+ * nome completo continua acessível pelo `title` (tooltip nativo).
+ */
 export function Palette({ onAdd, editable }: PaletteProps) {
   return (
     <div className="flex h-full flex-col">
@@ -20,25 +26,29 @@ export function Palette({ onAdd, editable }: PaletteProps) {
             : "Simulação em execução: pause para montar o circuito."}
         </p>
       </header>
-      <div className="flex-1 space-y-5 overflow-y-auto p-4">
+      <div className="flex-1 space-y-5 overflow-y-auto p-3">
         {FAMILIES.map((family) => (
           <section key={family.id}>
-            <h3 className="mb-2 font-mono text-[10px] uppercase tracking-widest text-primary">
+            <h3 className="mb-2 px-1 font-mono text-[10px] uppercase tracking-widest text-primary">
               {family.label}
             </h3>
-            <ul className="space-y-2">
+            <ul className="grid grid-cols-2 gap-2">
               {CATALOG_LIST.filter((item) => item.family === family.id).map((item) => (
                 <li key={item.type}>
                   <button
                     type="button"
                     draggable={editable}
                     disabled={!editable}
+                    title={item.name}
+                    aria-label={item.name}
                     onDragStart={(event) => event.dataTransfer.setData("text/component", item.type)}
                     onClick={() => onAdd(item.type)}
-                    className="w-full cursor-grab rounded-sm border border-border bg-surface px-3 py-2 text-left transition-colors hover:border-primary hover:bg-surface-strong disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-border disabled:hover:bg-surface"
+                    className="flex aspect-square w-full cursor-grab flex-col items-center justify-center gap-1 rounded-sm border border-border bg-surface p-1.5 text-center transition-colors hover:border-primary hover:bg-surface-strong disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-border disabled:hover:bg-surface"
                   >
-                    <span className="block text-sm font-medium">{item.short}</span>
-                    <span className="mt-0.5 block text-xs leading-snug text-muted-foreground">
+                    <span className="font-mono text-[13px] font-semibold leading-none text-foreground">
+                      {item.short}
+                    </span>
+                    <span className="line-clamp-3 text-[10px] leading-tight text-muted-foreground">
                       {item.name}
                     </span>
                   </button>

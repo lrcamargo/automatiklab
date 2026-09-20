@@ -177,22 +177,23 @@ export function PropertiesPanel({
         </div>
       )}
 
-      {selected.type === "button" && (
-        <div>
-          <label className={labelClass} htmlFor="mode">
-            Modo
-          </label>
-          <select
-            id="mode"
-            className={fieldClass}
-            value={selected.momentary ? "pulso" : "trava"}
-            onChange={(event) => onChange({ momentary: event.target.value === "pulso" })}
-          >
-            <option value="pulso">Momentâneo (pulso)</option>
-            <option value="trava">Com trava (liga/desliga)</option>
-          </select>
-        </div>
-      )}
+      {(selected.type === "valve32" || selected.type === "valve52") &&
+        selected.actuation === "botao" && (
+          <div>
+            <label className={labelClass} htmlFor="mode">
+              Modo
+            </label>
+            <select
+              id="mode"
+              className={fieldClass}
+              value={selected.momentary ? "pulso" : "trava"}
+              onChange={(event) => onChange({ momentary: event.target.value === "pulso" })}
+            >
+              <option value="pulso">Momentâneo (pulso)</option>
+              <option value="trava">Com trava (liga/desliga)</option>
+            </select>
+          </div>
+        )}
 
       {selected.type === "sensor" && (
         <>
@@ -271,6 +272,32 @@ export function PropertiesPanel({
           />
           <p className="mt-1 font-mono text-[11px] text-muted-foreground">
             Contagem: {(runtime.timerElapsed?.[selected.id] ?? 0).toFixed(1)} s
+          </p>
+        </div>
+      )}
+
+      {selected.type === "counter" && (
+        <div>
+          <label className={labelClass} htmlFor="preset">
+            Pré-seleção (1 a 99999)
+          </label>
+          <input
+            id="preset"
+            type="number"
+            min={1}
+            max={99999}
+            step={1}
+            value={selected.preset ?? 1}
+            onChange={(event) =>
+              onChange({
+                preset: Math.min(99999, Math.max(1, Math.round(Number(event.target.value) || 1))),
+              })
+            }
+            className="w-full rounded-sm border border-border bg-surface px-2 py-1 font-mono text-sm"
+          />
+          <p className="mt-1 font-mono text-[11px] text-muted-foreground">
+            Contagem: {runtime.counts?.[selected.id] ?? 0} — a saída 2 abre ao atingir a
+            pré-seleção. O sinal em 10 zera o contador.
           </p>
         </div>
       )}

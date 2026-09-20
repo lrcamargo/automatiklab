@@ -46,8 +46,24 @@ describe("motor pneumático topológico", () => {
     const circuit: Circuit = {
       components: [
         { id: "src", type: "source", x: 0, y: 0, label: "1P1", pressure: 6 },
-        { id: "advance", type: "button", x: 0, y: 0, label: "1S1" },
-        { id: "return", type: "button", x: 0, y: 0, label: "1S2" },
+        {
+          id: "advance",
+          type: "valve32",
+          x: 0,
+          y: 0,
+          label: "1S1",
+          actuation: "botao",
+          returnType: "mola",
+        },
+        {
+          id: "return",
+          type: "valve32",
+          x: 0,
+          y: 0,
+          label: "1S2",
+          actuation: "botao",
+          returnType: "mola",
+        },
         {
           id: "valve",
           type: "valve52",

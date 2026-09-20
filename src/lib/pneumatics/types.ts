@@ -2,9 +2,10 @@ export type ComponentType =
   | "source"
   | "valve32"
   | "valve52"
+  | "valve42"
+  | "valve53"
   | "cylinderSingle"
   | "cylinderDouble"
-  | "button"
   | "sensor"
   | "exhaust"
   | "valveOr"
@@ -13,7 +14,9 @@ export type ComponentType =
   | "checkValve"
   | "quickExhaust"
   | "throttleOneWay"
-  | "throttle";
+  | "throttle"
+  | "counter"
+  | "lubrifil";
 
 export type PortDomain = "pneumatic";
 export type PortKind = "supply" | "work" | "exhaust" | "control";
@@ -63,6 +66,8 @@ export interface PlacedComponent {
   delay?: number | undefined;
   /** reguladora de fluxo: abertura de 0,05 a 1 (1 = totalmente aberta) */
   restriction?: number | undefined;
+  /** contador pneumático: valor pré-ajustado de 1 a 99999 */
+  preset?: number | undefined;
 }
 
 export type ActuationType =
@@ -167,6 +172,10 @@ export interface RuntimeState {
   timers?: Record<string, boolean>;
   /** tempo acumulado de sinal em cada temporizadora, em segundos */
   timerElapsed?: Record<string, number>;
+  /** contagem atual de cada contador pneumático */
+  counts?: Record<string, number>;
+  /** memória de borda: última leitura da porta de contagem */
+  countEdges?: Record<string, boolean>;
 }
 
 export interface SolveResult {

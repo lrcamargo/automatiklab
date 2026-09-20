@@ -114,8 +114,9 @@ export function TechnicalDiagram({ circuit, runtime, solved }: TechnicalDiagramP
                 comp={comp}
                 stroke={runtime.strokes[comp.id] ?? 0}
                 actuated={!!solved.actuated[comp.id]}
-                signal={comp.type === "button" ? !!runtime.signals[comp.id] : sensorOn}
+                signal={comp.type === "sensor" ? sensorOn : !!runtime.signals[comp.id]}
                 pressurizedPorts={solved.pressurized}
+                count={runtime.counts?.[comp.id] ?? 0}
                 technical
               />
             </div>

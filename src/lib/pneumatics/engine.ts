@@ -10,7 +10,7 @@ interface NetworkState {
 }
 
 const isMainValve = (type: Circuit["components"][number]["type"]) =>
-  type === "valve32" || type === "valve52";
+  type === "valve32" || type === "valve52" || type === "valve42" || type === "valve53";
 
 const link = (adjacency: Adjacency, a: string, b: string) => {
   if (!adjacency.has(a)) adjacency.set(a, []);
@@ -73,10 +73,8 @@ function solveNetwork(
         if ((comp.pressure ?? 6) > 0) sources.add(key("P"));
         break;
 
-      case "button":
       case "sensor": {
-        const active =
-          comp.type === "button" ? !!runtime.signals[comp.id] : sensorActive(comp, runtime);
+        const active = sensorActive(comp, runtime);
         exhausts.add(key("R"));
         if (active) link(adjacency, key("P"), key("A"));
         else link(adjacency, key("A"), key("R"));
@@ -101,6 +99,58 @@ function solveNetwork(
           link(adjacency, key("P"), key("A"));
           link(adjacency, key("B"), key("R2"));
         }
+        break;
+
+      /*
+       * 4/2: quatro vias, duas posições, escape único em 3. Acionada liga
+       * 1→4 e 2→3; em repouso liga 1→2 e 4→3.
+       */
+      case "valve42":
+        exhausts.add(key("R"));
+        if (actuated[comp.id]) {
+          link(adjacency, key("P"), key("B"));
+          link(adjacency, key("A"), key("R"));
+        } else {
+          link(adjacency, key("P"), key("A"));
+          link(adjacency, key("B"), key("R"));
+        }
+        break;
+
+      /*
+       * 5/3 centro fechado: a posição central bloqueia todas as vias, o que
+       * prende o cilindro na parada intermediária. Só sai do centro com
+       * piloto ativo em 14 ou 12.
+       */
+      case "valve53": {
+        exhausts.add(key("R1"));
+        exhausts.add(key("R2"));
+        const left = previous?.pressurized.has(key("14")) ?? false;
+        const right = previous?.pressurized.has(key("12")) ?? false;
+        const manual = !!runtime.signals[comp.id];
+        if ((left || manual) && !right) {
+          link(adjacency, key("P"), key("B"));
+          link(adjacency, key("A"), key("R1"));
+        } else if (right && !left && !manual) {
+          link(adjacency, key("P"), key("A"));
+          link(adjacency, key("B"), key("R2"));
+        }
+        // centro fechado: nenhuma ligação — todas as vias bloqueadas
+        break;
+      }
+
+      /*
+       * Contador: emite sinal em 2 quando a contagem atinge o pré-ajuste.
+       * A contagem em si avança em stepCounters, fora do grafo.
+       */
+      case "counter":
+        if ((runtime.counts?.[comp.id] ?? 0) >= (comp.preset ?? 1)) {
+          link(adjacency, key("P"), key("A"));
+        }
+        break;
+
+      // unidade de conservação: passagem direta, condiciona sem bloquear
+      case "lubrifil":
+        link(adjacency, key("P"), key("A"));
         break;
 
       // escape: sempre atmosfera
@@ -311,6 +361,35 @@ export function stepTimers(
   }
 
   return { timers, timerElapsed };
+}
+
+/**
+ * Avança os contadores pneumáticos. A contagem sobe na borda de subida do
+ * sinal em Z; um sinal em Y zera imediatamente.
+ */
+export function stepCounters(
+  circuit: Circuit,
+  runtime: RuntimeState,
+  solved: SolveResult,
+): { counts: Record<string, number>; countEdges: Record<string, boolean> } {
+  const counts: Record<string, number> = { ...runtime.counts };
+  const countEdges: Record<string, boolean> = {};
+
+  for (const comp of circuit.components) {
+    if (comp.type !== "counter") continue;
+    const pulse = solved.pressurized.has(portKey(comp.id, "Z"));
+    const reset = solved.pressurized.has(portKey(comp.id, "Y"));
+    const previousPulse = runtime.countEdges?.[comp.id] ?? false;
+
+    if (reset) counts[comp.id] = 0;
+    else if (pulse && !previousPulse) {
+      counts[comp.id] = Math.min(99999, (counts[comp.id] ?? 0) + 1);
+    } else counts[comp.id] = counts[comp.id] ?? 0;
+
+    countEdges[comp.id] = pulse;
+  }
+
+  return { counts, countEdges };
 }
 
 /** avança a posição dos cilindros com base nas pressões calculadas */

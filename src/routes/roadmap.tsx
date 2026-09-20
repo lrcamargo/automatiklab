@@ -24,13 +24,14 @@ export const Route = createFileRoute("/roadmap")({
 });
 
 const DONE = [
-  "Bancada com grade, arrastar e soltar e seleção de componentes",
-  "Catálogo com fonte de ar, válvulas 3/2 e 5/2, cilindros de simples e dupla ação, botão pneumático e fim de curso",
-  "Botões e fins de curso 3/2 com portas pneumáticas reais 1, 2 e 3",
+  "Bancada com grade, arrastar e soltar, deslocamento livre e exclusão por clique",
+  "Biblioteca com fonte de ar, Lubrifil, escape, válvulas 3/2, 4/2, 5/2 e 5/3 de centro fechado, cilindros de simples e dupla ação e fim de curso",
+  "Elementos lógicos OU e E, temporizadora, contador pneumático, retenção, escape rápido e reguladoras de fluxo uni e bidirecional",
+  "Acionamento configurável por válvula: botão, alavanca, pedal, rolete, mola, pilotos e solenoides",
   "Pilotagem conectável pelas portas 14 e 12, inclusive com memória para duplo piloto",
   "Propagação topológica de pressão e escape, movimento do cilindro e detecção de ligação direta à atmosfera",
-  "Validação de conexões duplicadas, remoção de mangueiras e identificações técnicas únicas por família",
-  "Dois circuitos de exemplo e testes automatizados do núcleo pneumático",
+  "Trajeto das mangueiras editável, validação de conexões duplicadas e identificações técnicas únicas por família",
+  "Vista de diagrama técnico com impressão, circuitos de exemplo e testes automatizados do núcleo",
 ];
 
 const PREPARED = [
@@ -39,10 +40,10 @@ const PREPARED = [
 ];
 
 const NEXT = [
-  "Junções em T e edição manual do trajeto das linhas",
-  "Reguladores de fluxo, temporizadores, válvulas lógicas e instrumentos de medição",
+  "Persistência local dos circuitos, com importação e exportação em JSON",
+  "Junções em T visíveis nas linhas e revisão visual da simbologia contra a norma",
+  "Operação em telas pequenas e dispositivos por toque",
   "Modelo físico de pressão, vazão, força, carga, área do êmbolo e perdas",
-  "Persistência local de circuitos e, posteriormente, contas de usuário",
   "Exercícios guiados com verificação automática e modo de falhas",
   "Base eletropneumática e integração futura com lógica de CLP",
 ];
