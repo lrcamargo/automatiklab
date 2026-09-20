@@ -32,15 +32,12 @@ const DONE = [
   "Propagação topológica de pressão e escape, movimento do cilindro e detecção de ligação direta à atmosfera",
   "Trajeto das mangueiras editável, validação de conexões duplicadas e identificações técnicas únicas por família",
   "Vista de diagrama técnico com impressão, circuitos de exemplo e testes automatizados do núcleo",
+  "Projetos salvos no navegador: salvar, abrir, renomear, excluir e exportar/importar em .json",
 ];
 
-const PREPARED = [
-  "Salvar projeto e Meus projetos: botões visíveis na barra da bancada, ainda desabilitados por não haver persistência",
-  "Símbolos de solenoide disponíveis, ainda sem portas elétricas ou energização",
-];
+const PREPARED = ["Símbolos de solenoide disponíveis, ainda sem portas elétricas ou energização"];
 
 const NEXT = [
-  "Persistência local dos circuitos, com importação e exportação em JSON",
   "Junções em T visíveis nas linhas e revisão visual da simbologia contra a norma",
   "Operação em telas pequenas e dispositivos por toque",
   "Modelo físico de pressão, vazão, força, carga, área do êmbolo e perdas",

@@ -21,8 +21,12 @@
 - [x] Implementar válvulas 4/2 e 5/3 de centro fechado (parada intermediária).
 - [x] Unificar o botão pneumático na válvula 3/2 com acionamento configurável.
 - [x] Reorganizar a paleta em grade de quadrados.
-- [ ] Persistência local dos circuitos com `localStorage`, validação por esquema e
+- [x] Persistência local dos circuitos com `localStorage`, validação por esquema e
       importação/exportação em JSON.
+- [x] Corrigir a simbologia do Lubrifil, do escape, do compressor, do escape rápido e das
+      reguladoras de fluxo; acrescentar a unidade de conservação simplificada.
+- [x] Corrigir os acionamentos: came arredondado, mola sem traço de topo, botão em
+      semicírculo e remoção dos traços laterais das caixas das válvulas.
 - [ ] Revisão visual dos símbolos contra a norma, em navegadores desktop.
 - [ ] Junções em T visíveis nas linhas (o motor já as resolve).
 - [ ] Melhorar a operação em telas pequenas e dispositivos por toque.

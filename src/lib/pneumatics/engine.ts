@@ -150,6 +150,7 @@ function solveNetwork(
 
       // unidade de conservação: passagem direta, condiciona sem bloquear
       case "lubrifil":
+      case "conservationUnit":
         link(adjacency, key("P"), key("A"));
         break;
 

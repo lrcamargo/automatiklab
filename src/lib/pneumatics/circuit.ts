@@ -29,6 +29,7 @@ const TECHNICAL_PREFIX: Record<ComponentType, string> = {
   throttle: "1Y",
   counter: "1C",
   lubrifil: "0Z",
+  conservationUnit: "0Z",
 };
 
 export function nextTechnicalLabel(type: ComponentType, components: PlacedComponent[]) {

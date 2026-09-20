@@ -16,7 +16,8 @@ export type ComponentType =
   | "throttleOneWay"
   | "throttle"
   | "counter"
-  | "lubrifil";
+  | "lubrifil"
+  | "conservationUnit";
 
 export type PortDomain = "pneumatic";
 export type PortKind = "supply" | "work" | "exhaust" | "control";

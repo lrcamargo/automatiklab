@@ -20,13 +20,16 @@ fluxo — o que está aqui foi construído inteiramente dessa forma.
 - Biblioteca com fonte de ar, unidade de conservação (Lubrifil), escape/silenciador,
   válvulas direcionais 3/2, 4/2, 5/2 e 5/3 de centro fechado, cilindros de simples e dupla
   ação, fim de curso, elementos lógicos OU e E, temporizadora, contador pneumático,
-  retenção, escape rápido e reguladoras de fluxo uni e bidirecional.
+  retenção, escape rápido e reguladoras de fluxo uni e bidirecional, além da
+  unidade de conservação simplificada.
 - Acionamentos configuráveis por válvula (botão, alavanca, pedal, rolete, mola, piloto simples
   e duplo, servopiloto, solenoide) conforme a ISO 1219.
 - Pilotagem pneumática real pelas portas 14 e 12, com memória nas válvulas de duplo piloto.
 - Propagação topológica de alimentação e escape, movimento dos cilindros, detecção de conflito
   e de ligação direta à atmosfera.
 - Vista de diagrama técnico e impressão/PDF.
+- Persistência local dos circuitos no navegador: salvar, abrir, renomear, excluir e
+  exportar/importar em `.json`.
 - Circuitos de exemplo e testes automatizados do núcleo pneumático.
 
 ## Desenvolvimento
@@ -66,8 +69,14 @@ As principais camadas ficam em `src/lib/pneumatics`:
 | `engine.ts` | Solucionador topológico, posições das válvulas, temporizadores e contadores |
 | `presets.ts` | Circuitos de exemplo |
 | `useSimulation.ts` | Laço de simulação em React |
+| `storage.ts` | Persistência em `localStorage`, validação por esquema e import/export |
 
 A bancada e a simbologia SVG ficam em `src/components/simulator`.
+
+## Contato
+
+- Instagram: [@instleticia](https://instagram.com/instleticia)
+- TikTok: [@lercamargo](https://tiktok.com/@lercamargo)
 
 ## Referências
 

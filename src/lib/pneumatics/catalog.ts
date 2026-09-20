@@ -113,6 +113,17 @@ export const CATALOG: Record<ComponentType, ComponentDef> = {
     height: 120,
     ports: [pneumaticPort("P", "1", 0, 52, "supply"), pneumaticPort("A", "2", 228, 52, "work")],
   },
+  conservationUnit: {
+    type: "conservationUnit",
+    name: "Unidade de conservação simplificada",
+    short: "Unid. cons.",
+    description:
+      "Representação simplificada do conjunto filtro, regulador e lubrificador: um único losango com o traço tracejado.",
+    family: "alimentacao",
+    width: 120,
+    height: 108,
+    ports: [pneumaticPort("P", "1", 0, 52, "supply"), pneumaticPort("A", "2", 120, 52, "work")],
+  },
   cylinderSingle: {
     type: "cylinderSingle",
     name: "Cilindro de simples ação",

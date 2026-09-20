@@ -6,6 +6,7 @@ import { Canvas } from "@/components/simulator/Canvas";
 import { Palette } from "@/components/simulator/Palette";
 import { PropertiesPanel } from "@/components/simulator/PropertiesPanel";
 import { TechnicalDiagram } from "@/components/simulator/TechnicalDiagram";
+import { ProjectsDialog } from "@/components/simulator/ProjectsDialog";
 import { Button } from "@/components/ui/button";
 import { CATALOG, hasPneumaticPilot } from "@/lib/pneumatics/catalog";
 import {
@@ -17,6 +18,7 @@ import {
   validateConnection,
 } from "@/lib/pneumatics/circuit";
 import { basicCircuit, springReturnCircuit } from "@/lib/pneumatics/presets";
+import { saveProject } from "@/lib/pneumatics/storage";
 import { useSimulation } from "@/lib/pneumatics/useSimulation";
 import { strokeDirection } from "@/lib/pneumatics/engine";
 import type { Circuit, ComponentType, PlacedComponent } from "@/lib/pneumatics/types";
@@ -54,6 +56,10 @@ function SimulatorPage() {
     null,
   );
   const [blockedId, setBlockedId] = useState<string | null>(null);
+  /** projeto aberto: nome exibido e id gravado (vazio enquanto nunca foi salvo) */
+  const [projectName, setProjectName] = useState("Circuito sem título");
+  const [projectId, setProjectId] = useState("");
+  const [projectsOpen, setProjectsOpen] = useState(false);
   const [connectionMessage, setConnectionMessage] = useState<string | null>(null);
   const blockedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const messageTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -244,6 +250,29 @@ function SimulatorPage() {
     reset();
   };
 
+  /** Carrega um circuito salvo ou importado, assumindo sua identidade. */
+  const loadProject = (loaded: Circuit, name: string, id: string) => {
+    setRunning(false);
+    loadPreset(loaded);
+    setProjectName(name);
+    setProjectId(id);
+  };
+
+  /**
+   * Grava o circuito atual. Na primeira vez pede o nome; depois sobrescreve o
+   * mesmo projeto, e "Salvar como" fica por conta de renomear na biblioteca.
+   */
+  const handleSave = () => {
+    const name = projectId
+      ? projectName
+      : (window.prompt("Nome do projeto:", projectName) ?? "").trim();
+    if (!name) return;
+    const saved = saveProject(name, sanitizeCircuit(circuit), projectId || undefined);
+    setProjectId(saved.id);
+    setProjectName(saved.name);
+    showMessage(`Projeto "${saved.name}" salvo neste navegador.`);
+  };
+
   const activeCylinders = circuit.components.filter((c) => c.type.startsWith("cylinder"));
 
   const printTechnicalDiagram = () => {
@@ -307,21 +336,19 @@ function SimulatorPage() {
           </Button>
           <Button
             type="button"
-            disabled
-            title="Salvamento de projetos em preparação"
+            onClick={handleSave}
+            title="Gravar o circuito neste navegador"
             variant="outline"
             size="sm"
-            className="border-dashed"
           >
             <Save className="size-4" /> Salvar projeto
           </Button>
           <Button
             type="button"
-            disabled
-            title="Biblioteca de projetos em preparação"
+            onClick={() => setProjectsOpen(true)}
+            title="Abrir, renomear, exportar ou importar circuitos"
             variant="outline"
             size="sm"
-            className="border-dashed"
           >
             <FolderOpen className="size-4" /> Meus projetos
           </Button>
@@ -421,6 +448,15 @@ function SimulatorPage() {
         </aside>
       </div>
       <TechnicalDiagram circuit={circuit} runtime={runtime} solved={solved} />
+
+      <ProjectsDialog
+        open={projectsOpen}
+        onOpenChange={setProjectsOpen}
+        circuit={circuit}
+        currentName={projectName}
+        onLoad={loadProject}
+        onMessage={showMessage}
+      />
     </div>
   );
 }
