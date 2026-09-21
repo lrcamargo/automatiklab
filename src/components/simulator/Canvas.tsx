@@ -79,6 +79,7 @@ export function Canvas(props: CanvasProps) {
   } | null>(null);
   const [panning, setPanning] = useState(false);
   const [zoom, setZoom] = useState(1);
+  const zoomRef = useRef(1);
 
   /**
    * A margem antes da origem cresce junto com o componente mais à esquerda (ou
@@ -203,6 +204,44 @@ export function Canvas(props: CanvasProps) {
     onActivate(comp);
   };
 
+  /**
+   * React registra wheel como passivo em alguns navegadores; nesse caso o
+   * preventDefault sintético chega tarde e Ctrl+roda amplia a página inteira.
+   * O listener nativo não passivo reserva Ctrl+roda exclusivamente à bancada.
+   */
+  useEffect(() => {
+    const area = areaRef.current;
+    if (!area) return;
+    const onZoomWheel = (event: WheelEvent) => {
+      if (!event.ctrlKey) return;
+      event.preventDefault();
+      event.stopPropagation();
+      const current = zoomRef.current;
+      const next = Math.min(
+        MAX_ZOOM,
+        Math.max(
+          MIN_ZOOM,
+          Number((current + (event.deltaY < 0 ? ZOOM_STEP : -ZOOM_STEP)).toFixed(2)),
+        ),
+      );
+      if (next === current) return;
+      const rect = area.getBoundingClientRect();
+      const pointerX = event.clientX - rect.left;
+      const pointerY = event.clientY - rect.top;
+      const ratio = next / current;
+      const left = (area.scrollLeft + pointerX) * ratio - pointerX;
+      const top = (area.scrollTop + pointerY) * ratio - pointerY;
+      zoomRef.current = next;
+      setZoom(next);
+      requestAnimationFrame(() => {
+        area.scrollLeft = left;
+        area.scrollTop = top;
+      });
+    };
+    area.addEventListener("wheel", onZoomWheel, { passive: false });
+    return () => area.removeEventListener("wheel", onZoomWheel);
+  }, []);
+
   /** Delete/Backspace remove o que estiver selecionado, exceto ao digitar num campo. */
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -257,30 +296,7 @@ export function Canvas(props: CanvasProps) {
       }}
       onWheel={(event) => {
         const area = areaRef.current;
-        if (!area) return;
-        if (event.ctrlKey) {
-          event.preventDefault();
-          const rect = area.getBoundingClientRect();
-          const pointerX = event.clientX - rect.left;
-          const pointerY = event.clientY - rect.top;
-          const next = Math.min(
-            MAX_ZOOM,
-            Math.max(
-              MIN_ZOOM,
-              Number((zoom + (event.deltaY < 0 ? ZOOM_STEP : -ZOOM_STEP)).toFixed(2)),
-            ),
-          );
-          if (next === zoom) return;
-          const ratio = next / zoom;
-          const left = (area.scrollLeft + pointerX) * ratio - pointerX;
-          const top = (area.scrollTop + pointerY) * ratio - pointerY;
-          setZoom(next);
-          requestAnimationFrame(() => {
-            area.scrollLeft = left;
-            area.scrollTop = top;
-          });
-          return;
-        }
+        if (!area || event.ctrlKey) return;
         // roda pura mantém a rolagem horizontal já existente
         if (event.shiftKey || Math.abs(event.deltaX) > Math.abs(event.deltaY)) return;
         area.scrollLeft += event.deltaY;

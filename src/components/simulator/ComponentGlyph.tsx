@@ -159,10 +159,12 @@ function ActuationSymbol({
         )}
         {kind === "proportional" && (
           <g>
-            <path d={`M${p(near, 9)} L${p(far, -9)}`} className={cls} strokeWidth={1.8} />
+            {/* diagonal simples dentro da bobina */}
             <path d={`M${p(far, 9)} L${p(near, -9)}`} className={cls} strokeWidth={1.8} />
+            {/* diagonal de regulagem: atravessa a bobina e termina em seta fora dela */}
+            <path d={`M${p(near - 2, 14)} L${p(far + 3, -15)}`} className={cls} strokeWidth={1.8} />
             <path
-              d={`M${p(near + 6, -12)} L${p(near, -9)} L${p(near + 2, -16)} Z`}
+              d={`M${p(far - 3, -13)} L${p(far + 3, -15)} L${p(far + 1, -8)} Z`}
               className={filled}
               strokeWidth={0}
             />
@@ -348,14 +350,13 @@ function ActuationSymbol({
     default:
       return (
         <g>
-          <rect {...rectAt(1, 31, 8)} className={soft} strokeWidth={1.8} />
+          {/* corpo centralizado; termina exatamente na linha inicial do semicírculo */}
+          <rect {...rectAt(1, 27, 8)} className={soft} strokeWidth={1.8} />
           <path
             d={`M${p(28, -12)} L${p(28, 12)} A12 12 0 0 ${dir > 0 ? 0 : 1} ${p(28, -12)} Z`}
             className={soft}
             strokeWidth={1.8}
           />
-          {/* corpo retangular visível no centro da cabeça semicircular */}
-          <rect {...rectAt(20, 14, 8)} className={soft} strokeWidth={1.6} />
         </g>
       );
   }
