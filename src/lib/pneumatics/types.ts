@@ -101,6 +101,7 @@ export type ActuationType =
   | "servoPilotoDuplo"
   | "solenoideSimples"
   | "solenoideDuplo"
+  | "solenoideProporcional"
   | "servoSolenoideDuploManual";
 
 export const ACTUATIONS: { id: ActuationType; label: string; group: string }[] = [
@@ -123,20 +124,25 @@ export const ACTUATIONS: { id: ActuationType; label: string; group: string }[] =
   },
   {
     id: "pilotoSimples",
-    label: "Pneumático — piloto simples",
+    label: "Pneumático — piloto",
     group: "Pneumático",
   },
   {
     id: "servoPilotoSimples",
-    label: "Pneumático — servo-piloto simples",
+    label: "Pneumático — servo-piloto",
     group: "Pneumático",
   },
   {
     id: "solenoideSimples",
-    label: "Elétrico — solenoide simples",
+    label: "Elétrico — solenoide",
     group: "Elétrico",
   },
   { id: "solenoideDuplo", label: "Elétrico — solenoide duplo", group: "Elétrico" },
+  {
+    id: "solenoideProporcional",
+    label: "Elétrico — solenoide proporcional",
+    group: "Elétrico",
+  },
   {
     id: "servoSolenoideDuploManual",
     label: "Combinado — duplo servo-solenoide com manual",

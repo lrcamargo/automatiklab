@@ -135,20 +135,38 @@ function ActuationSymbol({
   };
 
   /**
-   * Solenoide (Quadro 12): uma bobina = uma diagonal; duas bobinas = duas
-   * diagonais PARALELAS; proporcional = duas diagonais cruzadas.
+   * Solenoides do Quadro 12: uma bobina (diagonal), duas bobinas (pico sem
+   * cruzamento) e proporcional (diagonais cruzadas, uma delas com seta).
    */
   const solenoidBox = (d0: number, kind: "single" | "double" | "proportional" = "single") => {
     const r = rectAt(d0, 34, 24);
+    const near = d0 + 3;
+    const middle = d0 + 17;
+    const far = d0 + 31;
     return (
       <g>
         <rect {...r} className={soft} strokeWidth={1.8} />
-        <path d={`M${p(d0 + 3, -9)} L${p(d0 + 31, 9)}`} className={cls} strokeWidth={1.8} />
+        {kind === "single" && (
+          <path d={`M${p(far, 9)} L${p(near, -9)}`} className={cls} strokeWidth={1.8} />
+        )}
         {kind === "double" && (
-          <path d={`M${p(d0 + 3, -3)} L${p(d0 + 22, 9)}`} className={cls} strokeWidth={1.8} />
+          <path
+            d={`M${p(far, 9)} L${p(middle, -9)} L${p(near, 9)}`}
+            className={cls}
+            strokeWidth={1.8}
+            fill="none"
+          />
         )}
         {kind === "proportional" && (
-          <path d={`M${p(d0 + 3, 9)} L${p(d0 + 31, -9)}`} className={cls} strokeWidth={1.8} />
+          <g>
+            <path d={`M${p(near, 9)} L${p(far, -9)}`} className={cls} strokeWidth={1.8} />
+            <path d={`M${p(far, 9)} L${p(near, -9)}`} className={cls} strokeWidth={1.8} />
+            <path
+              d={`M${p(near + 6, -12)} L${p(near, -9)} L${p(near + 2, -16)} Z`}
+              className={filled}
+              strokeWidth={0}
+            />
+          </g>
         )}
       </g>
     );
@@ -330,12 +348,14 @@ function ActuationSymbol({
     default:
       return (
         <g>
-          {stem(1, 28)}
+          <rect {...rectAt(1, 31, 8)} className={soft} strokeWidth={1.8} />
           <path
             d={`M${p(28, -12)} L${p(28, 12)} A12 12 0 0 ${dir > 0 ? 0 : 1} ${p(28, -12)} Z`}
             className={soft}
             strokeWidth={1.8}
           />
+          {/* corpo retangular visível no centro da cabeça semicircular */}
+          <rect {...rectAt(20, 14, 8)} className={soft} strokeWidth={1.6} />
         </g>
       );
   }
@@ -1386,10 +1406,10 @@ export function ComponentGlyph({
 
           {/* envoltória tracejada da unidade */}
           <rect
-            x={14}
-            y={20}
-            width={200}
-            height={82}
+            x={10}
+            y={14}
+            width={208}
+            height={94}
             className="fill-none stroke-steel"
             strokeWidth={1}
             strokeDasharray="5 4"
@@ -1478,24 +1498,25 @@ export function ComponentGlyph({
             strokeWidth={2}
           />
           <rect
-            x={24}
-            y={26}
-            width={72}
-            height={52}
+            x={14}
+            y={32}
+            width={92}
+            height={40}
             className={activeBox(flowing)}
             strokeWidth={1.8}
           />
-          {/* divisória vertical tracejada */}
-          <path d="M60 26 V78" className={baseLine} strokeWidth={1.3} strokeDasharray="4 3" />
-          {/* manômetro dentro do corpo */}
+          {/* divisória a poucos milímetros da parede esquerda */}
+          <path d="M22 32 V72" className={baseLine} strokeWidth={1.3} strokeDasharray="4 3" />
+          {/* manômetro centralizado; seta atravessa o diâmetro interno */}
           <circle
-            cx={76}
+            cx={60}
             cy={52}
-            r={10}
+            r={12}
             className="fill-background stroke-steel"
             strokeWidth={1.5}
           />
-          <path d="M76 52 L82 46" className={baseLine} strokeWidth={1.3} />
+          <path d="M52 60 L68 44" className={baseLine} strokeWidth={1.4} />
+          <path d="M68 44 L63 45 M68 44 L67 49" className={baseLine} strokeWidth={1.3} />
           <PortNumber x={2} y={44} value="1" />
           <PortNumber x={104} y={44} value="2" />
         </svg>

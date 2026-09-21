@@ -28,6 +28,9 @@ interface CanvasProps {
 }
 
 const GRID = 24;
+const MIN_ZOOM = 0.5;
+const MAX_ZOOM = 2;
+const ZOOM_STEP = 0.1;
 const WORLD_ORIGIN_X = 720;
 const WORLD_ORIGIN_Y = 360;
 const snap = (value: number) => Math.round(value / GRID) * GRID;
@@ -75,6 +78,7 @@ export function Canvas(props: CanvasProps) {
     moved: boolean;
   } | null>(null);
   const [panning, setPanning] = useState(false);
+  const [zoom, setZoom] = useState(1);
 
   /**
    * A margem antes da origem cresce junto com o componente mais à esquerda (ou
@@ -117,8 +121,8 @@ export function Canvas(props: CanvasProps) {
   useLayoutEffect(() => {
     const area = areaRef.current;
     if (!area || area.dataset["panReady"]) return;
-    area.scrollLeft = origin.x;
-    area.scrollTop = origin.y;
+    area.scrollLeft = origin.x * zoom;
+    area.scrollTop = origin.y * zoom;
     area.dataset["panReady"] = "true";
     prevOrigin.current = origin;
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -129,11 +133,11 @@ export function Canvas(props: CanvasProps) {
     const area = areaRef.current;
     const previous = prevOrigin.current;
     if (area && (previous.x !== origin.x || previous.y !== origin.y)) {
-      area.scrollLeft += origin.x - previous.x;
-      area.scrollTop += origin.y - previous.y;
+      area.scrollLeft += (origin.x - previous.x) * zoom;
+      area.scrollTop += (origin.y - previous.y) * zoom;
     }
     prevOrigin.current = origin;
-  }, [origin]);
+  }, [origin, zoom]);
 
   const startDrag = (event: PointerEvent, comp: PlacedComponent) => {
     if (event.button !== 0 || !editable) return;
@@ -141,8 +145,8 @@ export function Canvas(props: CanvasProps) {
     if (!rect) return;
     dragRef.current = {
       id: comp.id,
-      dx: event.clientX - rect.left - comp.x,
-      dy: event.clientY - rect.top - comp.y,
+      dx: (event.clientX - rect.left) / zoom - comp.x,
+      dy: (event.clientY - rect.top) / zoom - comp.y,
       moved: false,
     };
     onSelect(comp.id);
@@ -164,8 +168,8 @@ export function Canvas(props: CanvasProps) {
       tubeDrag.moved = true;
       onMoveTube(
         tubeDrag.id,
-        snap(event.clientY - surface.top - origin.y - tubeDrag.offsetY),
-        snap(event.clientX - surface.left - origin.x - tubeDrag.offsetX),
+        snap((event.clientY - surface.top) / zoom - origin.y - tubeDrag.offsetY),
+        snap((event.clientX - surface.left) / zoom - origin.x - tubeDrag.offsetX),
       );
       return;
     }
@@ -176,8 +180,8 @@ export function Canvas(props: CanvasProps) {
     // coordenadas livres: a bancada cresce para os quatro lados
     onMove(
       drag.id,
-      snap(event.clientX - rect.left - drag.dx),
-      snap(event.clientY - rect.top - drag.dy),
+      snap((event.clientX - rect.left) / zoom - drag.dx),
+      snap((event.clientY - rect.top) / zoom - drag.dy),
     );
   };
 
@@ -254,7 +258,30 @@ export function Canvas(props: CanvasProps) {
       onWheel={(event) => {
         const area = areaRef.current;
         if (!area) return;
-        // roda pura → rolagem horizontal da bancada; Shift/trackpad mantêm o eixo natural
+        if (event.ctrlKey) {
+          event.preventDefault();
+          const rect = area.getBoundingClientRect();
+          const pointerX = event.clientX - rect.left;
+          const pointerY = event.clientY - rect.top;
+          const next = Math.min(
+            MAX_ZOOM,
+            Math.max(
+              MIN_ZOOM,
+              Number((zoom + (event.deltaY < 0 ? ZOOM_STEP : -ZOOM_STEP)).toFixed(2)),
+            ),
+          );
+          if (next === zoom) return;
+          const ratio = next / zoom;
+          const left = (area.scrollLeft + pointerX) * ratio - pointerX;
+          const top = (area.scrollTop + pointerY) * ratio - pointerY;
+          setZoom(next);
+          requestAnimationFrame(() => {
+            area.scrollLeft = left;
+            area.scrollTop = top;
+          });
+          return;
+        }
+        // roda pura mantém a rolagem horizontal já existente
         if (event.shiftKey || Math.abs(event.deltaX) > Math.abs(event.deltaY)) return;
         area.scrollLeft += event.deltaY;
       }}
@@ -277,8 +304,8 @@ export function Canvas(props: CanvasProps) {
         if (!type || !rect) return;
         onDropComponent(
           type,
-          snap(event.clientX - rect.left - origin.x - 60),
-          snap(event.clientY - rect.top - origin.y - 40),
+          snap((event.clientX - rect.left) / zoom - origin.x - 60),
+          snap((event.clientY - rect.top) / zoom - origin.y - 40),
         );
       }}
       className={cn(
@@ -289,7 +316,7 @@ export function Canvas(props: CanvasProps) {
       <div
         ref={surfaceRef}
         className="grid-plate relative"
-        style={{ width: worldSize.width, height: worldSize.height }}
+        style={{ width: worldSize.width, height: worldSize.height, zoom }}
       >
         <div
           className="absolute"
@@ -347,8 +374,9 @@ export function Canvas(props: CanvasProps) {
                       event.stopPropagation();
                       tubeDragRef.current = {
                         id: tube.id,
-                        offsetY: event.clientY - surface.top - origin.y - middleY,
-                        offsetX: event.clientX - surface.left - origin.x - (tube.midX ?? b.x),
+                        offsetY: (event.clientY - surface.top) / zoom - origin.y - middleY,
+                        offsetX:
+                          (event.clientX - surface.left) / zoom - origin.x - (tube.midX ?? b.x),
                         moved: false,
                       };
                       (event.target as Element).setPointerCapture?.(event.pointerId);

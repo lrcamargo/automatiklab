@@ -257,19 +257,26 @@ function nextValvePositions(
     const pilot14 =
       hasPneumaticPilot(comp.returnType) && network.pressurized.has(portKey(comp.id, "14"));
 
-    if ((manualOverride || pilot12) && !pilot14) {
+    const dualPilot = hasPneumaticPilot(comp.actuation) && hasPneumaticPilot(comp.returnType);
+
+    if (dualPilot) {
+      // Na 5/2 de memória: 12 seleciona 1→2 (posição false, avanço) e
+      // 14 seleciona 1→4 (posição true, recuo).
+      if (pilot12 && !pilot14) next[comp.id] = false;
+      else if (pilot14 && !pilot12) next[comp.id] = true;
+      else next[comp.id] = last;
+    } else if ((manualOverride || pilot12) && !pilot14) {
+      // Em válvula monoestável, o acionamento à esquerda vence a mola.
       next[comp.id] = true;
     } else if (pilot14 && !manualOverride && !pilot12) {
       next[comp.id] = false;
     } else if ((manualOverride || pilot12) && pilot14) {
-      // Dois comandos simultâneos não escolhem uma nova posição.
       next[comp.id] = last;
     } else if (comp.returnType === "mola" || comp.returnType === "centragemMolas") {
       next[comp.id] = false;
     } else if (comp.actuation === "mola" || comp.actuation === "centragemMolas") {
       next[comp.id] = true;
     } else if (hasPneumaticPilot(comp.actuation) || hasPneumaticPilot(comp.returnType)) {
-      // Duplo piloto: conserva a última posição quando nenhum piloto está ativo.
       next[comp.id] = last;
     } else {
       // Acionamentos diretos continuam disponíveis para interação na bancada.

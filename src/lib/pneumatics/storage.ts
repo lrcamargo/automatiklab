@@ -38,6 +38,7 @@ const actuationSchema = z.enum([
   "servoPilotoDuplo",
   "solenoideSimples",
   "solenoideDuplo",
+  "solenoideProporcional",
   "servoSolenoideDuploManual",
 ]);
 

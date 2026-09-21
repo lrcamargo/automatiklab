@@ -82,6 +82,8 @@ export function basicCircuit(): Circuit {
       // escapes da direcional 5/2: portas 3 e 5
       { id: "ex3", type: "exhaust", x: 260, y: 380, label: "3" },
       { id: "ex5", type: "exhaust", x: 318, y: 380, label: "5" },
+      { id: "exS1", type: "exhaust", x: -52, y: 530, label: "3" },
+      { id: "exS2", type: "exhaust", x: 568, y: 530, label: "3" },
     ],
     tubes: [
       // fonte -> unidade de preparação
@@ -158,6 +160,20 @@ export function basicCircuit(): Circuit {
         to: { componentId: "ex5", portId: "R" },
         midY: 356,
       },
+      {
+        id: "t11",
+        medium: "pneumatic",
+        from: { componentId: "s1", portId: "R" },
+        to: { componentId: "exS1", portId: "R" },
+        midY: 510,
+      },
+      {
+        id: "t12",
+        medium: "pneumatic",
+        from: { componentId: "s2", portId: "R" },
+        to: { componentId: "exS2", portId: "R" },
+        midY: 510,
+      },
     ],
   };
 }
@@ -205,6 +221,7 @@ export function springReturnCircuit(): Circuit {
       },
       { id: "src1", type: "source", x: -470, y: 610, label: "1P1", pressure: 6 },
       { id: "ex3", type: "exhaust", x: 268, y: 380, label: "3" },
+      { id: "exS1", type: "exhaust", x: -52, y: 530, label: "3" },
     ],
     tubes: [
       {
@@ -248,6 +265,13 @@ export function springReturnCircuit(): Circuit {
         from: { componentId: "v1", portId: "R" },
         to: { componentId: "ex3", portId: "R" },
         midY: 356,
+      },
+      {
+        id: "t7",
+        medium: "pneumatic",
+        from: { componentId: "s1", portId: "R" },
+        to: { componentId: "exS1", portId: "R" },
+        midY: 510,
       },
     ],
   };

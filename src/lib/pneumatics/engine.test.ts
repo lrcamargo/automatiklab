@@ -43,9 +43,9 @@ describe("motor pneumático topológico", () => {
     const circuit = basicCircuit();
     const commanded = solveCircuit(circuit, runtime({ signals: { s1: true } }));
 
-    expect(commanded.actuated["v1"]).toBe(true);
-    expect(commanded.pressurized.has(portKey("cil1", "B"))).toBe(true);
-    expect(commanded.pressurized.has(portKey("cil1", "A"))).toBe(false);
+    expect(commanded.actuated["v1"]).toBe(false);
+    expect(commanded.pressurized.has(portKey("cil1", "A"))).toBe(true);
+    expect(commanded.pressurized.has(portKey("cil1", "B"))).toBe(false);
   });
 
   it("conserva a posição de uma válvula com duplo piloto", () => {
@@ -109,10 +109,10 @@ describe("motor pneumático topológico", () => {
     };
 
     const advanced = solveCircuit(circuit, runtime({ signals: { advance: true } }));
-    expect(advanced.actuated["valve"]).toBe(true);
+    expect(advanced.actuated["valve"]).toBe(false);
 
     const memorized = solveCircuit(circuit, runtime({ valvePositions: advanced.actuated }));
-    expect(memorized.actuated["valve"]).toBe(true);
+    expect(memorized.actuated["valve"]).toBe(false);
 
     const returned = solveCircuit(
       circuit,
@@ -121,7 +121,7 @@ describe("motor pneumático topológico", () => {
         valvePositions: memorized.actuated,
       }),
     );
-    expect(returned.actuated["valve"]).toBe(false);
+    expect(returned.actuated["valve"]).toBe(true);
   });
 
   it("detecta alimentação ligada diretamente ao escape", () => {
