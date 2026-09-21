@@ -126,15 +126,9 @@ export const ACTUATIONS: { id: ActuationType; label: string; group: string }[] =
     label: "Pneumático — piloto simples",
     group: "Pneumático",
   },
-  { id: "pilotoDuplo", label: "Pneumático — piloto duplo", group: "Pneumático" },
   {
     id: "servoPilotoSimples",
     label: "Pneumático — servo-piloto simples",
-    group: "Pneumático",
-  },
-  {
-    id: "servoPilotoDuplo",
-    label: "Pneumático — servo-piloto duplo",
     group: "Pneumático",
   },
   {

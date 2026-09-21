@@ -250,16 +250,18 @@ function nextValvePositions(
 
     const last = previous[comp.id] ?? runtime.valvePositions[comp.id] ?? false;
     const manualOverride = !!runtime.signals[comp.id];
-    const pilot14 =
-      hasPneumaticPilot(comp.actuation) && network.pressurized.has(portKey(comp.id, "14"));
+    // Numeração normativa na representação: 12 à esquerda (acionamento)
+    // e 14 à direita (retorno). Cada sinal comuta para o quadro oposto.
     const pilot12 =
-      hasPneumaticPilot(comp.returnType) && network.pressurized.has(portKey(comp.id, "12"));
+      hasPneumaticPilot(comp.actuation) && network.pressurized.has(portKey(comp.id, "12"));
+    const pilot14 =
+      hasPneumaticPilot(comp.returnType) && network.pressurized.has(portKey(comp.id, "14"));
 
-    if ((manualOverride || pilot14) && !pilot12) {
+    if ((manualOverride || pilot12) && !pilot14) {
       next[comp.id] = true;
-    } else if (pilot12 && !manualOverride && !pilot14) {
+    } else if (pilot14 && !manualOverride && !pilot12) {
       next[comp.id] = false;
-    } else if ((manualOverride || pilot14) && pilot12) {
+    } else if ((manualOverride || pilot12) && pilot14) {
       // Dois comandos simultâneos não escolhem uma nova posição.
       next[comp.id] = last;
     } else if (comp.returnType === "mola" || comp.returnType === "centragemMolas") {

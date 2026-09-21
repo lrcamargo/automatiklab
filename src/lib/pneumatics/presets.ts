@@ -116,14 +116,14 @@ export function basicCircuit(): Circuit {
         id: "t5",
         medium: "pneumatic",
         from: { componentId: "s1", portId: "A" },
-        to: { componentId: "v1", portId: "14" },
+        to: { componentId: "v1", portId: "12" },
         midY: PILOT_RAIL_Y,
       },
       {
         id: "t6",
         medium: "pneumatic",
         from: { componentId: "s2", portId: "A" },
-        to: { componentId: "v1", portId: "12" },
+        to: { componentId: "v1", portId: "14" },
         midY: PILOT_RAIL_Y,
       },
       // linhas de trabalho subindo até o cilindro
@@ -214,7 +214,7 @@ export function springReturnCircuit(): Circuit {
         id: "t4",
         medium: "pneumatic",
         from: { componentId: "s1", portId: "A" },
-        to: { componentId: "v1", portId: "14" },
+        to: { componentId: "v1", portId: "12" },
         midY: PILOT_RAIL_Y,
       },
       {

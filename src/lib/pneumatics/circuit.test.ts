@@ -17,7 +17,7 @@ describe("modelo de circuito", () => {
     expect(nextTechnicalLabel("cylinderDouble", components)).toBe("1A2");
   });
 
-  it("expõe a porta 14 somente quando há piloto pneumático", () => {
+  it("expõe a porta 12 à esquerda quando há piloto pneumático", () => {
     const piloted: PlacedComponent = {
       id: "v1",
       type: "valve32",
@@ -29,8 +29,8 @@ describe("modelo de circuito", () => {
     };
     const manual = { ...piloted, actuation: "botao" as const };
 
-    expect(portsForComponent(piloted).some((port) => port.id === "14")).toBe(true);
-    expect(portsForComponent(manual).some((port) => port.id === "14")).toBe(false);
+    expect(portsForComponent(piloted).some((port) => port.id === "12")).toBe(true);
+    expect(portsForComponent(manual).some((port) => port.id === "12")).toBe(false);
   });
 
   it("rejeita linhas duplicadas e aceita uma nova ligação pneumática", () => {

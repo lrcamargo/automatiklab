@@ -145,9 +145,9 @@ function ActuationSymbol({
     return (
       <g>
         <rect {...r} className={soft} strokeWidth={1.8} />
-        <path d={`M${p(d0 + 3, 9)} L${p(d0 + 31, -9)}`} className={cls} strokeWidth={1.8} />
+        <path d={`M${p(d0 + 3, -9)} L${p(d0 + 31, 9)}`} className={cls} strokeWidth={1.8} />
         {coils === 2 && (
-          <path d={`M${p(d0 + 3, -9)} L${p(d0 + 31, 9)}`} className={cls} strokeWidth={1.8} />
+          <path d={`M${p(d0 + 3, 9)} L${p(d0 + 31, -9)}`} className={cls} strokeWidth={1.8} />
         )}
       </g>
     );
@@ -249,7 +249,7 @@ function ActuationSymbol({
     case "rolete":
       return (
         <g>
-          {stem(1, 28)}
+          <rect {...rectAt(1, 28, 18)} className={soft} strokeWidth={1.8} />
           {roller(35)}
         </g>
       );
@@ -261,7 +261,7 @@ function ActuationSymbol({
     case "roleteEscamoteavel":
       return (
         <g>
-          {stem(1, 20)}
+          <rect {...rectAt(1, 19, 18)} className={soft} strokeWidth={1.8} />
           <path d={`M${p(20)} L${p(38, -18)}`} className={cls} strokeWidth={1.8} />
           {roller(20)}
           {roller(40, y - 20)}
@@ -1348,7 +1348,7 @@ export function ComponentGlyph({
      *   (4) lubrificador — losango com a gota no topo.
      * A linha de fluxo entra pela esquerda e sai pela direita.
      */
-    case "lubrifil": {
+    case "conservationUnit": {
       const flowing = live("A");
       const diamond = (cx: number, cy: number) =>
         `M${cx} ${cy - 18} L${cx + 20} ${cy} L${cx} ${cy + 18} L${cx - 20} ${cy} Z`;
@@ -1403,9 +1403,9 @@ export function ComponentGlyph({
             className="fill-background stroke-steel"
             strokeWidth={1.6}
           />
-          <path d="M111 66 V80" className={baseLine} strokeWidth={1.2} />
+          <path d="M111 38 V24" className={baseLine} strokeWidth={1.2} />
           <path
-            d="M105 70 L117 72 L105 75 L117 77"
+            d="M105 34 L117 32 L105 29 L117 27"
             className={baseLine}
             strokeWidth={1.2}
             fill="none"
@@ -1451,14 +1451,14 @@ export function ComponentGlyph({
      * e o MANÔMETRO no centro do losango. Sem dreno, sem tracejado e sem
      * numeração — todo o detalhamento fica na versão completa.
      */
-    case "conservationUnit": {
+    case "lubrifil": {
       const flowing = live("A");
       return (
         <svg
           width={def.width}
           height={def.height}
           viewBox={`0 0 ${def.width} ${def.height}`}
-          aria-label="Unidade de conservação simplificada"
+          aria-label="Unidade de conservação simplificada (símbolo compacto)"
         >
           {defs}
           <text x={4} y={13} className="fill-foreground font-mono text-[10px] font-semibold">

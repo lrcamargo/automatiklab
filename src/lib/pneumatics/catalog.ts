@@ -104,25 +104,24 @@ export const CATALOG: Record<ComponentType, ComponentDef> = {
   },
   lubrifil: {
     type: "lubrifil",
-    name: "Unidade de conservação (Lubrifil)",
-    short: "Lubrifil",
-    description:
-      "Filtro, regulador de pressão com manômetro e lubrificador. Condiciona o ar antes de entrar no circuito.",
-    family: "alimentacao",
-    width: 228,
-    height: 120,
-    ports: [pneumaticPort("P", "1", 0, 52, "supply"), pneumaticPort("A", "2", 228, 52, "work")],
-  },
-  conservationUnit: {
-    type: "conservationUnit",
     name: "Unidade de conservação simplificada",
-    short: "Unid. cons.",
-    description:
-      "Representação simplificada do conjunto filtro, regulador e lubrificador: um único losango com o traço tracejado.",
+    short: "Unid. simplificada",
+    description: "Representação compacta da unidade de conservação.",
     family: "alimentacao",
     width: 120,
     height: 108,
     ports: [pneumaticPort("P", "1", 0, 52, "supply"), pneumaticPort("A", "2", 120, 52, "work")],
+  },
+  conservationUnit: {
+    type: "conservationUnit",
+    name: "Unidade de conservação completa",
+    short: "Unid. completa",
+    description:
+      "Filtro, regulador de pressão com manômetro e lubrificador, representados detalhadamente.",
+    family: "alimentacao",
+    width: 228,
+    height: 120,
+    ports: [pneumaticPort("P", "1", 0, 52, "supply"), pneumaticPort("A", "2", 228, 52, "work")],
   },
   cylinderSingle: {
     type: "cylinderSingle",
@@ -322,12 +321,12 @@ export function portsForComponent(comp: PlacedComponent): PortDef[] {
   if (comp.type !== "valve32" && comp.type !== "valve52") return ports;
 
   if (hasPneumaticPilot(comp.actuation)) {
-    ports.push(pneumaticPort("14", "14", 72 - pilotOffset(comp.actuation), 61, "control"));
+    ports.push(pneumaticPort("12", "12", 72 - pilotOffset(comp.actuation), 61, "control"));
   }
 
   if (hasPneumaticPilot(comp.returnType)) {
     const rightEdge = comp.type === "valve32" ? 176 : 224;
-    ports.push(pneumaticPort("12", "12", rightEdge + pilotOffset(comp.returnType), 61, "control"));
+    ports.push(pneumaticPort("14", "14", rightEdge + pilotOffset(comp.returnType), 61, "control"));
   }
 
   return ports;

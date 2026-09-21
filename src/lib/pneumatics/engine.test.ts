@@ -17,18 +17,18 @@ const runtime = (patch: Partial<RuntimeState> = {}): RuntimeState => ({
 });
 
 describe("motor pneumático topológico", () => {
-  it("leva o sinal do botão pela porta 2 até o piloto 14", () => {
+  it("leva o sinal do botão pela porta 2 até o piloto 12 à esquerda", () => {
     const circuit = springReturnCircuit();
 
     const idle = solveCircuit(circuit, runtime());
     expect(idle.actuated["v1"]).toBe(false);
-    expect(idle.vented.has(portKey("v1", "14"))).toBe(true);
+    expect(idle.vented.has(portKey("v1", "12"))).toBe(true);
     expect(idle.pressurized.has(portKey("cil1", "A"))).toBe(false);
 
     const commanded = solveCircuit(circuit, runtime({ signals: { s1: true } }));
     expect(commanded.actuated["v1"]).toBe(true);
     expect(commanded.pressurized.has(portKey("s1", "A"))).toBe(true);
-    expect(commanded.pressurized.has(portKey("v1", "14"))).toBe(true);
+    expect(commanded.pressurized.has(portKey("v1", "12"))).toBe(true);
     expect(commanded.pressurized.has(portKey("cil1", "A"))).toBe(true);
   });
 
@@ -94,16 +94,16 @@ describe("motor pneumático topológico", () => {
           to: { componentId: "return", portId: "P" },
         },
         {
-          id: "p14",
-          medium: "pneumatic",
-          from: { componentId: "advance", portId: "A" },
-          to: { componentId: "valve", portId: "14" },
-        },
-        {
           id: "p12",
           medium: "pneumatic",
-          from: { componentId: "return", portId: "A" },
+          from: { componentId: "advance", portId: "A" },
           to: { componentId: "valve", portId: "12" },
+        },
+        {
+          id: "p14",
+          medium: "pneumatic",
+          from: { componentId: "return", portId: "A" },
+          to: { componentId: "valve", portId: "14" },
         },
       ],
     };
