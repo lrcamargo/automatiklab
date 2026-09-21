@@ -135,18 +135,19 @@ function ActuationSymbol({
   };
 
   /**
-   * Solenoide (Quadro 12): retângulo com uma diagonal para uma bobina e duas
-   * diagonais cruzadas em X para duas bobinas — não dois retângulos lado a
-   * lado. `coils` escolhe entre as duas formas.
+   * Solenoide (Quadro 12): uma bobina = uma diagonal; duas bobinas = duas
+   * diagonais PARALELAS; proporcional = duas diagonais cruzadas.
    */
-  const solenoidBox = (d0: number, coils: 1 | 2 = 1) => {
-    // retângulo deitado: a norma usa uma caixa mais larga que alta
+  const solenoidBox = (d0: number, kind: "single" | "double" | "proportional" = "single") => {
     const r = rectAt(d0, 34, 24);
     return (
       <g>
         <rect {...r} className={soft} strokeWidth={1.8} />
         <path d={`M${p(d0 + 3, -9)} L${p(d0 + 31, 9)}`} className={cls} strokeWidth={1.8} />
-        {coils === 2 && (
+        {kind === "double" && (
+          <path d={`M${p(d0 + 3, -3)} L${p(d0 + 22, 9)}`} className={cls} strokeWidth={1.8} />
+        )}
+        {kind === "proportional" && (
           <path d={`M${p(d0 + 3, 9)} L${p(d0 + 31, -9)}`} className={cls} strokeWidth={1.8} />
         )}
       </g>
@@ -249,8 +250,12 @@ function ActuationSymbol({
     case "rolete":
       return (
         <g>
-          <rect {...rectAt(1, 28, 18)} className={soft} strokeWidth={1.8} />
-          {roller(35)}
+          <path
+            d={`M${p(1, -9)} L${p(29, -9)} M${p(1, 9)} L${p(29, 9)} M${p(1, -9)} L${p(1, 9)}`}
+            className={cls}
+            strokeWidth={1.8}
+          />
+          {roller(29)}
         </g>
       );
     /*
@@ -261,8 +266,16 @@ function ActuationSymbol({
     case "roleteEscamoteavel":
       return (
         <g>
-          <rect {...rectAt(1, 19, 18)} className={soft} strokeWidth={1.8} />
-          <path d={`M${p(20)} L${p(38, -18)}`} className={cls} strokeWidth={1.8} />
+          <path
+            d={`M${p(1, -9)} L${p(20, -9)} M${p(1, 9)} L${p(20, 9)} M${p(1, -9)} L${p(1, 9)}`}
+            className={cls}
+            strokeWidth={1.8}
+          />
+          <path
+            d={`M${p(16, -4)} L${p(36, -24)} M${p(24, 4)} L${p(44, -16)}`}
+            className={cls}
+            strokeWidth={1.8}
+          />
           {roller(20)}
           {roller(40, y - 20)}
           <path d={`M${p(18, -30)} L${p(44, -30)}`} className={cls} strokeWidth={1.5} />
@@ -298,7 +311,9 @@ function ActuationSymbol({
     case "solenoideSimples":
       return <g>{solenoidBox(1)}</g>;
     case "solenoideDuplo":
-      return <g>{solenoidBox(1, 2)}</g>;
+      return <g>{solenoidBox(1, "double")}</g>;
+    case "solenoideProporcional":
+      return <g>{solenoidBox(1, "proportional")}</g>;
     case "servoSolenoideDuploManual":
       return (
         <g>
@@ -1443,14 +1458,7 @@ export function ComponentGlyph({
       );
     }
 
-    /*
-     * Unidade de conservação SIMPLIFICADA — Quadro 5 (imagem à direita).
-     *
-     * É o símbolo enxuto: um retângulo atravessado pela linha de fluxo, com
-     * um LOSANGO inscrito (o conjunto filtro/regulador/lubrificador reunido)
-     * e o MANÔMETRO no centro do losango. Sem dreno, sem tracejado e sem
-     * numeração — todo o detalhamento fica na versão completa.
-     */
+    /* Unidade de conservação simplificada — Quadro 5, figura da direita. */
     case "lubrifil": {
       const flowing = live("A");
       return (
@@ -1458,21 +1466,17 @@ export function ComponentGlyph({
           width={def.width}
           height={def.height}
           viewBox={`0 0 ${def.width} ${def.height}`}
-          aria-label="Unidade de conservação simplificada (símbolo compacto)"
+          aria-label="Unidade de conservação simplificada"
         >
           {defs}
           <text x={4} y={13} className="fill-foreground font-mono text-[10px] font-semibold">
             {comp.label}
           </text>
-
-          {/* linha de fluxo entrando e saindo */}
           <path
             d="M0 52 H120"
             className={flowing ? "fill-none stroke-air" : baseLine}
             strokeWidth={2}
           />
-
-          {/* corpo: retângulo de traço contínuo */}
           <rect
             x={24}
             y={26}
@@ -1481,24 +1485,17 @@ export function ComponentGlyph({
             className={activeBox(flowing)}
             strokeWidth={1.8}
           />
-
-          {/* losango inscrito */}
-          <path
-            d="M60 30 L92 52 L60 74 L28 52 Z"
-            className="fill-none stroke-steel"
-            strokeWidth={1.5}
-          />
-
-          {/* manômetro no centro */}
+          {/* divisória vertical tracejada */}
+          <path d="M60 26 V78" className={baseLine} strokeWidth={1.3} strokeDasharray="4 3" />
+          {/* manômetro dentro do corpo */}
           <circle
-            cx={60}
+            cx={76}
             cy={52}
             r={10}
             className="fill-background stroke-steel"
             strokeWidth={1.5}
           />
-          <path d="M60 52 L66 46" className={baseLine} strokeWidth={1.3} />
-
+          <path d="M76 52 L82 46" className={baseLine} strokeWidth={1.3} />
           <PortNumber x={2} y={44} value="1" />
           <PortNumber x={104} y={44} value="2" />
         </svg>
