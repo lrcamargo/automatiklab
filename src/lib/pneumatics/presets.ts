@@ -11,8 +11,9 @@ import type { Circuit } from "./types";
  *     alimentando cada uma o seu piloto;
  *   - a linha de alimentação é um barramento horizontal na parte de baixo,
  *     do qual derivam a direcional e os dois comandos;
- *   - a unidade de preparação e a fonte de ar ficam na extremidade esquerda
- *     desse barramento.
+ *   - a unidade de preparação e a fonte de ar ficam junto à extremidade
+ *     esquerda desse barramento, próximas ao corpo do diagrama (um pouco
+ *     abaixo dele, para não afastar o desenho).
  *
  * A constante abaixo é a altura desse barramento; todas as mangueiras de
  * alimentação usam esse mesmo `midY` para desenhar uma linha única.
@@ -73,11 +74,11 @@ export function basicCircuit(): Circuit {
       {
         id: "z1",
         type: "conservationUnit",
-        x: -560,
-        y: 508,
+        x: -290,
+        y: 604,
         label: "0Z1",
       },
-      { id: "src1", type: "source", x: -780, y: 518, label: "1P1", pressure: 6 },
+      { id: "src1", type: "source", x: -470, y: 610, label: "1P1", pressure: 6 },
     ],
     tubes: [
       // fonte -> unidade de preparação
@@ -181,11 +182,11 @@ export function springReturnCircuit(): Circuit {
       {
         id: "z1",
         type: "conservationUnit",
-        x: -560,
-        y: 508,
+        x: -290,
+        y: 604,
         label: "0Z1",
       },
-      { id: "src1", type: "source", x: -780, y: 518, label: "1P1", pressure: 6 },
+      { id: "src1", type: "source", x: -470, y: 610, label: "1P1", pressure: 6 },
     ],
     tubes: [
       {

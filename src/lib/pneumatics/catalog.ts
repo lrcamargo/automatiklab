@@ -189,10 +189,10 @@ export const CATALOG: Record<ComponentType, ComponentDef> = {
     description:
       "Silenciador de exaustão. Liga uma via de escape à atmosfera, descarregando a linha.",
     family: "alimentacao",
-    // menor que os demais componentes: é só o triângulo de exaustão
-    width: 48,
-    height: 56,
-    ports: [pneumaticPort("R", "3", 24, 0, "exhaust")],
+    // bem menor que os demais componentes: é só o triângulo de exaustão
+    width: 36,
+    height: 42,
+    ports: [pneumaticPort("R", "3", 18, 0, "exhaust")],
   },
   valveOr: {
     type: "valveOr",

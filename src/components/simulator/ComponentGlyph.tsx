@@ -114,7 +114,12 @@ function ActuationSymbol({
     />
   );
 
-  const pilot = (d0: number) => {
+  /*
+   * Piloto pneumático (Quadro 13). O triângulo aponta para a válvula.
+   * `external` desenha o traço de ligação que caracteriza o piloto positivo
+   * EXTERNO; o piloto interno (servo-piloto) encosta direto na caixa.
+   */
+  const pilot = (d0: number, external = true) => {
     const tip = px(d0);
     const back = px(d0 + 16);
     return (
@@ -124,7 +129,7 @@ function ActuationSymbol({
           className={soft}
           strokeWidth={1.6}
         />
-        <path d={`M${p(d0 + 16)} L${p(d0 + 23)}`} className={cls} strokeWidth={1.6} />
+        {external && <path d={`M${p(d0 + 16)} L${p(d0 + 23)}`} className={cls} strokeWidth={1.6} />}
       </g>
     );
   };
@@ -148,10 +153,17 @@ function ActuationSymbol({
     );
   };
 
+  /** Rolete (Quadro 11): círculo VAZADO com um ponto no centro. */
   const roller = (d0: number, cy = y) => (
     <g>
-      <circle cx={px(d0)} cy={cy} r={7} className={soft} strokeWidth={1.8} />
-      <circle cx={px(d0)} cy={cy} r={1.5} className={filled} strokeWidth={0} />
+      <circle
+        cx={px(d0)}
+        cy={cy}
+        r={7}
+        className="fill-background stroke-steel"
+        strokeWidth={1.8}
+      />
+      <circle cx={px(d0)} cy={cy} r={2} className="fill-steel stroke-steel" strokeWidth={0} />
     </g>
   );
 
@@ -183,31 +195,40 @@ function ActuationSymbol({
           <path d={`M${p(34, -11)} L${p(34, 11)}`} className={cls} strokeWidth={2.2} />
         </g>
       );
-    // Alavanca (Quadro 10): haste inclinada com um pequeno círculo na ponta.
+    /*
+     * Alavanca (Quadro 10): haste horizontal encostada na válvula, trecho
+     * vertical curto e um pequeno círculo VAZADO no topo.
+     */
     case "alavanca":
       return (
         <g>
           {stem(1, 30)}
-          <path d={`M${p(30)} L${p(30, -22)}`} className={cls} strokeWidth={1.8} />
-          <circle cx={px(30)} cy={y - 28} r={5} className={soft} strokeWidth={1.6} />
+          <path d={`M${p(30)} L${p(30, -20)}`} className={cls} strokeWidth={1.8} />
+          <circle
+            cx={px(30)}
+            cy={y - 26}
+            r={5}
+            className="fill-none stroke-steel"
+            strokeWidth={1.6}
+          />
         </g>
       );
-    // Pedal (Quadro 10): placa inclinada apoiada sobre a haste.
+    /*
+     * Pedal (Quadro 10): a placa é formada por DUAS LINHAS PARALELAS
+     * levemente inclinadas, fechadas por uma aresta à esquerda.
+     */
     case "pedal":
       return (
         <g>
-          {stem(1, 24)}
-          <path d={`M${p(24)} L${p(24, -14)}`} className={cls} strokeWidth={1.7} />
-          <path d={`M${p(12, -20)} L${p(46, -10)}`} className={cls} strokeWidth={2.4} />
+          {stem(1, 12)}
+          <path d={`M${p(12, -16)} L${p(42, -9)}`} className={cls} strokeWidth={1.8} />
+          <path d={`M${p(12, -4)} L${p(42, 2)}`} className={cls} strokeWidth={1.8} />
+          <path d={`M${p(12, -16)} L${p(12, -4)}`} className={cls} strokeWidth={1.8} />
         </g>
       );
     /*
-     * Came: o ressalto é arredondado — uma meia-lua cheia sobre a haste,
-     * que é o perfil que empurra o êmbolo ao passar.
-     */
-    /*
-     * Pino adaptador / came (Quadro 11): haste de ponta arredondada — um
-     * retângulo fechado por uma semicircunferência, não um ressalto cheio.
+     * Pino adaptador (Quadro 11): haste de ponta ARREDONDADA, com o
+     * comprimento ajustável — não um bloco reto.
      */
     case "came":
       return (
@@ -221,6 +242,10 @@ function ActuationSymbol({
           <path d={`M${p(1, -9)} L${p(1, 9)}`} className={cls} strokeWidth={1.8} />
         </g>
       );
+    /*
+     * Rolete fixo (Quadro 11): círculo vazado com ponto central, ligado à
+     * válvula por uma haste horizontal. Aciona em qualquer sentido.
+     */
     case "rolete":
       return (
         <g>
@@ -229,19 +254,20 @@ function ActuationSymbol({
         </g>
       );
     /*
-     * Rolete articulado / escamoteável (Quadro 11): dois círculos ligados pelo
-     * braço inclinado, com a seta indicando o único sentido que aciona.
+     * Rolete articulado / escamoteável (Quadro 11): dois círculos vazados
+     * ligados por um braço inclinado, com a seta horizontal no topo indicando
+     * o único sentido em que ele aciona.
      */
     case "roleteEscamoteavel":
       return (
         <g>
-          {stem(1, 14)}
-          <path d={`M${p(14)} L${p(34, -20)}`} className={cls} strokeWidth={1.8} />
-          <circle cx={px(16)} cy={y - 2} r={6} className={soft} strokeWidth={1.6} />
-          <circle cx={px(34)} cy={y - 22} r={6} className={soft} strokeWidth={1.6} />
-          <path d={`M${p(22, -30)} L${p(46, -30)}`} className={cls} strokeWidth={1.5} />
+          {stem(1, 20)}
+          <path d={`M${p(20)} L${p(38, -18)}`} className={cls} strokeWidth={1.8} />
+          {roller(20)}
+          {roller(40, y - 20)}
+          <path d={`M${p(18, -30)} L${p(44, -30)}`} className={cls} strokeWidth={1.5} />
           <path
-            d={`M${p(40, -34)} L${p(46, -30)} L${p(40, -26)}`}
+            d={`M${p(38, -34)} L${p(44, -30)} L${p(38, -26)}`}
             className={cls}
             strokeWidth={1.4}
             fill="none"
@@ -262,15 +288,13 @@ function ActuationSymbol({
     case "pilotoSimples":
     case "pilotoDuplo":
       return <g>{pilot(1)}</g>;
+    /*
+     * Servo-piloto = piloto positivo INTERNO (Quadro 13): o triângulo encosta
+     * direto na caixa da válvula, sem o traço de ligação externa.
+     */
     case "servoPilotoSimples":
     case "servoPilotoDuplo":
-      return (
-        <g>
-          {pilot(1)}
-          <path d={`M${p(24)} L${p(31)}`} className={cls} strokeWidth={1.6} />
-          {pilot(31)}
-        </g>
-      );
+      return <g>{pilot(1, false)}</g>;
     case "solenoideSimples":
       return <g>{solenoidBox(1)}</g>;
     case "solenoideDuplo":
@@ -805,12 +829,12 @@ export function ComponentGlyph({
             {comp.label}
           </text>
           <path
-            d="M24 0 V24"
+            d="M18 0 V18"
             className={live("R") ? "fill-none stroke-air" : baseLine}
             strokeWidth={2}
           />
-          <path d="M11 24 L37 24 L24 46 Z" className={baseLine} strokeWidth={2} />
-          <PortNumber x={24} y={16} value="3" />
+          <path d="M8 18 L28 18 L18 35 Z" className={baseLine} strokeWidth={2} />
+          <PortNumber x={18} y={12} value="3" />
         </svg>
       );
 
@@ -1420,12 +1444,12 @@ export function ComponentGlyph({
     }
 
     /*
-     * Unidade de conservação SIMPLIFICADA — Quadro 5 da apostila.
+     * Unidade de conservação SIMPLIFICADA — Quadro 5 (imagem à direita).
      *
-     * É um retângulo de traço contínuo atravessado pela linha de fluxo, com
-     * uma linha tracejada vertical no meio, o manômetro no centro, os
-     * algarismos 1/2/3 acima do corpo (filtro, regulador e lubrificador
-     * reunidos num único símbolo) e a seta do dreno abaixo da caixa.
+     * É o símbolo enxuto: um retângulo atravessado pela linha de fluxo, com
+     * um LOSANGO inscrito (o conjunto filtro/regulador/lubrificador reunido)
+     * e o MANÔMETRO no centro do losango. Sem dreno, sem tracejado e sem
+     * numeração — todo o detalhamento fica na versão completa.
      */
     case "conservationUnit": {
       const flowing = live("A");
@@ -1441,7 +1465,7 @@ export function ComponentGlyph({
             {comp.label}
           </text>
 
-          {/* linha de fluxo */}
+          {/* linha de fluxo entrando e saindo */}
           <path
             d="M0 52 H120"
             className={flowing ? "fill-none stroke-air" : baseLine}
@@ -1450,41 +1474,30 @@ export function ComponentGlyph({
 
           {/* corpo: retângulo de traço contínuo */}
           <rect
-            x={28}
-            y={30}
-            width={64}
-            height={44}
+            x={24}
+            y={26}
+            width={72}
+            height={52}
             className={activeBox(flowing)}
             strokeWidth={1.8}
           />
 
-          {/* divisória tracejada vertical */}
-          <path d="M60 30 V74" className={baseLine} strokeWidth={1.2} strokeDasharray="3 3" />
+          {/* losango inscrito */}
+          <path
+            d="M60 30 L92 52 L60 74 L28 52 Z"
+            className="fill-none stroke-steel"
+            strokeWidth={1.5}
+          />
 
           {/* manômetro no centro */}
           <circle
             cx={60}
             cy={52}
-            r={9}
+            r={10}
             className="fill-background stroke-steel"
-            strokeWidth={1.4}
+            strokeWidth={1.5}
           />
-          <path d="M60 52 L65 47" className={baseLine} strokeWidth={1.2} />
-
-          {/* algarismos dos três elementos reunidos */}
-          <text x={30} y={26} className="fill-muted-foreground font-mono text-[9px]">
-            1
-          </text>
-          <text x={57} y={26} className="fill-muted-foreground font-mono text-[9px]">
-            2
-          </text>
-          <text x={84} y={26} className="fill-muted-foreground font-mono text-[9px]">
-            3
-          </text>
-
-          {/* dreno abaixo do corpo */}
-          <path d="M60 74 V90" className={baseLine} strokeWidth={1.3} />
-          <path d="M55 83 L60 92 L65 83" className={baseLine} strokeWidth={1.3} fill="none" />
+          <path d="M60 52 L66 46" className={baseLine} strokeWidth={1.3} />
 
           <PortNumber x={2} y={44} value="1" />
           <PortNumber x={104} y={44} value="2" />
