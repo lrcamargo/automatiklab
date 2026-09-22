@@ -63,10 +63,10 @@ export const CATALOG: Record<ComponentType, ComponentDef> = {
     width: 264,
     height: 129,
     ports: [
-      pneumaticPort("A", "2", 166, 0, "work"),
-      pneumaticPort("B", "4", 210, 0, "work"),
-      pneumaticPort("R", "3", 166, 112, "exhaust"),
-      pneumaticPort("P", "1", 210, 129, "supply"),
+      pneumaticPort("A", "2", 190, 0, "work"),
+      pneumaticPort("B", "4", 234, 0, "work"),
+      pneumaticPort("R", "3", 190, 112, "exhaust"),
+      pneumaticPort("P", "1", 234, 129, "supply"),
     ],
   },
   valve53: {
@@ -148,8 +148,7 @@ export const CATALOG: Record<ComponentType, ComponentDef> = {
     type: "rotaryMotor",
     name: "Motor pneumático",
     short: "Motor",
-    description:
-      "Atuador rotativo reversível de deslocamento fixo, com dois sentidos de escoamento e de rotação.",
+    description: "Motor pneumático com apenas um sentido de rotação.",
     family: "atuacao",
     width: 132,
     height: 132,
@@ -157,14 +156,13 @@ export const CATALOG: Record<ComponentType, ComponentDef> = {
   },
   rotaryOscillator: {
     type: "rotaryOscillator",
-    name: "Atuador de giro controlado",
-    short: "Oscilador",
-    description:
-      "Oscilador com ângulo de rotação limitado e dois sentidos de giro, comandado pelas duas entradas.",
+    name: "Motor pneumático reversível",
+    short: "Motor reversível",
+    description: "Motor pneumático com dois sentidos de rotação, conforme a entrada pressurizada.",
     family: "atuacao",
-    width: 156,
-    height: 108,
-    ports: [pneumaticPort("A", "2", 0, 40, "work"), pneumaticPort("B", "4", 0, 74, "work")],
+    width: 132,
+    height: 132,
+    ports: [pneumaticPort("A", "2", 66, 0, "work"), pneumaticPort("B", "4", 66, 132, "work")],
   },
   sensor: {
     type: "sensor",
@@ -203,9 +201,9 @@ export const CATALOG: Record<ComponentType, ComponentDef> = {
     width: 120,
     height: 110,
     ports: [
-      pneumaticPort("A", "2", 60, 0, "work"),
-      pneumaticPort("P1", "1", 24, 110, "supply"),
-      pneumaticPort("P2", "1'", 96, 110, "supply"),
+      pneumaticPort("A", "A", 60, 0, "work"),
+      pneumaticPort("P1", "X", 0, 56, "supply"),
+      pneumaticPort("P2", "Y", 120, 56, "supply"),
     ],
   },
   valveAnd: {
@@ -218,9 +216,9 @@ export const CATALOG: Record<ComponentType, ComponentDef> = {
     width: 120,
     height: 110,
     ports: [
-      pneumaticPort("A", "2", 60, 0, "work"),
-      pneumaticPort("P1", "1", 24, 110, "supply"),
-      pneumaticPort("P2", "1'", 96, 110, "supply"),
+      pneumaticPort("A", "A", 60, 0, "work"),
+      pneumaticPort("P1", "P", 0, 56, "supply"),
+      pneumaticPort("P2", "P", 120, 56, "supply"),
     ],
   },
   valveTimer: {
@@ -339,4 +337,6 @@ export const FAMILIES: { id: ComponentDef["family"]; label: string }[] = [
   { id: "sinal", label: "Sinais pneumáticos" },
 ];
 
-export const CATALOG_LIST = Object.values(CATALOG);
+export const CATALOG_LIST = Object.values(CATALOG).filter(
+  (component) => component.type !== "sensor",
+);
