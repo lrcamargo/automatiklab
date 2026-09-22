@@ -1,5 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { Gauge } from "lucide-react";
+import { APP_VERSION_LABEL } from "@/lib/version";
 
 const NAV = [
   { to: "/", label: "Início" },
@@ -18,6 +19,9 @@ export function SiteHeader() {
           </span>
           <span className="font-mono text-sm font-semibold tracking-tight">
             AUTOMATIK<span className="text-primary">LAB</span>
+          </span>
+          <span className="rounded-sm border border-border px-1.5 py-0.5 font-mono text-[9px] text-muted-foreground">
+            {APP_VERSION_LABEL}
           </span>
         </Link>
         <nav className="flex items-center gap-1 text-sm">

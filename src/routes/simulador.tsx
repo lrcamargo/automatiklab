@@ -276,6 +276,9 @@ function SimulatorPage() {
     setProjectId(saved.id);
     setProjectName(saved.name);
     showMessage(`Projeto "${saved.name}" salvo neste navegador.`);
+    // Abre imediatamente a biblioteca: permite trocar de projeto ou exportar
+    // o circuito recém-salvo sem procurar outro comando.
+    setProjectsOpen(true);
   };
 
   const activeCylinders = circuit.components.filter((c) => c.type.startsWith("cylinder"));

@@ -150,21 +150,20 @@ function ActuationSymbol({
           <path d={`M${p(far, 9)} L${p(near, -9)}`} className={cls} strokeWidth={1.8} />
         )}
         {kind === "double" && (
-          <path
-            d={`M${p(far, 9)} L${p(middle, -9)} L${p(near, 9)}`}
-            className={cls}
-            strokeWidth={1.8}
-            fill="none"
-          />
+          <g>
+            {/* duas bobinas: diagonais inclinadas juntas, mas com vão entre as pontas */}
+            <path d={`M${p(far, 9)} L${p(middle + 2, -9)}`} className={cls} strokeWidth={1.8} />
+            <path d={`M${p(middle - 2, -9)} L${p(near, 9)}`} className={cls} strokeWidth={1.8} />
+          </g>
         )}
         {kind === "proportional" && (
           <g>
-            {/* diagonal simples dentro da bobina */}
+            {/* duas diagonais realmente cruzadas */}
             <path d={`M${p(far, 9)} L${p(near, -9)}`} className={cls} strokeWidth={1.8} />
-            {/* diagonal de regulagem: atravessa a bobina e termina em seta fora dela */}
-            <path d={`M${p(near - 2, 14)} L${p(far + 3, -15)}`} className={cls} strokeWidth={1.8} />
+            <path d={`M${p(near - 2, 14)} L${p(far + 4, -16)}`} className={cls} strokeWidth={1.8} />
+            {/* seta cheia na ponta externa da segunda diagonal */}
             <path
-              d={`M${p(far - 3, -13)} L${p(far + 3, -15)} L${p(far + 1, -8)} Z`}
+              d={`M${p(far + 4, -16)} L${p(far - 4, -13)} L${p(far + 1, -7)} Z`}
               className={filled}
               strokeWidth={0}
             />

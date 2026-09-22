@@ -1,4 +1,5 @@
 import { Instagram, Music2 } from "lucide-react";
+import { APP_VERSION_LABEL } from "@/lib/version";
 
 export function SiteFooter() {
   return (
@@ -9,7 +10,7 @@ export function SiteFooter() {
         </p>
         <p className="text-xs md:max-w-md">
           Projeto educacional independente. Simulação simplificada, sem substituir normas técnicas
-          ou bancadas reais. v0.8.9.1-beta
+          ou bancadas reais. - {APP_VERSION_LABEL}
         </p>
         <div className="flex items-center gap-4 text-xs">
           <a
