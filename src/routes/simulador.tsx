@@ -146,7 +146,10 @@ function SimulatorPage() {
             : undefined,
       preset: type === "counter" ? 1 : undefined,
       speed:
-        type.startsWith("cylinder") || type === "rotaryMotor" || type === "rotaryOscillator"
+        type.startsWith("cylinder") ||
+        type === "rotaryMotor" ||
+        type === "rotaryOscillator" ||
+        type === "rotaryCylinder"
           ? 1
           : undefined,
       springAction: type === "cylinderSingle" ? "retornoMola" : undefined,

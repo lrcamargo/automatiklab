@@ -164,6 +164,17 @@ export const CATALOG: Record<ComponentType, ComponentDef> = {
     height: 132,
     ports: [pneumaticPort("A", "2", 66, 0, "work"), pneumaticPort("B", "4", 66, 132, "work")],
   },
+  rotaryCylinder: {
+    type: "rotaryCylinder",
+    name: "Cilindro pneumático rotativo",
+    short: "Cilindro rotativo",
+    description:
+      "Atuador pneumático de movimento angular limitado, comandado alternadamente pelas portas 2 e 4.",
+    family: "atuacao",
+    width: 156,
+    height: 108,
+    ports: [pneumaticPort("A", "2", 0, 40, "work"), pneumaticPort("B", "4", 0, 74, "work")],
+  },
   sensor: {
     type: "sensor",
     name: "Válvula 3/2 de fim de curso",
@@ -257,9 +268,9 @@ export const CATALOG: Record<ComponentType, ComponentDef> = {
     width: 132,
     height: 110,
     ports: [
-      pneumaticPort("P", "1", 0, 46, "supply"),
-      pneumaticPort("A", "2", 132, 46, "work"),
-      pneumaticPort("R", "3", 66, 110, "exhaust"),
+      pneumaticPort("P", "1", 0, 56, "supply"),
+      pneumaticPort("A", "2", 66, 0, "work"),
+      pneumaticPort("R", "3", 132, 56, "exhaust"),
     ],
   },
   throttleOneWay: {

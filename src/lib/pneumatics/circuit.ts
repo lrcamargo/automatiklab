@@ -32,6 +32,7 @@ const TECHNICAL_PREFIX: Record<ComponentType, string> = {
   conservationUnit: "0Z",
   rotaryMotor: "1A",
   rotaryOscillator: "1A",
+  rotaryCylinder: "1A",
 };
 
 export function nextTechnicalLabel(type: ComponentType, components: PlacedComponent[]) {

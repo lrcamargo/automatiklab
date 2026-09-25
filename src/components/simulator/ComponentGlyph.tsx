@@ -406,7 +406,7 @@ export function ComponentGlyph({
           </text>
           {/* Fonte pneumática: somente o triângulo vazado, sem círculo/eixo. */}
           <path
-            d="M18 42 L48 25 L48 59 Z"
+            d="M18 25 L48 42 L18 59 Z"
             className="fill-background stroke-steel"
             strokeWidth={2}
           />
@@ -727,7 +727,13 @@ export function ComponentGlyph({
           />
           <path d="M66 0 V28 M66 104 V132" className={baseLine} strokeWidth={2} />
           <path d="M104 60 H130 M104 72 H130" className={baseLine} strokeWidth={1.7} />
-          <path d="M120 48 L130 54 L120 60" className={baseLine} strokeWidth={1.6} fill="none" />
+          <path
+            d="M112 76 C136 76 136 56 112 56"
+            className={baseLine}
+            strokeWidth={1.6}
+            fill="none"
+          />
+          <path d="M112 56 L120 52 M112 56 L119 62" className={baseLine} strokeWidth={1.5} />
           <PortNumber x={70} y={20} value="2" />
           <PortNumber x={70} y={124} value="4" />
         </svg>
@@ -763,13 +769,46 @@ export function ComponentGlyph({
           <path d="M66 0 V28 M66 104 V132" className={baseLine} strokeWidth={2} />
           <path d="M104 58 H130 M104 74 H130" className={baseLine} strokeWidth={1.7} />
           <path
-            d="M120 46 L130 52 L120 58 M120 86 L130 80 L120 74"
+            d="M112 78 C138 78 138 54 112 54"
             className={baseLine}
             strokeWidth={1.6}
             fill="none"
           />
+          <path
+            d="M112 54 L120 50 M112 54 L119 60 M112 78 L120 72 M112 78 L120 82"
+            className={baseLine}
+            strokeWidth={1.5}
+          />
           <PortNumber x={70} y={20} value="2" />
           <PortNumber x={70} y={124} value="4" />
+        </svg>
+      );
+    }
+
+    case "rotaryCylinder": {
+      const a = live("A");
+      const b = live("B");
+      return (
+        <svg
+          width={def.width}
+          height={def.height}
+          viewBox={`0 0 ${def.width} ${def.height}`}
+          aria-label="Cilindro pneumático rotativo"
+        >
+          {defs}
+          <text x={4} y={13} className="fill-foreground font-mono text-[10px] font-semibold">
+            {comp.label}
+          </text>
+          <path d="M58 20 A38 38 0 0 1 58 96 V20 Z" className={activeBox(a || b)} strokeWidth={2} />
+          <path d="M96 58 H156 M0 40 H58 M0 74 H58" className={baseLine} strokeWidth={2} />
+          <path
+            d="M20 32 L38 40 L20 48 Z M20 66 L38 74 L20 82 Z"
+            className="fill-background stroke-steel"
+            strokeWidth={1.5}
+          />
+          <path d="M76 38 Q92 58 76 78" className={baseLine} strokeWidth={1.4} fill="none" />
+          <PortNumber x={4} y={32} value="2" />
+          <PortNumber x={4} y={66} value="4" />
         </svg>
       );
     }
@@ -892,28 +931,18 @@ export function ComponentGlyph({
             </>
           ) : (
             <>
-              {/* simultaneidade: duas retenções opostas alimentam juntas a saída */}
+              {/* Elemento E: êmbolo horizontal entre as duas entradas. */}
               <path
-                d="M24 44 L42 56 L24 68 Z M96 44 L78 56 L96 68 Z"
+                d="M38 44 V68 M82 44 V68 M38 49 H82 M38 63 H82"
                 className={baseLine}
-                strokeWidth={1.5}
+                strokeWidth={1.7}
                 fill="none"
               />
-              <circle
-                cx={50}
-                cy={56}
-                r={6}
-                className="fill-background stroke-steel"
-                strokeWidth={1.5}
+              <path
+                d="M52 34 V44 M68 34 V44 M52 68 V78 M68 68 V78"
+                className={baseLine}
+                strokeWidth={1.3}
               />
-              <circle
-                cx={70}
-                cy={56}
-                r={6}
-                className="fill-background stroke-steel"
-                strokeWidth={1.5}
-              />
-              <path d="M56 44 V68 M64 44 V68" className={baseLine} strokeWidth={1.3} />
             </>
           )}
           <PortNumber x={60} y={8} value="A" />
@@ -1056,7 +1085,7 @@ export function ComponentGlyph({
       );
     }
 
-    /* Escape rápido: corpo retangular de três vias com obturador interno. */
+    /* Escape rápido — corpo e pilotagem conforme a referência de três vias. */
     case "quickExhaust": {
       const flowing = live("A");
       return (
@@ -1072,31 +1101,53 @@ export function ComponentGlyph({
           </text>
           <rect
             x={20}
-            y={24}
-            width={92}
-            height={62}
+            y={34}
+            width={82}
+            height={48}
             className={activeBox(flowing)}
             strokeWidth={1.8}
           />
-          <path d="M0 46 H46 M86 46 H132 M66 86 V110" className={baseLine} strokeWidth={2} />
-          {/* assentos e disco móvel que alterna alimentação/escape */}
-          <path
-            d="M46 34 L46 58 L58 46 Z M86 34 L86 58 L74 46 Z"
-            className={baseLine}
+          <path d="M0 56 H36 M66 0 V34 M102 56 H132" className={baseLine} strokeWidth={2} />
+          {/* retenção interna entre 1 e o nó da saída 2 */}
+          <path d="M38 44 L54 56 L38 68" className={baseLine} strokeWidth={1.6} fill="none" />
+          <circle
+            cx={58}
+            cy={56}
+            r={6}
+            className="fill-background stroke-steel"
             strokeWidth={1.6}
+          />
+          <circle cx={66} cy={56} r={2.5} className="fill-steel stroke-steel" strokeWidth={0} />
+          {/* passagem inclinada para o escape 3 */}
+          <path
+            d="M72 68 L92 48 M92 48 L85 50 M92 48 L90 55"
+            className={baseLine}
+            strokeWidth={1.5}
+          />
+          {/* comando pneumático do obturador, com realimentação tracejada */}
+          <rect
+            x={102}
+            y={42}
+            width={20}
+            height={28}
+            className="fill-background stroke-steel"
+            strokeWidth={1.4}
+          />
+          <path
+            d="M122 42 L132 56 L122 70 Z"
+            className="fill-background stroke-steel"
+            strokeWidth={1.4}
+          />
+          <path
+            d="M66 34 V22 H112 V42"
+            className={baseLine}
+            strokeWidth={1.2}
+            strokeDasharray="4 3"
             fill="none"
           />
-          <circle
-            cx={66}
-            cy={46}
-            r={8}
-            className="fill-background stroke-steel"
-            strokeWidth={1.7}
-          />
-          <path d="M58 66 H74 L66 80 Z" className={baseLine} strokeWidth={1.6} fill="none" />
-          <PortNumber x={2} y={38} value="1" />
-          <PortNumber x={116} y={38} value="2" />
-          <PortNumber x={70} y={102} value="3" />
+          <PortNumber x={2} y={48} value="1" />
+          <PortNumber x={70} y={8} value="2" />
+          <PortNumber x={118} y={48} value="3" />
         </svg>
       );
     }
@@ -1164,25 +1215,19 @@ export function ComponentGlyph({
             </>
           ) : (
             <>
-              <rect
-                x={20}
-                y={18}
-                width={80}
-                height={48}
-                className="fill-none stroke-steel"
-                strokeWidth={1.6}
-              />
-              <path d="M0 42 H36 M84 42 H120" className={line} strokeWidth={2} />
+              {/* estrangulador ajustável bidirecional: dois arcos e seta transversal */}
+              <path d="M0 42 H120" className={line} strokeWidth={2} />
               <path
-                d="M36 28 L52 42 L36 56 M84 28 L68 42 L84 56"
+                d="M42 31 Q60 42 78 31 M42 53 Q60 42 78 53"
                 className={baseLine}
                 strokeWidth={1.8}
                 fill="none"
               />
               <path
-                d="M96 70 L26 14 M26 14 L36 17 M26 14 L31 23"
+                d="M54 66 Q58 42 66 18 M66 18 L60 26 M66 18 L69 28"
                 className={baseLine}
                 strokeWidth={1.7}
+                fill="none"
               />
             </>
           )}
@@ -1505,6 +1550,7 @@ export function ComponentGlyph({
 
           {/* (4) lubrificador */}
           <path d={diamond(190, 52)} className="fill-background stroke-steel" strokeWidth={1.6} />
+          <path d="M190 34 V27" className={baseLine} strokeWidth={1.4} />
           {numeral(198, 70, "4")}
 
           <PortNumber x={2} y={44} value="1" />

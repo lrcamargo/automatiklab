@@ -297,7 +297,8 @@ export function PropertiesPanel({
       {(selected.type === "cylinderSingle" ||
         selected.type === "cylinderDouble" ||
         selected.type === "rotaryMotor" ||
-        selected.type === "rotaryOscillator") && (
+        selected.type === "rotaryOscillator" ||
+        selected.type === "rotaryCylinder") && (
         <div>
           <label className={labelClass} htmlFor="speed">
             Velocidade de curso ({(selected.speed ?? 1).toFixed(1)}×)

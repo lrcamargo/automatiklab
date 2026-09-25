@@ -19,7 +19,8 @@ export type ComponentType =
   | "lubrifil"
   | "conservationUnit"
   | "rotaryMotor"
-  | "rotaryOscillator";
+  | "rotaryOscillator"
+  | "rotaryCylinder";
 
 export type PortDomain = "pneumatic";
 export type PortKind = "supply" | "work" | "exhaust" | "control";

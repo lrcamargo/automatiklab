@@ -3,5 +3,5 @@
  *
  * Mantida em sincronia com package.json por `bun run version:set -- <versão>`.
  */
-export const APP_VERSION = "0.9.0-beta.2";
+export const APP_VERSION = "0.9.0-beta.2.1";
 export const APP_VERSION_LABEL = `v${APP_VERSION}`;

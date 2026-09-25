@@ -431,7 +431,8 @@ export function stepStrokes(
       comp.type !== "cylinderSingle" &&
       comp.type !== "cylinderDouble" &&
       comp.type !== "rotaryMotor" &&
-      comp.type !== "rotaryOscillator"
+      comp.type !== "rotaryOscillator" &&
+      comp.type !== "rotaryCylinder"
     )
       continue;
     const current = next[comp.id] ?? 0;
@@ -451,7 +452,11 @@ export function strokeDirection(
   comp: Circuit["components"][number],
   solved: SolveResult,
 ): -1 | 0 | 1 {
-  if (comp.type === "rotaryMotor" || comp.type === "rotaryOscillator") {
+  if (
+    comp.type === "rotaryMotor" ||
+    comp.type === "rotaryOscillator" ||
+    comp.type === "rotaryCylinder"
+  ) {
     const a = solved.pressurized.has(portKey(comp.id, "A"));
     const b = solved.pressurized.has(portKey(comp.id, "B"));
     if (a && !b) return 1;
