@@ -727,12 +727,7 @@ export function ComponentGlyph({
           />
           <path d="M66 0 V28 M66 104 V132" className={baseLine} strokeWidth={2} />
           <path d="M104 60 H130 M104 72 H130" className={baseLine} strokeWidth={1.7} />
-          <path
-            d="M112 76 C136 76 136 56 112 56"
-            className={baseLine}
-            strokeWidth={1.6}
-            fill="none"
-          />
+          <path d="M112 76 Q128 66 112 56" className={baseLine} strokeWidth={1.6} fill="none" />
           <path d="M112 56 L120 52 M112 56 L119 62" className={baseLine} strokeWidth={1.5} />
           <PortNumber x={70} y={20} value="2" />
           <PortNumber x={70} y={124} value="4" />
@@ -800,13 +795,15 @@ export function ComponentGlyph({
             {comp.label}
           </text>
           <path d="M58 20 A38 38 0 0 1 58 96 V20 Z" className={activeBox(a || b)} strokeWidth={2} />
-          <path d="M96 58 H156 M0 40 H58 M0 74 H58" className={baseLine} strokeWidth={2} />
+          {/* entradas à esquerda; os triângulos ficam dentro do semicírculo */}
+          <path d="M0 40 H58 M0 74 H58" className={baseLine} strokeWidth={2} />
           <path
-            d="M20 32 L38 40 L20 48 Z M20 66 L38 74 L20 82 Z"
+            d="M62 32 L82 40 L62 48 Z M62 66 L82 74 L62 82 Z"
             className="fill-background stroke-steel"
             strokeWidth={1.5}
           />
-          <path d="M76 38 Q92 58 76 78" className={baseLine} strokeWidth={1.4} fill="none" />
+          {/* duas linhas paralelas do eixo no centro */}
+          <path d="M94 52 H156 M94 64 H156" className={baseLine} strokeWidth={2} />
           <PortNumber x={4} y={32} value="2" />
           <PortNumber x={4} y={66} value="4" />
         </svg>
@@ -916,7 +913,7 @@ export function ComponentGlyph({
             <>
               {/* alternadora: esfera móvel entre dois assentos */}
               <path
-                d="M20 40 L40 56 L20 72 M100 40 L80 56 L100 72"
+                d="M28 46 L42 56 L28 66 M92 46 L78 56 L92 66 M20 56 H42 M78 56 H100"
                 className={baseLine}
                 strokeWidth={1.6}
                 fill="none"
@@ -924,7 +921,7 @@ export function ComponentGlyph({
               <circle
                 cx={ballX}
                 cy={56}
-                r={9}
+                r={5}
                 className="fill-background stroke-steel"
                 strokeWidth={1.8}
               />
@@ -933,13 +930,13 @@ export function ComponentGlyph({
             <>
               {/* Elemento E: êmbolo horizontal entre as duas entradas. */}
               <path
-                d="M38 44 V68 M82 44 V68 M38 49 H82 M38 63 H82"
+                d="M38 48 V64 M82 48 V64 M38 52 H82 M38 60 H82"
                 className={baseLine}
                 strokeWidth={1.7}
                 fill="none"
               />
               <path
-                d="M52 34 V44 M68 34 V44 M52 68 V78 M68 68 V78"
+                d="M52 34 V48 M68 34 V48 M52 64 V78 M68 64 V78"
                 className={baseLine}
                 strokeWidth={1.3}
               />
@@ -1550,7 +1547,7 @@ export function ComponentGlyph({
 
           {/* (4) lubrificador */}
           <path d={diamond(190, 52)} className="fill-background stroke-steel" strokeWidth={1.6} />
-          <path d="M190 34 V27" className={baseLine} strokeWidth={1.4} />
+          <path d="M190 34 V41" className={baseLine} strokeWidth={1.4} />
           {numeral(198, 70, "4")}
 
           <PortNumber x={2} y={44} value="1" />

@@ -37,3 +37,25 @@
 - [ ] Domínio elétrico para eletropneumática e integração futura com CLP.
 - [ ] Modelo físico quantitativo de pressão, vazão, força, carga e perdas.
 - [ ] Contas de usuário e biblioteca de circuitos compartilhados.
+
+## Estado da revisão visual — v0.9.0-beta.2
+
+### Conferidos nesta etapa
+
+- [x] Fonte de ar e unidades de conservação completa/simplificada.
+- [x] Válvula 4/2 com conexões alinhadas à posição de repouso.
+- [x] Motor pneumático e motor pneumático reversível.
+- [x] Cilindro pneumático rotativo como componente separado.
+- [x] Elemento E e reguladora de fluxo bidirecional.
+- [x] Fim de curso representado por válvula 3/2 acionada por rolete.
+
+### Em revisão
+
+- [ ] Escape rápido: concluir comparação visual fina com a apostila.
+- [ ] Elemento OU: concluir comparação visual fina e posições da esfera.
+- [ ] Retenção, temporizadora e reguladora unidirecional.
+
+### Próximo passo preservado
+
+- [ ] Permitir definir as variantes do acionamento por rolete, incluindo fixo e
+      articulado/escamoteável e o sentido de atuação.

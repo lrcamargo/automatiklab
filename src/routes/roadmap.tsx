@@ -24,25 +24,28 @@ export const Route = createFileRoute("/roadmap")({
 });
 
 const DONE = [
-  "Bancada com grade, arrastar e soltar, deslocamento livre e exclusão por clique",
-  "Biblioteca com fonte de ar, Lubrifil, escape, válvulas 3/2, 4/2, 5/2 e 5/3 de centro fechado, cilindros de simples e dupla ação e fim de curso",
-  "Elementos lógicos OU e E, temporizadora, contador pneumático, retenção, escape rápido e reguladoras de fluxo uni e bidirecional",
-  "Acionamento configurável por válvula: botão, alavanca, pedal, rolete, mola, pilotos e solenoides",
-  "Pilotagem conectável pelas portas 14 e 12, inclusive com memória para duplo piloto",
-  "Propagação topológica de pressão e escape, movimento do cilindro e detecção de ligação direta à atmosfera",
-  "Trajeto das mangueiras editável, validação de conexões duplicadas e identificações técnicas únicas por família",
-  "Vista de diagrama técnico com impressão, circuitos de exemplo e testes automatizados do núcleo",
-  "Projetos salvos no navegador: salvar, abrir, renomear, excluir e exportar/importar em .json",
+  "Bancada livre com zoom, arrastar, conectar, editar mangueiras e excluir componentes",
+  "Válvulas direcionais 3/2, 4/2, 5/2 e 5/3 com pilotagem 12/14 e memória",
+  "Cilindros de simples e dupla ação, cilindro rotativo e motores pneumáticos simples e reversível",
+  "Fonte de ar e unidades de conservação completa e simplificada conferidas",
+  "Acionamentos por botão, alavanca, pedal, mola, piloto, servo-piloto e solenoides",
+  "Escapes conectáveis, circuitos de exemplo, impressão técnica e projetos salvos no navegador",
+  "Versionamento SemVer beta e entrega incremental de arquivos completos",
 ];
 
-const PREPARED = ["Símbolos de solenoide disponíveis, ainda sem portas elétricas ou energização"];
+const PREPARED = [
+  "Revisão visual em andamento: escape rápido e elemento OU",
+  "Implementados e em conferência: elemento E, temporizadora, retenção e reguladoras de fluxo",
+  "Solenoides disponíveis graficamente, ainda sem domínio elétrico ou energização",
+];
 
 const NEXT = [
-  "Junções em T visíveis nas linhas e revisão visual da simbologia contra a norma",
+  "Variantes do acionamento por rolete (fixo, articulado/escamoteável e respectivos sentidos)",
+  "Concluir a revisão visual dos símbolos restantes contra a apostila",
+  "Junções em T visíveis nas linhas",
   "Operação em telas pequenas e dispositivos por toque",
   "Modelo físico de pressão, vazão, força, carga, área do êmbolo e perdas",
-  "Exercícios guiados com verificação automática e modo de falhas",
-  "Base eletropneumática e integração futura com lógica de CLP",
+  "Exercícios guiados, modo de falhas e futura base eletropneumática/CLP",
 ];
 
 function Section({ title, items, tone }: { title: string; items: string[]; tone: string }) {
@@ -75,11 +78,7 @@ function RoadmapPage() {
 
         <div className="mt-8 grid gap-4">
           <Section title="Disponível agora" items={DONE} tone="text-[var(--color-signal)]" />
-          <Section
-            title="Presente na interface, ainda sem função"
-            items={PREPARED}
-            tone="text-primary"
-          />
+          <Section title="Em desenvolvimento ou revisão" items={PREPARED} tone="text-primary" />
           <Section
             title="Direções de evolução (não implementado)"
             items={NEXT}

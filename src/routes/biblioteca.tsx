@@ -17,7 +17,7 @@ export const Route = createFileRoute("/biblioteca")({
       {
         name: "description",
         content:
-          "Referência dos componentes disponíveis no simulador: fonte de ar, válvulas 3/2 e 5/2, cilindros, botões e sensores de fim de curso.",
+          "Referência atualizada dos componentes disponíveis: preparação de ar, válvulas, cilindros, motores e elementos lógicos.",
       },
       { property: "og:title", content: "Biblioteca pneumática | AutoMatikLab" },
       {
@@ -75,13 +75,13 @@ function LibraryPage() {
         ))}
 
         <div className="mt-12 rounded-md border border-dashed border-border p-5 text-sm text-muted-foreground">
-          Novas famílias — como válvulas reguladoras de fluxo, temporizadores e blocos lógicos —
-          ainda não existem na plataforma. Quando forem implementadas, aparecerão aqui
-          automaticamente.{" "}
+          Esta biblioteca é gerada diretamente do catálogo da bancada. Os componentes presentes, mas
+          ainda em revisão visual, são acompanhados no{" "}
           <Link to="/roadmap" className="text-primary underline underline-offset-4">
-            Ver roadmap
+            roadmap
           </Link>
-          .
+          . O fim de curso não é um componente separado: use uma válvula 3/2 com acionamento por
+          rolete.
         </div>
       </main>
       <SiteFooter />
