@@ -1,7 +1,43 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
+import { ComponentGlyph } from "@/components/simulator/ComponentGlyph";
 import { CATALOG_LIST, FAMILIES } from "@/lib/pneumatics/catalog";
+import type { ComponentType, PlacedComponent } from "@/lib/pneumatics/types";
+
+/** Símbolos ainda em revisão não são apresentados como referência validada. */
+const SYMBOLS_IN_REVIEW = new Set<ComponentType>([
+  "quickExhaust",
+  "valveOr",
+  "checkValve",
+  "valveTimer",
+  "throttleOneWay",
+]);
+
+function LibrarySymbol({ type, label }: { type: ComponentType; label: string }) {
+  const comp: PlacedComponent = {
+    id: `library-${type}`,
+    type,
+    x: 0,
+    y: 0,
+    label,
+    actuation: type.startsWith("valve") ? "botao" : undefined,
+    returnType: type.startsWith("valve") ? "mola" : undefined,
+    pressure: type === "source" ? 6 : undefined,
+    restriction: type === "throttle" || type === "throttleOneWay" ? 1 : undefined,
+  };
+  return (
+    <div className="mb-4 flex min-h-36 items-center justify-center overflow-hidden rounded-sm border border-border bg-background p-3">
+      <ComponentGlyph
+        comp={comp}
+        stroke={0}
+        actuated={false}
+        signal={false}
+        pressurizedPorts={new Set<string>()}
+      />
+    </div>
+  );
+}
 
 const PORT_KIND_LABEL = {
   supply: "alimentação",
@@ -57,6 +93,13 @@ function LibraryPage() {
             <div className="mt-4 grid gap-4 md:grid-cols-2">
               {CATALOG_LIST.filter((item) => item.family === family.id).map((item) => (
                 <article key={item.type} className="rounded-md border border-border bg-surface p-5">
+                  {SYMBOLS_IN_REVIEW.has(item.type) ? (
+                    <p className="mb-4 rounded-sm border border-dashed border-border px-3 py-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                      Símbolo em revisão visual
+                    </p>
+                  ) : (
+                    <LibrarySymbol type={item.type} label={item.short} />
+                  )}
                   <h3 className="text-base font-semibold">{item.name}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                     {item.description}
@@ -80,8 +123,7 @@ function LibraryPage() {
           <Link to="/roadmap" className="text-primary underline underline-offset-4">
             roadmap
           </Link>
-          . O fim de curso não é um componente separado: use uma válvula 3/2 com acionamento por
-          rolete.
+          .
         </div>
       </main>
       <SiteFooter />

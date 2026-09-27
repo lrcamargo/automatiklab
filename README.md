@@ -17,13 +17,14 @@ fluxo — o que está aqui foi construído inteiramente dessa forma.
 ## O que já funciona
 
 - Bancada com grade, arrastar e soltar, deslocamento livre e exclusão por clique.
-- Biblioteca com fonte de ar, unidade de conservação (Lubrifil), escape/silenciador,
-  válvulas direcionais 3/2, 4/2, 5/2 e 5/3 de centro fechado, cilindros de simples e dupla
-  ação, fim de curso, elementos lógicos OU e E, temporizadora, contador pneumático,
-  retenção, escape rápido e reguladoras de fluxo uni e bidirecional, além da
-  unidade de conservação simplificada.
-- Acionamentos configuráveis por válvula (botão, alavanca, pedal, rolete, mola, piloto simples
-  e duplo, servopiloto, solenoide) conforme a ISO 1219.
+- Biblioteca com fonte de ar, unidades de conservação completa e simplificada, escape para a
+  atmosfera, válvulas direcionais 3/2, 4/2, 5/2 e 5/3, cilindros de simples e dupla ação,
+  cilindro rotativo, motores pneumáticos simples e reversível, elementos lógicos, temporizadora,
+  contador, retenção, escape rápido e reguladoras de fluxo.
+- Os cartões da Biblioteca mostram os símbolos já validados e identificam os que continuam em
+  revisão visual contra as referências.
+- Acionamentos configuráveis por válvula: botão, alavanca, pedal, rolete, mola, piloto,
+  servo-piloto e solenoides.
 - Pilotagem pneumática real pelas portas 14 e 12, com memória nas válvulas de duplo piloto.
 - Propagação topológica de alimentação e escape, movimento dos cilindros, detecção de conflito
   e de ligação direta à atmosfera.
@@ -61,15 +62,15 @@ que é o que os materiais didáticos de pneumática exercitam.
 
 As principais camadas ficam em `src/lib/pneumatics`:
 
-| Arquivo | Responsabilidade |
-| --- | --- |
-| `types.ts` | Tipos de componente, portas e estado de runtime |
-| `catalog.ts` | Dimensões, famílias e coordenadas das portas de cada símbolo |
-| `circuit.ts` | Modelo do circuito, rotas das mangueiras, rótulos técnicos e validações |
-| `engine.ts` | Solucionador topológico, posições das válvulas, temporizadores e contadores |
-| `presets.ts` | Circuitos de exemplo |
-| `useSimulation.ts` | Laço de simulação em React |
-| `storage.ts` | Persistência em `localStorage`, validação por esquema e import/export |
+| Arquivo            | Responsabilidade                                                            |
+| ------------------ | --------------------------------------------------------------------------- |
+| `types.ts`         | Tipos de componente, portas e estado de runtime                             |
+| `catalog.ts`       | Dimensões, famílias e coordenadas das portas de cada símbolo                |
+| `circuit.ts`       | Modelo do circuito, rotas das mangueiras, rótulos técnicos e validações     |
+| `engine.ts`        | Solucionador topológico, posições das válvulas, temporizadores e contadores |
+| `presets.ts`       | Circuitos de exemplo                                                        |
+| `useSimulation.ts` | Laço de simulação em React                                                  |
+| `storage.ts`       | Persistência em `localStorage`, validação por esquema e import/export       |
 
 A bancada e a simbologia SVG ficam em `src/components/simulator`.
 

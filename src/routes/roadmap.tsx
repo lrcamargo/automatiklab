@@ -41,6 +41,7 @@ const PREPARED = [
 
 const NEXT = [
   "Variantes do acionamento por rolete (fixo, articulado/escamoteável e respectivos sentidos)",
+  "Adicionar silenciador pneumático após receber uma referência visual legível",
   "Concluir a revisão visual dos símbolos restantes contra a apostila",
   "Junções em T visíveis nas linhas",
   "Operação em telas pequenas e dispositivos por toque",

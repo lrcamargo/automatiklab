@@ -5,7 +5,7 @@
 - [x] Converter a bancada para o padrão de diagrama técnico dos materiais de referência.
 - [x] Adicionar visualização técnica e impressão/PDF funcional.
 - [x] Reproduzir os símbolos de acionamento e restaurar o deslocamento da bancada.
-- [x] Transformar botão e fim de curso em válvulas pneumáticas 3/2 conectáveis.
+- [x] Transformar o botão pneumático em acionamento configurável da válvula 3/2.
 - [x] Implementar pilotagem pneumática pelas portas 14 e 12.
 - [x] Separar alimentação, escape, conflito e posição memorizada das válvulas no motor.
 - [x] Validar conexões duplicadas e remover linhas órfãs após reconfiguração.
@@ -47,7 +47,6 @@
 - [x] Motor pneumático e motor pneumático reversível.
 - [x] Cilindro pneumático rotativo como componente separado.
 - [x] Elemento E e reguladora de fluxo bidirecional.
-- [x] Fim de curso representado por válvula 3/2 acionada por rolete.
 
 ### Em revisão
 
@@ -55,7 +54,9 @@
 - [ ] Elemento OU: concluir comparação visual fina e posições da esfera.
 - [ ] Retenção, temporizadora e reguladora unidirecional.
 
-### Próximo passo preservado
+### Próximos passos preservados
 
 - [ ] Permitir definir as variantes do acionamento por rolete, incluindo fixo e
       articulado/escamoteável e o sentido de atuação.
+- [ ] Adicionar o silenciador pneumático após receber uma referência visual com
+      fundo claro/contraste suficiente para reproduzir o símbolo sem suposição.

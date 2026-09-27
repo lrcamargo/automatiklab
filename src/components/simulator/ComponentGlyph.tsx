@@ -763,12 +763,7 @@ export function ComponentGlyph({
           />
           <path d="M66 0 V28 M66 104 V132" className={baseLine} strokeWidth={2} />
           <path d="M104 58 H130 M104 74 H130" className={baseLine} strokeWidth={1.7} />
-          <path
-            d="M112 78 C138 78 138 54 112 54"
-            className={baseLine}
-            strokeWidth={1.6}
-            fill="none"
-          />
+          <path d="M112 78 Q130 66 112 54" className={baseLine} strokeWidth={1.6} fill="none" />
           <path
             d="M112 54 L120 50 M112 54 L119 60 M112 78 L120 72 M112 78 L120 82"
             className={baseLine}
@@ -798,7 +793,7 @@ export function ComponentGlyph({
           {/* entradas à esquerda; os triângulos ficam dentro do semicírculo */}
           <path d="M0 40 H58 M0 74 H58" className={baseLine} strokeWidth={2} />
           <path
-            d="M62 32 L82 40 L62 48 Z M62 66 L82 74 L62 82 Z"
+            d="M66 35 L78 40 L66 45 Z M66 69 L78 74 L66 79 Z"
             className="fill-background stroke-steel"
             strokeWidth={1.5}
           />
@@ -895,7 +890,7 @@ export function ComponentGlyph({
       const out = live("A");
       const p1 = live("P1");
       const p2 = live("P2");
-      const ballX = p1 && !p2 ? 78 : p2 && !p1 ? 42 : 60;
+      const ballX = p1 && !p2 ? 74 : p2 && !p1 ? 46 : 60;
       return (
         <svg
           width={def.width}
@@ -913,11 +908,12 @@ export function ComponentGlyph({
             <>
               {/* alternadora: esfera móvel entre dois assentos */}
               <path
-                d="M28 46 L42 56 L28 66 M92 46 L78 56 L92 66 M20 56 H42 M78 56 H100"
+                d="M20 56 H38 M82 56 H100 M38 47 L48 56 L38 65 M82 47 L72 56 L82 65"
                 className={baseLine}
-                strokeWidth={1.6}
+                strokeWidth={1.5}
                 fill="none"
               />
+              <path d="M52 56 H68" className={baseLine} strokeWidth={1.3} />
               <circle
                 cx={ballX}
                 cy={56}
