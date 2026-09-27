@@ -36,6 +36,15 @@ fluxo — o que está aqui foi construído inteiramente dessa forma.
   o de dupla ação. Ao carregar, o circuito é centralizado automaticamente na área visível.
 - Circuitos de exemplo e testes automatizados do núcleo pneumático.
 
+## Tecnologias
+
+- **TypeScript** e **React 19** para a aplicação e os símbolos SVG.
+- **TanStack Router/Start** para rotas e estrutura web.
+- **Vite 8** e **Nitro** para desenvolvimento, build e implantação.
+- **Tailwind CSS 4** e **Radix UI** para estilos e componentes acessíveis.
+- **Zod** para validar projetos persistidos e importados.
+- **Vitest** para os testes automatizados.
+
 ## Desenvolvimento
 
 O projeto requer **Node.js 22.12 ou superior**.

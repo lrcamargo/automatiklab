@@ -49,7 +49,7 @@
 - [x] Fonte de ar e unidades de conservação completa/simplificada.
 - [x] Válvula 4/2 com conexões alinhadas à posição de repouso.
 - [x] Motor pneumático e motor pneumático reversível.
-- [x] Cilindro pneumático rotativo como componente separado.
+- [x] Cilindro pneumático rotativo como componente separado, com simbologia validada; animações ficam para uma etapa futura.
 - [x] Elemento E e reguladora de fluxo bidirecional.
 
 ### Em revisão

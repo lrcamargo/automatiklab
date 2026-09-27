@@ -728,7 +728,7 @@ export function ComponentGlyph({
           <path d="M66 0 V28 M66 104 V132" className={baseLine} strokeWidth={2} />
           <path d="M104 60 H130 M104 72 H130" className={baseLine} strokeWidth={1.7} />
           <path d="M112 82 Q132 66 112 50" className={baseLine} strokeWidth={1.6} fill="none" />
-          <path d="M112 50 L122 49.3 M112 50 L117 58.7" className={baseLine} strokeWidth={1.5} />
+          <path d="M112 50 L122 49.7 M112 50 L117 58.4" className={baseLine} strokeWidth={1.5} />
           <PortNumber x={70} y={20} value="2" />
           <PortNumber x={70} y={124} value="4" />
         </svg>
@@ -765,7 +765,7 @@ export function ComponentGlyph({
           <path d="M104 58 H130 M104 74 H130" className={baseLine} strokeWidth={1.7} />
           <path d="M112 84 Q134 66 112 48" className={baseLine} strokeWidth={1.6} fill="none" />
           <path
-            d="M112 48 L122 47.3 M112 48 L117 56.7 M112 84 L122 83.3 M112 84 L117 75.3"
+            d="M112 48 L122 47.7 M112 48 L117 56.4 M112 84 L122 83.7 M112 84 L117 75.6"
             className={baseLine}
             strokeWidth={1.5}
           />
@@ -908,14 +908,14 @@ export function ComponentGlyph({
               {/* obturadores com as pontas apoiadas nas paredes externas */}
               <path d="M20 56 H100" className={baseLine} strokeWidth={1.5} />
               <path
-                d="M40.4 50.3 L20 56 L40.4 61.7 M86 46 L100 56 L86 66"
+                d="M31.4 50.5 L20 56 L31.4 61.5 M86 46 L100 56 L86 66"
                 className={baseLine}
                 strokeWidth={1.6}
                 fill="none"
               />
-              {/* linhas do obturador esquerdo tangentes à esfera */}
+              {/* obturador esquerdo aberto ao redor da esfera, com linhas tangentes */}
               <circle
-                cx={42}
+                cx={34}
                 cy={56}
                 r={6}
                 className="fill-background stroke-steel"
