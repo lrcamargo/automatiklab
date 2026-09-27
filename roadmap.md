@@ -50,14 +50,14 @@
       informação por função, aplicação industrial específica e conexões, sem dimensões físicas genéricas.
 - [x] Fonte de ar e unidades de conservação completa/simplificada.
 - [x] Válvula 4/2 com conexões alinhadas à posição de repouso.
-- [x] Motor pneumático e motor pneumático reversível.
+- [x] Motor pneumático e motor pneumático reversível, com arcos abertos e pontas ajustadas para ampliar a abertura interna.
 - [x] Cilindro pneumático rotativo como componente separado, com simbologia validada; animações ficam para uma etapa futura.
 - [x] Elemento E e reguladora de fluxo bidirecional.
 
 ### Em revisão
 
 - [ ] Escape rápido: concluir comparação visual fina com a apostila.
-- [ ] Elemento OU: concluir comparação visual fina e posições da esfera.
+- [ ] Elemento OU: concluir comparação visual fina; obturador esquerdo ampliado ao redor da esfera na beta.13.
 - [ ] Retenção, temporizadora e reguladora unidirecional.
 
 ### Próximos passos preservados

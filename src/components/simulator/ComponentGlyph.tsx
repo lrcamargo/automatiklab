@@ -722,7 +722,7 @@ export function ComponentGlyph({
             d="M112 50 L122 49.7 M112 50 L117 58.4"
             className={baseLine}
             strokeWidth={1.5}
-            transform="rotate(-5 112 50)"
+            transform="rotate(5 112 50)"
           />
           <PortNumber x={70} y={20} value="2" />
           <PortNumber x={70} y={124} value="4" />
@@ -763,13 +763,13 @@ export function ComponentGlyph({
             d="M112 48 L122 47.7 M112 48 L117 56.4"
             className={baseLine}
             strokeWidth={1.5}
-            transform="rotate(-5 112 48)"
+            transform="rotate(5 112 48)"
           />
           <path
             d="M112 84 L122 83.7 M112 84 L117 75.6"
             className={baseLine}
             strokeWidth={1.5}
-            transform="rotate(-5 112 84)"
+            transform="rotate(5 112 84)"
           />
           <PortNumber x={70} y={20} value="2" />
           <PortNumber x={70} y={124} value="4" />
@@ -910,7 +910,7 @@ export function ComponentGlyph({
               {/* obturadores com as pontas apoiadas nas paredes externas */}
               <path d="M20 56 H100" className={baseLine} strokeWidth={1.5} />
               <path
-                d="M34 46 L20 56 L34 66 M86 46 L100 56 L86 66"
+                d="M37 44 L20 56 L37 68 M86 46 L100 56 L86 66"
                 className={baseLine}
                 strokeWidth={1.6}
                 fill="none"
