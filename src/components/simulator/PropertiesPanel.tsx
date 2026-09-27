@@ -1,7 +1,7 @@
 import { CATALOG, hasPneumaticPilot } from "@/lib/pneumatics/catalog";
 import { ACTUATIONS, ACTUATION_GROUPS } from "@/lib/pneumatics/types";
 import type { Circuit, PlacedComponent, RuntimeState } from "@/lib/pneumatics/types";
-import { Trash2 } from "lucide-react";
+import { FlipHorizontal, FlipVertical, RotateCw, Trash2 } from "lucide-react";
 
 interface PropertiesPanelProps {
   circuit: Circuit;
@@ -87,6 +87,41 @@ export function PropertiesPanel({
           value={selected.label}
           onChange={(event) => onChange({ label: event.target.value })}
         />
+      </div>
+
+      <div>
+        <span className={labelClass}>Orientação</span>
+        <div className="grid grid-cols-3 gap-2">
+          <button
+            type="button"
+            onClick={() =>
+              onChange({
+                orientation: (((selected.orientation ?? 0) + 90) % 360) as 0 | 90 | 180 | 270,
+              })
+            }
+            className="flex items-center justify-center gap-1 rounded-sm border border-border bg-surface px-2 py-1.5 text-xs hover:border-primary"
+          >
+            <RotateCw className="size-3.5" /> Girar
+          </button>
+          <button
+            type="button"
+            onClick={() => onChange({ mirroredX: !selected.mirroredX })}
+            className="flex items-center justify-center gap-1 rounded-sm border border-border bg-surface px-2 py-1.5 text-xs hover:border-primary"
+          >
+            <FlipHorizontal className="size-3.5" /> Horizontal
+          </button>
+          <button
+            type="button"
+            onClick={() => onChange({ mirroredY: !selected.mirroredY })}
+            className="flex items-center justify-center gap-1 rounded-sm border border-border bg-surface px-2 py-1.5 text-xs hover:border-primary"
+          >
+            <FlipVertical className="size-3.5" /> Vertical
+          </button>
+        </div>
+        <p className="mt-1 font-mono text-[10px] text-muted-foreground">
+          Rotação: {selected.orientation ?? 0}° · Espelho H: {selected.mirroredX ? "sim" : "não"} ·
+          V: {selected.mirroredY ? "sim" : "não"}
+        </p>
       </div>
 
       {selected.type === "source" && (

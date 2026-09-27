@@ -3,7 +3,8 @@
 ## Núcleo pneumático didático
 
 - [x] Converter a bancada para o padrão de diagrama técnico dos materiais de referência.
-- [x] Adicionar visualização técnica e impressão/PDF funcional.
+- [x] Adicionar visualização técnica e impressão/PDF com normalização de coordenadas negativas e
+      escala automática para caber na página.
 - [x] Iniciar com bancada limpa, agrupar os circuitos didáticos no menu suspenso Exemplos e
       centralizar automaticamente o exemplo escolhido.
 - [x] Reproduzir os símbolos de acionamento e restaurar o deslocamento da bancada.
@@ -16,6 +17,7 @@
 - [x] Excluir componentes e mangueiras por clique, com edição bloqueada durante a simulação.
 - [x] Remover as paredes da bancada: componentes e mangueiras em coordenadas negativas.
 - [x] Editar manualmente o trajeto das mangueiras arrastando os trechos horizontal e vertical.
+- [x] Rotacionar e espelhar componentes preservando as posições transformadas das portas e mangueiras.
 - [x] Corrigir a simbologia de fluxo: setas retas, tampões em T e numeração da esquerda
       para a direita.
 - [x] Completar a biblioteca conforme a apostila: OU, E, temporizadora, contador, retenção,

@@ -1,5 +1,10 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type PointerEvent } from "react";
-import { CATALOG, portsForComponent } from "@/lib/pneumatics/catalog";
+import {
+  CATALOG,
+  componentSize,
+  componentTransform,
+  portsForComponent,
+} from "@/lib/pneumatics/catalog";
 import { tubePath } from "@/lib/pneumatics/circuit";
 import type { Circuit, PlacedComponent, RuntimeState, SolveResult } from "@/lib/pneumatics/types";
 import { ComponentGlyph } from "./ComponentGlyph";
@@ -110,11 +115,11 @@ export function Canvas(props: CanvasProps) {
     () => ({
       width: Math.max(
         2400,
-        ...circuit.components.map((comp) => origin.x + comp.x + CATALOG[comp.type].width + 720),
+        ...circuit.components.map((comp) => origin.x + comp.x + componentSize(comp).width + 720),
       ),
       height: Math.max(
         1400,
-        ...circuit.components.map((comp) => origin.y + comp.y + CATALOG[comp.type].height + 420),
+        ...circuit.components.map((comp) => origin.y + comp.y + componentSize(comp).height + 420),
       ),
     }),
     [circuit.components, origin],
@@ -151,7 +156,7 @@ export function Canvas(props: CanvasProps) {
     const top = Math.min(...circuit.components.map((comp) => comp.y));
     const right = Math.max(...circuit.components.map((comp) => comp.x + CATALOG[comp.type].width));
     const bottom = Math.max(
-      ...circuit.components.map((comp) => comp.y + CATALOG[comp.type].height),
+      ...circuit.components.map((comp) => comp.y + componentSize(comp).height),
     );
     area.scrollLeft = (origin.x + (left + right) / 2) * zoom - area.clientWidth / 2;
     area.scrollTop = (origin.y + (top + bottom) / 2) * zoom - area.clientHeight / 2;
@@ -498,6 +503,7 @@ export function Canvas(props: CanvasProps) {
 
           {circuit.components.map((comp) => {
             const def = CATALOG[comp.type];
+            const transformedSize = componentSize(comp);
             const isSignal = comp.type === "valve32" || comp.type === "valve52";
             const sensorOn =
               comp.type === "sensor"
@@ -508,7 +514,12 @@ export function Canvas(props: CanvasProps) {
             return (
               <div
                 key={comp.id}
-                style={{ left: comp.x, top: comp.y, width: def.width, height: def.height }}
+                style={{
+                  left: comp.x,
+                  top: comp.y,
+                  width: transformedSize.width,
+                  height: transformedSize.height,
+                }}
                 className={cn(
                   "group absolute select-none transition-[filter]",
                   selectedId === comp.id && "drop-shadow-[0_0_6px_var(--color-primary)]",
@@ -541,14 +552,32 @@ export function Canvas(props: CanvasProps) {
                     editable ? "cursor-grab active:cursor-grabbing" : "cursor-pointer",
                   )}
                 >
-                  <ComponentGlyph
-                    comp={comp}
-                    stroke={runtime.strokes[comp.id] ?? 0}
-                    actuated={!!solved.actuated[comp.id]}
-                    signal={isSignal ? !!runtime.signals[comp.id] : sensorOn}
-                    pressurizedPorts={solved.pressurized}
-                    count={runtime.counts?.[comp.id] ?? 0}
-                  />
+                  <div
+                    style={{
+                      width: def.width,
+                      height: def.height,
+                      transform: componentTransform(comp),
+                      transformOrigin: "top left",
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: def.width,
+                        height: def.height,
+                        transform: `scale(${comp.mirroredX ? -1 : 1}, ${comp.mirroredY ? -1 : 1})`,
+                        transformOrigin: "center",
+                      }}
+                    >
+                      <ComponentGlyph
+                        comp={comp}
+                        stroke={runtime.strokes[comp.id] ?? 0}
+                        actuated={!!solved.actuated[comp.id]}
+                        signal={isSignal ? !!runtime.signals[comp.id] : sensorOn}
+                        pressurizedPorts={solved.pressurized}
+                        count={runtime.counts?.[comp.id] ?? 0}
+                      />
+                    </div>
+                  </div>
                 </div>
 
                 {portsForComponent(comp).map((port) => {

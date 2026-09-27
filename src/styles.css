@@ -223,9 +223,11 @@
     color: var(--color-muted-foreground);
   }
 
+  .technical-sheet__viewport {
+    overflow: hidden;
+  }
+
   .technical-sheet__diagram {
     position: relative;
-    transform: scale(0.8);
-    transform-origin: top left;
   }
 }

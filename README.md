@@ -16,7 +16,7 @@ fluxo — o que está aqui foi construído inteiramente dessa forma.
 
 ## O que já funciona
 
-- Bancada com grade, arrastar e soltar, deslocamento livre e exclusão por clique.
+- Bancada com grade, arrastar e soltar, deslocamento livre, rotação, espelhamento e exclusão por clique.
 - Biblioteca com fonte de ar, unidades de conservação completa e simplificada, escape para a
   atmosfera, válvulas direcionais 3/2, 4/2, 5/2 e 5/3, cilindros de simples e dupla ação,
   cilindro rotativo, motores pneumáticos simples e reversível, elementos lógicos, temporizadora,
@@ -29,7 +29,7 @@ fluxo — o que está aqui foi construído inteiramente dessa forma.
 - Pilotagem pneumática real pelas portas 14 e 12, com memória nas válvulas de duplo piloto.
 - Propagação topológica de alimentação e escape, movimento dos cilindros, detecção de conflito
   e de ligação direta à atmosfera.
-- Vista de diagrama técnico e impressão/PDF.
+- Vista de diagrama técnico e impressão/PDF com enquadramento automático do circuito na página.
 - Persistência local dos circuitos no navegador: salvar, abrir, renomear, excluir e
   exportar/importar em `.json`.
 - Bancada inicia limpa; o menu **Exemplos** oferece primeiro o circuito de simples ação e depois

@@ -67,6 +67,11 @@ export interface PlacedComponent {
   throughRod?: boolean | undefined;
   /** cilindro: amortecimento de fim de curso */
   cushioning?: "nenhum" | "fixo" | "regulavel" | undefined;
+  /** orientação visual e geométrica do componente na bancada */
+  orientation?: 0 | 90 | 180 | 270 | undefined;
+  /** espelhamento visual e das coordenadas das portas */
+  mirroredX?: boolean | undefined;
+  mirroredY?: boolean | undefined;
   /** atuador rotativo: sentido de giro observado pelo fim de curso */
   rotation?: number | undefined;
   /** fim de curso: cilindro observado e posição de disparo */

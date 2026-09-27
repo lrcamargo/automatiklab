@@ -324,21 +324,63 @@ const pilotOffset = (type: ActuationType | undefined) => {
   }
 };
 
-/** Retorna as portas visíveis e conectáveis conforme a configuração da válvula. */
+export function componentSize(comp: PlacedComponent) {
+  const def = CATALOG[comp.type];
+  const quarterTurn = comp.orientation === 90 || comp.orientation === 270;
+  return {
+    width: quarterTurn ? def.height : def.width,
+    height: quarterTurn ? def.width : def.height,
+  };
+}
+
+/** Transformação CSS aplicada ao glifo original dentro da caixa transformada. */
+export function componentTransform(comp: PlacedComponent): string {
+  const { width, height } = CATALOG[comp.type];
+  switch (comp.orientation ?? 0) {
+    case 90:
+      return `translate(${height}px, 0) rotate(90deg)`;
+    case 180:
+      return `translate(${width}px, ${height}px) rotate(180deg)`;
+    case 270:
+      return `translate(0, ${width}px) rotate(270deg)`;
+    default:
+      return "none";
+  }
+}
+
+const transformPort = (comp: PlacedComponent, port: PortDef): PortDef => {
+  const def = CATALOG[comp.type];
+  let x = comp.mirroredX ? def.width - port.x : port.x;
+  let y = comp.mirroredY ? def.height - port.y : port.y;
+  switch (comp.orientation ?? 0) {
+    case 90:
+      [x, y] = [def.height - y, x];
+      break;
+    case 180:
+      [x, y] = [def.width - x, def.height - y];
+      break;
+    case 270:
+      [x, y] = [y, def.width - x];
+      break;
+  }
+  return { ...port, x, y };
+};
+
+/** Retorna portas visíveis já espelhadas/rotacionadas. */
 export function portsForComponent(comp: PlacedComponent): PortDef[] {
   const ports = [...CATALOG[comp.type].ports];
-  if (comp.type !== "valve32" && comp.type !== "valve52") return ports;
-
-  if (hasPneumaticPilot(comp.actuation)) {
-    ports.push(pneumaticPort("12", "12", 72 - pilotOffset(comp.actuation), 61, "control"));
+  if (comp.type === "valve32" || comp.type === "valve52") {
+    if (hasPneumaticPilot(comp.actuation)) {
+      ports.push(pneumaticPort("12", "12", 72 - pilotOffset(comp.actuation), 61, "control"));
+    }
+    if (hasPneumaticPilot(comp.returnType)) {
+      const rightEdge = comp.type === "valve32" ? 176 : 224;
+      ports.push(
+        pneumaticPort("14", "14", rightEdge + pilotOffset(comp.returnType), 61, "control"),
+      );
+    }
   }
-
-  if (hasPneumaticPilot(comp.returnType)) {
-    const rightEdge = comp.type === "valve32" ? 176 : 224;
-    ports.push(pneumaticPort("14", "14", rightEdge + pilotOffset(comp.returnType), 61, "control"));
-  }
-
-  return ports;
+  return ports.map((port) => transformPort(comp, port));
 }
 
 export const FAMILIES: { id: ComponentDef["family"]; label: string }[] = [

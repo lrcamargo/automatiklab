@@ -61,6 +61,9 @@ const componentSchema = z.object({
   springAction: z.enum(["retornoMola", "avancoMola"]).optional(),
   throughRod: z.boolean().optional(),
   cushioning: z.enum(["nenhum", "fixo", "regulavel"]).optional(),
+  orientation: z.union([z.literal(0), z.literal(90), z.literal(180), z.literal(270)]).optional(),
+  mirroredX: z.boolean().optional(),
+  mirroredY: z.boolean().optional(),
   rotation: z.number().finite().optional(),
 });
 

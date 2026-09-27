@@ -72,6 +72,21 @@ describe("persistência local", () => {
     expect(loaded?.circuit.tubes).toHaveLength(1);
   });
 
+  it("preserva rotação e espelhamento dos componentes", () => {
+    const transformed = circuit();
+    transformed.components[1] = {
+      ...transformed.components[1]!,
+      orientation: 90,
+      mirroredX: true,
+      mirroredY: true,
+    };
+    const saved = saveProject("Transformado", transformed);
+    const component = getProject(saved.id)?.circuit.components[1];
+    expect(component?.orientation).toBe(90);
+    expect(component?.mirroredX).toBe(true);
+    expect(component?.mirroredY).toBe(true);
+  });
+
   it("sobrescreve o mesmo projeto e mantém a data de criação", () => {
     const first = saveProject("Projeto", circuit());
     const second = saveProject("Projeto", { components: [], tubes: [] }, first.id);
