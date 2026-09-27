@@ -22,6 +22,13 @@ const SYMBOLS_IN_REVIEW = new Set<ComponentType>([
   "throttleOneWay",
 ]);
 
+const DIDACTIC_USE: Record<ComponentDef["family"], string> = {
+  alimentacao: "Prepara, fornece ou descarrega o ar utilizado pelo circuito.",
+  comando: "Define os caminhos entre alimentação, utilização e escape.",
+  atuacao: "Converte ou controla a energia pneumática para produzir movimento.",
+  sinal: "Processa condições pneumáticas e gera sinais para comandar outras válvulas.",
+};
+
 function LibrarySymbol({ item }: { item: ComponentDef }) {
   const [open, setOpen] = useState(false);
   const comp: PlacedComponent = {
@@ -73,20 +80,31 @@ function LibrarySymbol({ item }: { item: ComponentDef }) {
           <div className="flex min-h-56 items-center justify-center overflow-auto rounded-md border border-border bg-background p-6">
             {symbol}
           </div>
-          <div className="space-y-2 text-sm">
-            <p>
-              <strong>Família:</strong>{" "}
-              {FAMILIES.find((family) => family.id === item.family)?.label}
-            </p>
-            <p>
-              <strong>Dimensão na bancada:</strong> {item.width} × {item.height}
-            </p>
-            <p>
-              <strong>Portas:</strong>{" "}
-              {item.ports
-                .map((port) => `${port.label} — ${PORT_KIND_LABEL[port.kind]}`)
-                .join(" · ") || "sem portas pneumáticas"}
-            </p>
+          <div className="grid gap-3 text-sm sm:grid-cols-2">
+            <section className="rounded-sm border border-border p-3">
+              <h3 className="font-mono text-[10px] uppercase tracking-widest text-primary">
+                O que é
+              </h3>
+              <p className="mt-2 leading-relaxed text-muted-foreground">{item.description}</p>
+            </section>
+            <section className="rounded-sm border border-border p-3">
+              <h3 className="font-mono text-[10px] uppercase tracking-widest text-primary">
+                Uso didático
+              </h3>
+              <p className="mt-2 leading-relaxed text-muted-foreground">
+                {DIDACTIC_USE[item.family]}
+              </p>
+            </section>
+            <section className="rounded-sm border border-border p-3 sm:col-span-2">
+              <h3 className="font-mono text-[10px] uppercase tracking-widest text-primary">
+                Conexões pneumáticas
+              </h3>
+              <p className="mt-2 leading-relaxed text-muted-foreground">
+                {item.ports
+                  .map((port) => `${port.label} — ${PORT_KIND_LABEL[port.kind]}`)
+                  .join(" · ") || "Este símbolo não possui portas pneumáticas externas."}
+              </p>
+            </section>
           </div>
         </DialogContent>
       </Dialog>
