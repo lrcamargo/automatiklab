@@ -4,6 +4,7 @@
 
 - [x] Converter a bancada para o padrão de diagrama técnico dos materiais de referência.
 - [x] Adicionar visualização técnica e impressão/PDF funcional.
+- [x] Iniciar com bancada limpa e agrupar os circuitos didáticos no menu suspenso Exemplos.
 - [x] Reproduzir os símbolos de acionamento e restaurar o deslocamento da bancada.
 - [x] Transformar o botão pneumático em acionamento configurável da válvula 3/2.
 - [x] Implementar pilotagem pneumática pelas portas 14 e 12.

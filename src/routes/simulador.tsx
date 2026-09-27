@@ -1,6 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useRef, useState } from "react";
-import { Pause, Play, RotateCcw, Save, FolderOpen, Trash, Printer } from "lucide-react";
+import {
+  Pause,
+  Play,
+  RotateCcw,
+  Save,
+  FolderOpen,
+  Trash,
+  Printer,
+  ChevronDown,
+} from "lucide-react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { Canvas } from "@/components/simulator/Canvas";
 import { Palette } from "@/components/simulator/Palette";
@@ -8,6 +17,12 @@ import { PropertiesPanel } from "@/components/simulator/PropertiesPanel";
 import { TechnicalDiagram } from "@/components/simulator/TechnicalDiagram";
 import { ProjectsDialog } from "@/components/simulator/ProjectsDialog";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { CATALOG, hasPneumaticPilot } from "@/lib/pneumatics/catalog";
 import {
   countAttachedTubes,
@@ -48,8 +63,8 @@ export const Route = createFileRoute("/simulador")({
 let counter = 0;
 const nextId = (type: string) => `${type}-${Date.now().toString(36)}-${counter++}`;
 function SimulatorPage() {
-  const [circuit, setCircuit] = useState<Circuit>(() => basicCircuit());
-  const [running, setRunning] = useState(true);
+  const [circuit, setCircuit] = useState<Circuit>({ components: [], tubes: [] });
+  const [running, setRunning] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [selectedTubeId, setSelectedTubeId] = useState<string | null>(null);
   const [pendingPort, setPendingPort] = useState<{ componentId: string; portId: string } | null>(
@@ -60,9 +75,11 @@ function SimulatorPage() {
   const [projectName, setProjectName] = useState("Circuito sem título");
   const [projectId, setProjectId] = useState("");
   const [projectsOpen, setProjectsOpen] = useState(false);
+  const [examplesOpen, setExamplesOpen] = useState(false);
   const [connectionMessage, setConnectionMessage] = useState<string | null>(null);
   const blockedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const messageTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const examplesTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { runtime, solved, setSignal, toggleSignal, setStroke, reset } = useSimulation(
     circuit,
     running,
@@ -284,6 +301,16 @@ function SimulatorPage() {
     setProjectsOpen(true);
   };
 
+  const keepExamplesOpen = () => {
+    if (examplesTimer.current) clearTimeout(examplesTimer.current);
+    setExamplesOpen(true);
+  };
+
+  const scheduleExamplesClose = () => {
+    if (examplesTimer.current) clearTimeout(examplesTimer.current);
+    examplesTimer.current = setTimeout(() => setExamplesOpen(false), 160);
+  };
+
   const activeCylinders = circuit.components.filter((c) => c.type.startsWith("cylinder"));
 
   const printTechnicalDiagram = () => {
@@ -310,22 +337,41 @@ function SimulatorPage() {
         <Button type="button" onClick={reset} variant="outline" size="sm">
           <RotateCcw className="size-4" /> Reiniciar
         </Button>
-        <Button
-          type="button"
-          onClick={() => loadPreset(basicCircuit())}
-          variant="outline"
-          size="sm"
-        >
-          Exemplo dupla ação
-        </Button>
-        <Button
-          type="button"
-          onClick={() => loadPreset(springReturnCircuit())}
-          variant="outline"
-          size="sm"
-        >
-          Exemplo simples ação
-        </Button>
+        <DropdownMenu open={examplesOpen} onOpenChange={setExamplesOpen}>
+          <DropdownMenuTrigger asChild>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onMouseEnter={keepExamplesOpen}
+              onMouseLeave={scheduleExamplesClose}
+            >
+              Exemplos <ChevronDown className="size-3.5" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            align="start"
+            onMouseEnter={keepExamplesOpen}
+            onMouseLeave={scheduleExamplesClose}
+          >
+            <DropdownMenuItem
+              onSelect={() => {
+                loadPreset(basicCircuit());
+                setExamplesOpen(false);
+              }}
+            >
+              Cilindro de dupla ação
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onSelect={() => {
+                loadPreset(springReturnCircuit());
+                setExamplesOpen(false);
+              }}
+            >
+              Cilindro de simples ação
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
         <Button
           type="button"
           onClick={() => loadPreset({ components: [], tubes: [] })}

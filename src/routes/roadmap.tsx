@@ -29,7 +29,7 @@ const DONE = [
   "Cilindros de simples e dupla ação, cilindro rotativo e motores pneumáticos simples e reversível",
   "Fonte de ar e unidades de conservação completa e simplificada conferidas",
   "Acionamentos por botão, alavanca, pedal, mola, piloto, servo-piloto e solenoides",
-  "Escapes conectáveis, circuitos de exemplo, impressão técnica e projetos salvos no navegador",
+  "Bancada inicial limpa, menu suspenso de exemplos, impressão técnica e projetos salvos no navegador",
   "Versionamento SemVer beta, entrega incremental e Biblioteca com miniaturas expansíveis em modal",
 ];
 

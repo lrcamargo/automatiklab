@@ -22,8 +22,8 @@ fluxo — o que está aqui foi construído inteiramente dessa forma.
   cilindro rotativo, motores pneumáticos simples e reversível, elementos lógicos, temporizadora,
   contador, retenção, escape rápido e reguladoras de fluxo.
 - Os cartões da Biblioteca mostram miniaturas dos símbolos já validados; ao clicar, abrem um
-  modal com desenho ampliado, descrição, família, dimensões e portas. Itens ainda não aprovados
-  permanecem identificados como revisão visual.
+  modal com desenho ampliado e grupos de informação sobre função, aplicação industrial e conexões.
+  Itens ainda não aprovados permanecem identificados como revisão visual.
 - Acionamentos configuráveis por válvula: botão, alavanca, pedal, rolete, mola, piloto,
   servo-piloto e solenoides.
 - Pilotagem pneumática real pelas portas 14 e 12, com memória nas válvulas de duplo piloto.
@@ -32,6 +32,8 @@ fluxo — o que está aqui foi construído inteiramente dessa forma.
 - Vista de diagrama técnico e impressão/PDF.
 - Persistência local dos circuitos no navegador: salvar, abrir, renomear, excluir e
   exportar/importar em `.json`.
+- Bancada inicia limpa; o menu **Exemplos** oferece circuitos de cilindro de dupla ação e de
+  simples ação sem ocupar a barra com botões separados.
 - Circuitos de exemplo e testes automatizados do núcleo pneumático.
 
 ## Desenvolvimento

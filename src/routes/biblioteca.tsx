@@ -22,6 +22,17 @@ const SYMBOLS_IN_REVIEW = new Set<ComponentType>([
   "throttleOneWay",
 ]);
 
+const EXPLANATION_CONTEXT: Record<ComponentDef["family"], string> = {
+  alimentacao:
+    "Ele integra a etapa de geração, preparação ou descarte do ar e influencia a confiabilidade de todo o circuito.",
+  comando:
+    "Sua posição interna determina quais vias ficam ligadas ou bloqueadas em cada estado de operação.",
+  atuacao:
+    "É selecionado conforme o tipo de movimento, curso, velocidade, torque e esforço exigidos pela máquina.",
+  sinal:
+    "Trabalha com sinais de comando para criar condições, memória, sequência ou proteção no processo.",
+};
+
 const INDUSTRIAL_USE: Record<ComponentType, string> = {
   source: "Ponto de entrada do ar comprimido que alimenta máquinas, painéis e linhas pneumáticas.",
   valve32: "Comanda sinais, cilindros de simples ação, sopros e sequências de ligar/desligar.",
@@ -109,21 +120,15 @@ function LibrarySymbol({ item }: { item: ComponentDef }) {
             {symbol}
           </div>
           <div className="grid gap-3 text-sm sm:grid-cols-2">
-            <section className="rounded-sm border border-border p-3">
+            <section className="rounded-sm border border-border p-4">
               <h3 className="font-mono text-[10px] uppercase tracking-widest text-primary">
                 O que é
               </h3>
-              <p className="mt-2 leading-relaxed text-muted-foreground">{item.description}</p>
-            </section>
-            <section className="rounded-sm border border-border p-4 sm:col-span-2">
-              <h3 className="font-mono text-[10px] uppercase tracking-widest text-primary">
-                Aplicação industrial
-              </h3>
               <p className="mt-2 leading-relaxed text-muted-foreground">
-                {INDUSTRIAL_USE[item.type]}
+                {item.description} {EXPLANATION_CONTEXT[item.family]}
               </p>
             </section>
-            <section className="rounded-sm border border-border p-3 sm:col-span-2">
+            <section className="rounded-sm border border-border p-4">
               <h3 className="font-mono text-[10px] uppercase tracking-widest text-primary">
                 Conexões pneumáticas
               </h3>
@@ -131,6 +136,14 @@ function LibrarySymbol({ item }: { item: ComponentDef }) {
                 {item.ports
                   .map((port) => `${port.label} — ${PORT_KIND_LABEL[port.kind]}`)
                   .join(" · ") || "Este símbolo não possui portas pneumáticas externas."}
+              </p>
+            </section>
+            <section className="rounded-sm border border-border p-4 sm:col-span-2">
+              <h3 className="font-mono text-[10px] uppercase tracking-widest text-primary">
+                Aplicação industrial
+              </h3>
+              <p className="mt-2 leading-relaxed text-muted-foreground">
+                {INDUSTRIAL_USE[item.type]}
               </p>
             </section>
           </div>
