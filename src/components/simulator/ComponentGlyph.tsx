@@ -726,9 +726,9 @@ export function ComponentGlyph({
             strokeWidth={1.4}
           />
           <path d="M66 0 V28 M66 104 V132" className={baseLine} strokeWidth={2} />
-          <path d="M104 60 H130 M104 72 H130" className={baseLine} strokeWidth={1.7} />
-          <path d="M112 76 Q128 66 112 56" className={baseLine} strokeWidth={1.6} fill="none" />
-          <path d="M112 56 L120 52 M112 56 L119 62" className={baseLine} strokeWidth={1.5} />
+          <path d="M104 60 H120 M104 72 H120" className={baseLine} strokeWidth={1.7} />
+          <path d="M124 76 Q140 66 124 56" className={baseLine} strokeWidth={1.6} fill="none" />
+          <path d="M124 56 L132 52 M124 56 L131 62" className={baseLine} strokeWidth={1.5} />
           <PortNumber x={70} y={20} value="2" />
           <PortNumber x={70} y={124} value="4" />
         </svg>
@@ -762,10 +762,10 @@ export function ComponentGlyph({
             strokeWidth={1.4}
           />
           <path d="M66 0 V28 M66 104 V132" className={baseLine} strokeWidth={2} />
-          <path d="M104 58 H130 M104 74 H130" className={baseLine} strokeWidth={1.7} />
-          <path d="M112 78 Q130 66 112 54" className={baseLine} strokeWidth={1.6} fill="none" />
+          <path d="M104 58 H120 M104 74 H120" className={baseLine} strokeWidth={1.7} />
+          <path d="M124 78 Q142 66 124 54" className={baseLine} strokeWidth={1.6} fill="none" />
           <path
-            d="M112 54 L120 50 M112 54 L119 60 M112 78 L120 72 M112 78 L120 82"
+            d="M124 54 L132 50 M124 54 L131 60 M124 78 L132 72 M124 78 L132 82"
             className={baseLine}
             strokeWidth={1.5}
           />
@@ -793,7 +793,7 @@ export function ComponentGlyph({
           {/* entradas à esquerda; os triângulos ficam dentro do semicírculo */}
           <path d="M0 40 H58 M0 74 H58" className={baseLine} strokeWidth={2} />
           <path
-            d="M66 35 L78 40 L66 45 Z M66 69 L78 74 L66 79 Z"
+            d="M72 35 L84 40 L72 45 Z M72 69 L84 74 L72 79 Z"
             className="fill-background stroke-steel"
             strokeWidth={1.5}
           />
@@ -890,7 +890,6 @@ export function ComponentGlyph({
       const out = live("A");
       const p1 = live("P1");
       const p2 = live("P2");
-      const ballX = p1 && !p2 ? 74 : p2 && !p1 ? 46 : 60;
       return (
         <svg
           width={def.width}
@@ -907,20 +906,19 @@ export function ComponentGlyph({
           {isOr ? (
             <>
               {/* alternadora: esfera móvel entre dois assentos */}
-              <path
-                d="M20 56 H38 M82 56 H100 M38 47 L48 56 L38 65 M82 47 L72 56 L82 65"
-                className={baseLine}
-                strokeWidth={1.5}
-                fill="none"
-              />
-              <path d="M52 56 H68" className={baseLine} strokeWidth={1.3} />
+              <path d="M20 56 H38 M54 56 H100" className={baseLine} strokeWidth={1.6} />
+              {/* assento esquerdo envolvendo a esfera */}
+              <path d="M38 47 L48 56 L38 65" className={baseLine} strokeWidth={1.5} fill="none" />
               <circle
-                cx={ballX}
+                cx={p1 && !p2 ? 72 : 46}
                 cy={56}
-                r={5}
+                r={6}
                 className="fill-background stroke-steel"
-                strokeWidth={1.8}
+                strokeWidth={1.7}
               />
+              {/* derivação central da saída e assento/obturador à direita */}
+              <circle cx={60} cy={56} r={2.8} className="fill-steel stroke-steel" strokeWidth={0} />
+              <path d="M76 47 L88 56 L76 65" className={baseLine} strokeWidth={1.5} fill="none" />
             </>
           ) : (
             <>

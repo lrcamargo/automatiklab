@@ -30,7 +30,7 @@ const DONE = [
   "Fonte de ar e unidades de conservação completa e simplificada conferidas",
   "Acionamentos por botão, alavanca, pedal, mola, piloto, servo-piloto e solenoides",
   "Escapes conectáveis, circuitos de exemplo, impressão técnica e projetos salvos no navegador",
-  "Versionamento SemVer beta e entrega incremental de arquivos completos",
+  "Versionamento SemVer beta, entrega incremental e Biblioteca com miniaturas expansíveis em modal",
 ];
 
 const PREPARED = [

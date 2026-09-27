@@ -1,9 +1,17 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { ComponentGlyph } from "@/components/simulator/ComponentGlyph";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { CATALOG_LIST, FAMILIES } from "@/lib/pneumatics/catalog";
-import type { ComponentType, PlacedComponent } from "@/lib/pneumatics/types";
+import type { ComponentDef, ComponentType, PlacedComponent } from "@/lib/pneumatics/types";
 
 /** Símbolos ainda em revisão não são apresentados como referência validada. */
 const SYMBOLS_IN_REVIEW = new Set<ComponentType>([
@@ -14,28 +22,75 @@ const SYMBOLS_IN_REVIEW = new Set<ComponentType>([
   "throttleOneWay",
 ]);
 
-function LibrarySymbol({ type, label }: { type: ComponentType; label: string }) {
+function LibrarySymbol({ item }: { item: ComponentDef }) {
+  const [open, setOpen] = useState(false);
   const comp: PlacedComponent = {
-    id: `library-${type}`,
-    type,
+    id: `library-${item.type}`,
+    type: item.type,
     x: 0,
     y: 0,
-    label,
-    actuation: type.startsWith("valve") ? "botao" : undefined,
-    returnType: type.startsWith("valve") ? "mola" : undefined,
-    pressure: type === "source" ? 6 : undefined,
-    restriction: type === "throttle" || type === "throttleOneWay" ? 1 : undefined,
+    label: item.short,
+    actuation: item.type.startsWith("valve") ? "botao" : undefined,
+    returnType: item.type.startsWith("valve") ? "mola" : undefined,
+    pressure: item.type === "source" ? 6 : undefined,
+    restriction: item.type === "throttle" || item.type === "throttleOneWay" ? 1 : undefined,
   };
+  const scale = Math.min(0.72, 104 / item.width, 76 / item.height);
+  const symbol = (
+    <ComponentGlyph
+      comp={comp}
+      stroke={0}
+      actuated={false}
+      signal={false}
+      pressurizedPorts={new Set<string>()}
+    />
+  );
+
   return (
-    <div className="mb-4 flex min-h-36 items-center justify-center overflow-hidden rounded-sm border border-border bg-background p-3">
-      <ComponentGlyph
-        comp={comp}
-        stroke={0}
-        actuated={false}
-        signal={false}
-        pressurizedPorts={new Set<string>()}
-      />
-    </div>
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        title={`Ampliar símbolo de ${item.name}`}
+        className="float-right ml-4 flex h-24 w-28 items-center justify-center overflow-hidden rounded-sm border border-border bg-background transition-colors hover:border-primary"
+      >
+        <span style={{ width: item.width * scale, height: item.height * scale }}>
+          <span
+            className="block"
+            style={{ transform: `scale(${scale})`, transformOrigin: "top left", width: item.width }}
+          >
+            {symbol}
+          </span>
+        </span>
+      </button>
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>{item.name}</DialogTitle>
+            <DialogDescription>{item.description}</DialogDescription>
+          </DialogHeader>
+          <div className="flex min-h-56 items-center justify-center overflow-auto rounded-md border border-border bg-background p-6">
+            {symbol}
+          </div>
+          <div className="space-y-2 text-sm">
+            <p>
+              <strong>Família:</strong>{" "}
+              {FAMILIES.find((family) => family.id === item.family)?.label}
+            </p>
+            <p>
+              <strong>Dimensão na bancada:</strong> {item.width} × {item.height}
+            </p>
+            <p>
+              <strong>Portas:</strong>{" "}
+              {item.ports
+                .map((port) => `${port.label} — ${PORT_KIND_LABEL[port.kind]}`)
+                .join(" · ") || "sem portas pneumáticas"}
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 
@@ -98,7 +153,7 @@ function LibraryPage() {
                       Símbolo em revisão visual
                     </p>
                   ) : (
-                    <LibrarySymbol type={item.type} label={item.short} />
+                    <LibrarySymbol item={item} />
                   )}
                   <h3 className="text-base font-semibold">{item.name}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-muted-foreground">

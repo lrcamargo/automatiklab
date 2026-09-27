@@ -21,8 +21,9 @@ fluxo — o que está aqui foi construído inteiramente dessa forma.
   atmosfera, válvulas direcionais 3/2, 4/2, 5/2 e 5/3, cilindros de simples e dupla ação,
   cilindro rotativo, motores pneumáticos simples e reversível, elementos lógicos, temporizadora,
   contador, retenção, escape rápido e reguladoras de fluxo.
-- Os cartões da Biblioteca mostram os símbolos já validados e identificam os que continuam em
-  revisão visual contra as referências.
+- Os cartões da Biblioteca mostram miniaturas dos símbolos já validados; ao clicar, abrem um
+  modal com desenho ampliado, descrição, família, dimensões e portas. Itens ainda não aprovados
+  permanecem identificados como revisão visual.
 - Acionamentos configuráveis por válvula: botão, alavanca, pedal, rolete, mola, piloto,
   servo-piloto e solenoides.
 - Pilotagem pneumática real pelas portas 14 e 12, com memória nas válvulas de duplo piloto.
