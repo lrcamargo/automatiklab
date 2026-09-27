@@ -187,12 +187,16 @@
   }
 
   .technical-sheet__header {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    margin-bottom: 7mm;
-    border-bottom: 1px solid var(--color-steel);
-    padding-bottom: 3mm;
+    display: none !important;
+  }
+
+  /* Elementos injetados pelo editor não pertencem ao diagrama impresso. */
+  [class*="lovable"],
+  [id*="lovable"],
+  [data-lovable],
+  a[href*="lovable"],
+  iframe {
+    display: none !important;
   }
 
   .technical-sheet__header p,

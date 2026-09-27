@@ -458,11 +458,6 @@ export function ComponentGlyph({
           <FlowArrow d="M150 38 L166 82" active={!actuated} />
           <Blocked x={136} y={84} />
           <path d="M150 0 V34 M136 88 V129 M166 88 V112" className={baseLine} strokeWidth={1.7} />
-          <path
-            d="M158 124 H174 M161 119 H171 M164 114 H168"
-            className={baseLine}
-            strokeWidth={1.4}
-          />
           <ActuationSymbol
             type={comp.actuation ?? "botao"}
             x={72}
@@ -524,11 +519,6 @@ export function ComponentGlyph({
             d="M166 0 V34 M210 0 V34 M158 88 V112 M186 88 V129 M216 88 V112"
             className={baseLine}
             strokeWidth={1.7}
-          />
-          <path
-            d="M150 124 H166 M153 119 H163 M156 114 H160 M208 124 H224 M211 119 H221 M214 114 H218"
-            className={baseLine}
-            strokeWidth={1.4}
           />
           <ActuationSymbol
             type={comp.actuation ?? "botao"}
@@ -728,7 +718,12 @@ export function ComponentGlyph({
           <path d="M66 0 V28 M66 104 V132" className={baseLine} strokeWidth={2} />
           <path d="M104 60 H130 M104 72 H130" className={baseLine} strokeWidth={1.7} />
           <path d="M112 82 Q132 66 112 50" className={baseLine} strokeWidth={1.6} fill="none" />
-          <path d="M112 50 L122 49.7 M112 50 L117 58.4" className={baseLine} strokeWidth={1.5} />
+          <path
+            d="M112 50 L122 49.7 M112 50 L117 58.4"
+            className={baseLine}
+            strokeWidth={1.5}
+            transform="rotate(-5 112 50)"
+          />
           <PortNumber x={70} y={20} value="2" />
           <PortNumber x={70} y={124} value="4" />
         </svg>
@@ -765,9 +760,16 @@ export function ComponentGlyph({
           <path d="M104 58 H130 M104 74 H130" className={baseLine} strokeWidth={1.7} />
           <path d="M112 84 Q134 66 112 48" className={baseLine} strokeWidth={1.6} fill="none" />
           <path
-            d="M112 48 L122 47.7 M112 48 L117 56.4 M112 84 L122 83.7 M112 84 L117 75.6"
+            d="M112 48 L122 47.7 M112 48 L117 56.4"
             className={baseLine}
             strokeWidth={1.5}
+            transform="rotate(-5 112 48)"
+          />
+          <path
+            d="M112 84 L122 83.7 M112 84 L117 75.6"
+            className={baseLine}
+            strokeWidth={1.5}
+            transform="rotate(-5 112 84)"
           />
           <PortNumber x={70} y={20} value="2" />
           <PortNumber x={70} y={124} value="4" />
@@ -908,14 +910,14 @@ export function ComponentGlyph({
               {/* obturadores com as pontas apoiadas nas paredes externas */}
               <path d="M20 56 H100" className={baseLine} strokeWidth={1.5} />
               <path
-                d="M31.4 50.5 L20 56 L31.4 61.5 M86 46 L100 56 L86 66"
+                d="M34 46 L20 56 L34 66 M86 46 L100 56 L86 66"
                 className={baseLine}
                 strokeWidth={1.6}
                 fill="none"
               />
               {/* obturador esquerdo aberto ao redor da esfera, com linhas tangentes */}
               <circle
-                cx={34}
+                cx={30.3}
                 cy={56}
                 r={6}
                 className="fill-background stroke-steel"

@@ -3,8 +3,8 @@
 ## Núcleo pneumático didático
 
 - [x] Converter a bancada para o padrão de diagrama técnico dos materiais de referência.
-- [x] Adicionar visualização técnica e impressão/PDF com normalização de coordenadas negativas e
-      escala automática para caber na página.
+- [x] Adicionar impressão/PDF somente do circuito, sem cabeçalhos da interface/editor, com
+      normalização de coordenadas negativas e escala automática para caber na página.
 - [x] Iniciar com bancada limpa, agrupar os circuitos didáticos no menu suspenso Exemplos e
       centralizar automaticamente o exemplo escolhido.
 - [x] Reproduzir os símbolos de acionamento e restaurar o deslocamento da bancada.

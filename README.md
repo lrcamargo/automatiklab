@@ -29,7 +29,7 @@ fluxo — o que está aqui foi construído inteiramente dessa forma.
 - Pilotagem pneumática real pelas portas 14 e 12, com memória nas válvulas de duplo piloto.
 - Propagação topológica de alimentação e escape, movimento dos cilindros, detecção de conflito
   e de ligação direta à atmosfera.
-- Vista de diagrama técnico e impressão/PDF com enquadramento automático do circuito na página.
+- Impressão/PDF somente do circuito, com enquadramento automático e sem cabeçalhos da interface ou do editor.
 - Persistência local dos circuitos no navegador: salvar, abrir, renomear, excluir e
   exportar/importar em `.json`.
 - Bancada inicia limpa; o menu **Exemplos** oferece primeiro o circuito de simples ação e depois
