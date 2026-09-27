@@ -8,6 +8,7 @@ export type ComponentType =
   | "cylinderDouble"
   | "sensor"
   | "exhaust"
+  | "silencer"
   | "valveOr"
   | "valveAnd"
   | "valveTimer"

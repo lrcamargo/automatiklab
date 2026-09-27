@@ -18,6 +18,7 @@
 - [x] Remover as paredes da bancada: componentes e mangueiras em coordenadas negativas.
 - [x] Editar manualmente o trajeto das mangueiras arrastando os trechos horizontal e vertical.
 - [x] Rotacionar e espelhar componentes preservando as posições transformadas das portas e mangueiras.
+- [x] Encaixar portas de componentes com precisão durante o arraste, inclusive após transformações.
 - [x] Corrigir a simbologia de fluxo: setas retas, tampões em T e numeração da esquerda
       para a direita.
 - [x] Completar a biblioteca conforme a apostila: OU, E, temporizadora, contador, retenção,
@@ -57,7 +58,9 @@
 ### Em revisão
 
 - [ ] Escape rápido: concluir comparação visual fina com a apostila.
-- [ ] Elemento OU: concluir comparação visual fina; obturador esquerdo ampliado ao redor da esfera na beta.13.
+- [x] Elemento OU validado visualmente, com obturador esquerdo ampliado ao redor da esfera.
+- [x] Silenciador pneumático incluído conforme referência legível, separado do escape direto.
+- [x] Escape rápido revisado com seletor interno e silenciador integrado.
 - [ ] Retenção, temporizadora e reguladora unidirecional.
 
 ### Próximos passos preservados

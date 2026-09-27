@@ -20,6 +20,7 @@ const TECHNICAL_PREFIX: Record<ComponentType, string> = {
   sensor: "1S",
   // escape e elementos de processamento seguem a notação da apostila
   exhaust: "0Z",
+  silencer: "0Z",
   valveOr: "1V",
   valveAnd: "1V",
   valveTimer: "1V",

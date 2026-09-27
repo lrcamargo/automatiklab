@@ -45,7 +45,9 @@ const INDUSTRIAL_USE: Record<ComponentType, string> = {
   cylinderDouble:
     "Produz avanço e retorno pneumáticos em movimentação, montagem, embalagem e manipulação.",
   sensor: "Gera um sinal pneumático quando um mecanismo alcança uma posição física determinada.",
-  exhaust: "Descarrega ar usado para a atmosfera e permite a despressurização das linhas.",
+  exhaust: "Descarrega ar usado diretamente para a atmosfera e permite despressurizar linhas.",
+  silencer:
+    "Atenua o ruído nos escapes de válvulas e equipamentos por meio de chicanas internas, mantendo a descarga atmosférica.",
   valveOr:
     "Seleciona qualquer um de dois sinais disponíveis, comum em comandos alternativos e redundância.",
   valveAnd:

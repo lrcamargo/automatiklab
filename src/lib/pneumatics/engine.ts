@@ -156,6 +156,7 @@ function solveNetwork(
 
       // escape: sempre atmosfera
       case "exhaust":
+      case "silencer":
         exhausts.add(key("R"));
         break;
 

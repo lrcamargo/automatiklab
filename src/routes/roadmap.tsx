@@ -24,7 +24,7 @@ export const Route = createFileRoute("/roadmap")({
 });
 
 const DONE = [
-  "Bancada livre com zoom, arrastar, rotacionar, espelhar, conectar, editar mangueiras e excluir componentes",
+  "Bancada livre com zoom, encaixe porta-a-porta, rotação, espelhamento, conexões, edição de mangueiras e exclusão",
   "Válvulas direcionais 3/2, 4/2, 5/2 e 5/3 com pilotagem 12/14 e memória",
   "Cilindros de simples e dupla ação, cilindro rotativo e motores pneumáticos simples e reversível",
   "Fonte de ar e unidades de conservação completa e simplificada conferidas",

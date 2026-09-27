@@ -722,7 +722,7 @@ export function ComponentGlyph({
             d="M112 50 L122 49.7 M112 50 L117 58.4"
             className={baseLine}
             strokeWidth={1.5}
-            transform="rotate(5 112 50)"
+            transform="rotate(10 112 50)"
           />
           <PortNumber x={70} y={20} value="2" />
           <PortNumber x={70} y={124} value="4" />
@@ -763,13 +763,13 @@ export function ComponentGlyph({
             d="M112 48 L122 47.7 M112 48 L117 56.4"
             className={baseLine}
             strokeWidth={1.5}
-            transform="rotate(5 112 48)"
+            transform="rotate(10 112 48)"
           />
           <path
             d="M112 84 L122 83.7 M112 84 L117 75.6"
             className={baseLine}
             strokeWidth={1.5}
-            transform="rotate(5 112 84)"
+            transform="rotate(-10 112 84)"
           />
           <PortNumber x={70} y={20} value="2" />
           <PortNumber x={70} y={124} value="4" />
@@ -881,7 +881,26 @@ export function ComponentGlyph({
             strokeWidth={2}
           />
           <path d="M8 18 L28 18 L18 35 Z" className={baseLine} strokeWidth={2} />
-          <PortNumber x={18} y={12} value="3" />
+        </svg>
+      );
+
+    /* Silenciador com chicanas alternadas conforme a referência fornecida. */
+    case "silencer":
+      return (
+        <svg
+          width={def.width}
+          height={def.height}
+          viewBox={`0 0 ${def.width} ${def.height}`}
+          aria-label="Silenciador pneumático"
+        >
+          {defs}
+          <text x={4} y={10} className="fill-foreground font-mono text-[10px] font-semibold">
+            {comp.label}
+          </text>
+          <path d="M0 36 H34" className={baseLine} strokeWidth={2} />
+          <rect x={34} y={12} width={92} height={48} className={activeBox(false)} strokeWidth={2} />
+          <path d="M72 12 V29 M54 44 V60 M108 44 V60" className={baseLine} strokeWidth={2} />
+          <path d="M126 20 L148 36 L126 52 Z" className={baseLine} strokeWidth={2} fill="none" />
         </svg>
       );
 
@@ -1081,7 +1100,7 @@ export function ComponentGlyph({
       );
     }
 
-    /* Escape rápido — corpo e pilotagem conforme a referência de três vias. */
+    /* Escape rápido: elemento seletor interno e silenciador na descarga 3. */
     case "quickExhaust": {
       const flowing = live("A");
       return (
@@ -1096,54 +1115,43 @@ export function ComponentGlyph({
             {comp.label}
           </text>
           <rect
-            x={20}
-            y={34}
-            width={82}
-            height={48}
+            x={24}
+            y={28}
+            width={88}
+            height={56}
             className={activeBox(flowing)}
             strokeWidth={1.8}
           />
-          <path d="M0 56 H36 M66 0 V34 M102 56 H132" className={baseLine} strokeWidth={2} />
-          {/* retenção interna entre 1 e o nó da saída 2 */}
-          <path d="M38 44 L54 56 L38 68" className={baseLine} strokeWidth={1.6} fill="none" />
+          <path d="M0 56 H24 M68 0 V28 M112 56 H120" className={baseLine} strokeWidth={2} />
+          <path
+            d="M38 44 L52 56 L38 68 M84 44 L98 56 L84 68"
+            className={baseLine}
+            strokeWidth={1.6}
+            fill="none"
+          />
           <circle
-            cx={58}
+            cx={56}
             cy={56}
-            r={6}
+            r={7}
             className="fill-background stroke-steel"
             strokeWidth={1.6}
           />
-          <circle cx={66} cy={56} r={2.5} className="fill-steel stroke-steel" strokeWidth={0} />
-          {/* passagem inclinada para o escape 3 */}
-          <path
-            d="M72 68 L92 48 M92 48 L85 50 M92 48 L90 55"
-            className={baseLine}
-            strokeWidth={1.5}
-          />
-          {/* comando pneumático do obturador, com realimentação tracejada */}
+          <circle cx={68} cy={56} r={2.5} className="fill-steel stroke-steel" strokeWidth={0} />
+          <path d="M68 28 L82 38" className={baseLine} strokeWidth={1.4} strokeDasharray="4 3" />
+          {/* silenciador integrado à descarga */}
           <rect
-            x={102}
+            x={120}
             y={42}
-            width={20}
+            width={24}
             height={28}
             className="fill-background stroke-steel"
-            strokeWidth={1.4}
+            strokeWidth={1.5}
           />
-          <path
-            d="M122 42 L132 56 L122 70 Z"
-            className="fill-background stroke-steel"
-            strokeWidth={1.4}
-          />
-          <path
-            d="M66 34 V22 H112 V42"
-            className={baseLine}
-            strokeWidth={1.2}
-            strokeDasharray="4 3"
-            fill="none"
-          />
+          <path d="M128 42 V51 M136 61 V70" className={baseLine} strokeWidth={1.4} />
+          <path d="M144 45 L158 56 L144 67 Z" className={baseLine} strokeWidth={1.5} fill="none" />
           <PortNumber x={2} y={48} value="1" />
-          <PortNumber x={70} y={8} value="2" />
-          <PortNumber x={118} y={48} value="3" />
+          <PortNumber x={72} y={8} value="2" />
+          <PortNumber x={146} y={48} value="3" />
         </svg>
       );
     }

@@ -16,7 +16,7 @@ fluxo — o que está aqui foi construído inteiramente dessa forma.
 
 ## O que já funciona
 
-- Bancada com grade, arrastar e soltar, deslocamento livre, rotação, espelhamento e exclusão por clique.
+- Bancada com grade, arrastar e soltar, encaixe preciso porta-a-porta, deslocamento livre, rotação, espelhamento e exclusão por clique.
 - Biblioteca com fonte de ar, unidades de conservação completa e simplificada, escape para a
   atmosfera, válvulas direcionais 3/2, 4/2, 5/2 e 5/3, cilindros de simples e dupla ação,
   cilindro rotativo, motores pneumáticos simples e reversível, elementos lógicos, temporizadora,

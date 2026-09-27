@@ -202,6 +202,17 @@ export const CATALOG: Record<ComponentType, ComponentDef> = {
     height: 42,
     ports: [pneumaticPort("R", "3", 18, 0, "exhaust")],
   },
+  silencer: {
+    type: "silencer",
+    name: "Silenciador pneumático",
+    short: "Silenciador",
+    description:
+      "Reduz o ruído da descarga de ar por meio de chicanas internas, sem impedir a exaustão para a atmosfera.",
+    family: "alimentacao",
+    width: 150,
+    height: 72,
+    ports: [pneumaticPort("R", "", 0, 36, "exhaust")],
+  },
   valveOr: {
     type: "valveOr",
     name: "Válvula alternadora (OU)",
@@ -265,12 +276,12 @@ export const CATALOG: Record<ComponentType, ComponentDef> = {
     description:
       "Descarrega a câmara do cilindro direto para a atmosfera pela via 3, acelerando o movimento.",
     family: "atuacao",
-    width: 132,
-    height: 110,
+    width: 160,
+    height: 100,
     ports: [
       pneumaticPort("P", "1", 0, 56, "supply"),
-      pneumaticPort("A", "2", 66, 0, "work"),
-      pneumaticPort("R", "3", 132, 56, "exhaust"),
+      pneumaticPort("A", "2", 68, 0, "work"),
+      pneumaticPort("R", "3", 160, 56, "exhaust"),
     ],
   },
   throttleOneWay: {

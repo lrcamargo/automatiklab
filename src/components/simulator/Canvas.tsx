@@ -202,12 +202,33 @@ export function Canvas(props: CanvasProps) {
     const rect = surfaceRef.current?.getBoundingClientRect();
     if (!drag || !rect) return;
     drag.moved = true;
-    // coordenadas livres: a bancada cresce para os quatro lados
-    onMove(
-      drag.id,
-      snap((event.clientX - rect.left) / zoom - drag.dx),
-      snap((event.clientY - rect.top) / zoom - drag.dy),
-    );
+    // Primeiro aproxima da grade; perto de outra porta, a porta tem prioridade
+    // e desloca o componente exatamente nos dois eixos.
+    const moving = circuit.components.find((comp) => comp.id === drag.id);
+    let nextX = snap((event.clientX - rect.left) / zoom - drag.dx);
+    let nextY = snap((event.clientY - rect.top) / zoom - drag.dy);
+    if (moving) {
+      const movingPorts = portsForComponent(moving);
+      let closest: { x: number; y: number; distance: number } | null = null;
+      for (const other of circuit.components) {
+        if (other.id === moving.id) continue;
+        for (const movingPort of movingPorts) {
+          for (const targetPort of portsForComponent(other)) {
+            const alignedX = other.x + targetPort.x - movingPort.x;
+            const alignedY = other.y + targetPort.y - movingPort.y;
+            const distance = Math.hypot(alignedX - nextX, alignedY - nextY);
+            if (distance <= 18 && (!closest || distance < closest.distance)) {
+              closest = { x: alignedX, y: alignedY, distance };
+            }
+          }
+        }
+      }
+      if (closest) {
+        nextX = closest.x;
+        nextY = closest.y;
+      }
+    }
+    onMove(drag.id, nextX, nextY);
   };
 
   const movedRef = useRef(false);
