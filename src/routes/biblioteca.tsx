@@ -22,11 +22,39 @@ const SYMBOLS_IN_REVIEW = new Set<ComponentType>([
   "throttleOneWay",
 ]);
 
-const DIDACTIC_USE: Record<ComponentDef["family"], string> = {
-  alimentacao: "Prepara, fornece ou descarrega o ar utilizado pelo circuito.",
-  comando: "Define os caminhos entre alimentação, utilização e escape.",
-  atuacao: "Converte ou controla a energia pneumática para produzir movimento.",
-  sinal: "Processa condições pneumáticas e gera sinais para comandar outras válvulas.",
+const INDUSTRIAL_USE: Record<ComponentType, string> = {
+  source: "Ponto de entrada do ar comprimido que alimenta máquinas, painéis e linhas pneumáticas.",
+  valve32: "Comanda sinais, cilindros de simples ação, sopros e sequências de ligar/desligar.",
+  valve52: "Alterna o ar entre as duas câmaras de cilindros de dupla ação em máquinas automáticas.",
+  valve42: "Comanda atuadores de dupla ação quando uma única via de escape atende ao processo.",
+  valve53:
+    "Permite parar ou manter um atuador em condição intermediária conforme o centro escolhido.",
+  cylinderSingle:
+    "Produz movimento linear em fixação, ejeção ou prensagem com retorno mecânico por mola.",
+  cylinderDouble:
+    "Produz avanço e retorno pneumáticos em movimentação, montagem, embalagem e manipulação.",
+  sensor: "Gera um sinal pneumático quando um mecanismo alcança uma posição física determinada.",
+  exhaust: "Descarrega ar usado para a atmosfera e permite a despressurização das linhas.",
+  valveOr:
+    "Seleciona qualquer um de dois sinais disponíveis, comum em comandos alternativos e redundância.",
+  valveAnd:
+    "Só libera saída com dois sinais simultâneos, aplicada em intertravamentos e comandos bimanuais.",
+  valveTimer: "Cria atraso pneumático para sequenciar movimentos sem controlador elétrico.",
+  checkValve: "Impede retorno de ar, preserva pressão e separa trechos do circuito.",
+  quickExhaust: "Descarrega diretamente o ar do cilindro para aumentar a velocidade do movimento.",
+  throttleOneWay:
+    "Regula a velocidade do atuador em um sentido e mantém passagem livre no sentido oposto.",
+  throttle: "Limita vazão nos dois sentidos para ajustar velocidade ou suavizar movimentos.",
+  counter:
+    "Conta ciclos ou peças por pulsos pneumáticos e libera uma ação ao atingir a quantidade ajustada.",
+  lubrifil: "Representa de forma compacta o conjunto que condiciona o ar antes da máquina.",
+  conservationUnit:
+    "Filtra, regula e, quando necessário, lubrifica o ar que alimenta equipamentos pneumáticos.",
+  rotaryMotor:
+    "Converte ar comprimido em rotação contínua para ferramentas, agitadores e pequenos acionamentos.",
+  rotaryOscillator: "Permite rotação pneumática nos dois sentidos em acionamentos reversíveis.",
+  rotaryCylinder:
+    "Executa giro angular limitado em seleção, basculamento, posicionamento e transferência de peças.",
 };
 
 function LibrarySymbol({ item }: { item: ComponentDef }) {
@@ -87,12 +115,12 @@ function LibrarySymbol({ item }: { item: ComponentDef }) {
               </h3>
               <p className="mt-2 leading-relaxed text-muted-foreground">{item.description}</p>
             </section>
-            <section className="rounded-sm border border-border p-3">
+            <section className="rounded-sm border border-border p-4 sm:col-span-2">
               <h3 className="font-mono text-[10px] uppercase tracking-widest text-primary">
-                Uso didático
+                Aplicação industrial
               </h3>
               <p className="mt-2 leading-relaxed text-muted-foreground">
-                {DIDACTIC_USE[item.family]}
+                {INDUSTRIAL_USE[item.type]}
               </p>
             </section>
             <section className="rounded-sm border border-border p-3 sm:col-span-2">

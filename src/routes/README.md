@@ -22,7 +22,7 @@ fluxo — o que está aqui foi construído inteiramente dessa forma.
   cilindro rotativo, motores pneumáticos simples e reversível, elementos lógicos, temporizadora,
   contador, retenção, escape rápido e reguladoras de fluxo.
 - Os cartões da Biblioteca mostram miniaturas dos símbolos já validados; ao clicar, abrem um
-  modal com desenho ampliado e grupos de informação sobre função, uso didático e conexões.
+  modal com desenho ampliado e grupos de informação sobre função, aplicação industrial e conexões.
   Itens ainda não aprovados permanecem identificados como revisão visual.
 - Acionamentos configuráveis por válvula: botão, alavanca, pedal, rolete, mola, piloto,
   servo-piloto e solenoides.

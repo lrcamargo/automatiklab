@@ -728,7 +728,7 @@ export function ComponentGlyph({
           <path d="M66 0 V28 M66 104 V132" className={baseLine} strokeWidth={2} />
           <path d="M104 60 H130 M104 72 H130" className={baseLine} strokeWidth={1.7} />
           <path d="M112 82 Q132 66 112 50" className={baseLine} strokeWidth={1.6} fill="none" />
-          <path d="M112 50 L121 47 M112 50 L120 56" className={baseLine} strokeWidth={1.5} />
+          <path d="M112 50 L122 49 M112 50 L117 59" className={baseLine} strokeWidth={1.5} />
           <PortNumber x={70} y={20} value="2" />
           <PortNumber x={70} y={124} value="4" />
         </svg>
@@ -765,7 +765,7 @@ export function ComponentGlyph({
           <path d="M104 58 H130 M104 74 H130" className={baseLine} strokeWidth={1.7} />
           <path d="M112 84 Q134 66 112 48" className={baseLine} strokeWidth={1.6} fill="none" />
           <path
-            d="M112 48 L121 44 M112 48 L120 54 M112 84 L121 78 M112 84 L121 88"
+            d="M112 48 L122 47 M112 48 L117 57 M112 84 L122 83 M112 84 L117 75"
             className={baseLine}
             strokeWidth={1.5}
           />
@@ -798,7 +798,7 @@ export function ComponentGlyph({
             strokeWidth={1.5}
           />
           {/* duas linhas paralelas do eixo no centro */}
-          <path d="M94 52 H156 M94 64 H156" className={baseLine} strokeWidth={2} />
+          <path d="M94 52 H146 M94 64 H146" className={baseLine} strokeWidth={2} />
           <PortNumber x={4} y={32} value="2" />
           <PortNumber x={4} y={66} value="4" />
         </svg>
@@ -908,14 +908,14 @@ export function ComponentGlyph({
               {/* obturadores com as pontas apoiadas nas paredes externas */}
               <path d="M20 56 H100" className={baseLine} strokeWidth={1.5} />
               <path
-                d="M34 46 L20 56 L34 66 M86 46 L100 56 L86 66"
+                d="M40.4 50.3 L20 56 L40.4 61.7 M86 46 L100 56 L86 66"
                 className={baseLine}
                 strokeWidth={1.6}
                 fill="none"
               />
-              {/* esfera apoiada na abertura interna do obturador esquerdo */}
+              {/* linhas do obturador esquerdo tangentes à esfera */}
               <circle
-                cx={40}
+                cx={42}
                 cy={56}
                 r={6}
                 className="fill-background stroke-steel"

@@ -43,7 +43,7 @@
 ### Conferidos nesta etapa
 
 - [x] Biblioteca com miniaturas compactas dos símbolos validados e modal com grupos de
-      informação por função, uso didático e conexões, sem dimensões físicas genéricas.
+      informação por função, aplicação industrial específica e conexões, sem dimensões físicas genéricas.
 - [x] Fonte de ar e unidades de conservação completa/simplificada.
 - [x] Válvula 4/2 com conexões alinhadas à posição de repouso.
 - [x] Motor pneumático e motor pneumático reversível.
