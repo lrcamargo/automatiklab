@@ -728,7 +728,7 @@ export function ComponentGlyph({
           <path d="M66 0 V28 M66 104 V132" className={baseLine} strokeWidth={2} />
           <path d="M104 60 H130 M104 72 H130" className={baseLine} strokeWidth={1.7} />
           <path d="M112 82 Q132 66 112 50" className={baseLine} strokeWidth={1.6} fill="none" />
-          <path d="M112 50 L122 48.7 M112 50 L117.3 59" className={baseLine} strokeWidth={1.5} />
+          <path d="M112 50 L122 49.3 M112 50 L117 58.7" className={baseLine} strokeWidth={1.5} />
           <PortNumber x={70} y={20} value="2" />
           <PortNumber x={70} y={124} value="4" />
         </svg>
@@ -765,7 +765,7 @@ export function ComponentGlyph({
           <path d="M104 58 H130 M104 74 H130" className={baseLine} strokeWidth={1.7} />
           <path d="M112 84 Q134 66 112 48" className={baseLine} strokeWidth={1.6} fill="none" />
           <path
-            d="M112 48 L122 46.7 M112 48 L117.3 57 M112 84 L122 82.7 M112 84 L117.3 75"
+            d="M112 48 L122 47.3 M112 48 L117 56.7 M112 84 L122 83.3 M112 84 L117 75.3"
             className={baseLine}
             strokeWidth={1.5}
           />

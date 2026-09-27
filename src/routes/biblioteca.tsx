@@ -22,15 +22,15 @@ const SYMBOLS_IN_REVIEW = new Set<ComponentType>([
   "throttleOneWay",
 ]);
 
-const EXPLANATION_CONTEXT: Record<ComponentDef["family"], string> = {
+const INDUSTRIAL_CONTEXT: Record<ComponentDef["family"], string> = {
   alimentacao:
-    "Ele integra a etapa de geração, preparação ou descarte do ar e influencia a confiabilidade de todo o circuito.",
+    "Na especificação real, sua capacidade e qualidade devem acompanhar a vazão, a pressão e o nível de contaminação tolerado pelos equipamentos a jusante.",
   comando:
-    "Sua posição interna determina quais vias ficam ligadas ou bloqueadas em cada estado de operação.",
+    "A escolha industrial considera número de vias e posições, vazão nominal, pressão de trabalho, tempo de resposta e forma de acionamento.",
   atuacao:
-    "É selecionado conforme o tipo de movimento, curso, velocidade, torque e esforço exigidos pela máquina.",
+    "Seu dimensionamento considera carga, velocidade, frequência de ciclos, condições ambientais e requisitos de segurança e manutenção.",
   sinal:
-    "Trabalha com sinais de comando para criar condições, memória, sequência ou proteção no processo.",
+    "É usado para automatizar sequências e intertravamentos localmente, muitas vezes reduzindo a necessidade de sensores ou controladores elétricos.",
 };
 
 const INDUSTRIAL_USE: Record<ComponentType, string> = {
@@ -124,9 +124,7 @@ function LibrarySymbol({ item }: { item: ComponentDef }) {
               <h3 className="font-mono text-[10px] uppercase tracking-widest text-primary">
                 O que é
               </h3>
-              <p className="mt-2 leading-relaxed text-muted-foreground">
-                {item.description} {EXPLANATION_CONTEXT[item.family]}
-              </p>
+              <p className="mt-2 leading-relaxed text-muted-foreground">{item.description}</p>
             </section>
             <section className="rounded-sm border border-border p-4">
               <h3 className="font-mono text-[10px] uppercase tracking-widest text-primary">
@@ -143,7 +141,7 @@ function LibrarySymbol({ item }: { item: ComponentDef }) {
                 Aplicação industrial
               </h3>
               <p className="mt-2 leading-relaxed text-muted-foreground">
-                {INDUSTRIAL_USE[item.type]}
+                {INDUSTRIAL_USE[item.type]} {INDUSTRIAL_CONTEXT[item.family]}
               </p>
             </section>
           </div>

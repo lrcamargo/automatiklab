@@ -32,8 +32,8 @@ fluxo — o que está aqui foi construído inteiramente dessa forma.
 - Vista de diagrama técnico e impressão/PDF.
 - Persistência local dos circuitos no navegador: salvar, abrir, renomear, excluir e
   exportar/importar em `.json`.
-- Bancada inicia limpa; o menu **Exemplos** oferece circuitos de cilindro de dupla ação e de
-  simples ação sem ocupar a barra com botões separados.
+- Bancada inicia limpa; o menu **Exemplos** oferece primeiro o circuito de simples ação e depois
+  o de dupla ação. Ao carregar, o circuito é centralizado automaticamente na área visível.
 - Circuitos de exemplo e testes automatizados do núcleo pneumático.
 
 ## Desenvolvimento

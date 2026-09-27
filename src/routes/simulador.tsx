@@ -76,6 +76,7 @@ function SimulatorPage() {
   const [projectId, setProjectId] = useState("");
   const [projectsOpen, setProjectsOpen] = useState(false);
   const [examplesOpen, setExamplesOpen] = useState(false);
+  const [canvasFocusToken, setCanvasFocusToken] = useState(0);
   const [connectionMessage, setConnectionMessage] = useState<string | null>(null);
   const blockedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const messageTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -269,6 +270,7 @@ function SimulatorPage() {
 
   const loadPreset = (preset: Circuit) => {
     setCircuit(preset);
+    setCanvasFocusToken((value) => value + 1);
     setSelectedId(null);
     setSelectedTubeId(null);
     setPendingPort(null);
@@ -356,19 +358,19 @@ function SimulatorPage() {
           >
             <DropdownMenuItem
               onSelect={() => {
-                loadPreset(basicCircuit());
-                setExamplesOpen(false);
-              }}
-            >
-              Cilindro de dupla ação
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onSelect={() => {
                 loadPreset(springReturnCircuit());
                 setExamplesOpen(false);
               }}
             >
               Cilindro de simples ação
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onSelect={() => {
+                loadPreset(basicCircuit());
+                setExamplesOpen(false);
+              }}
+            >
+              Cilindro de dupla ação
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -431,6 +433,7 @@ function SimulatorPage() {
             onDeleteTube={deleteTube}
             onMoveTube={moveTube}
             editable={!running}
+            focusToken={canvasFocusToken}
             onMove={moveComponent}
             onPortClick={handlePortClick}
             onActivate={activateComponent}

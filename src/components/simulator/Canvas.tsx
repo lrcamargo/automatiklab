@@ -25,6 +25,8 @@ interface CanvasProps {
   onDropComponent: (type: string, x: number, y: number) => void;
   /** Com a simulação rodando a bancada fica somente para operação. */
   editable: boolean;
+  /** Incrementado ao carregar um circuito que deve ser enquadrado na tela. */
+  focusToken: number;
 }
 
 const GRID = 24;
@@ -60,6 +62,7 @@ export function Canvas(props: CanvasProps) {
     blockedId,
     onDropComponent,
     editable,
+    focusToken,
   } = props;
   const areaRef = useRef<HTMLDivElement>(null);
   const surfaceRef = useRef<HTMLDivElement>(null);
@@ -139,6 +142,22 @@ export function Canvas(props: CanvasProps) {
     }
     prevOrigin.current = origin;
   }, [origin, zoom]);
+
+  /** Centraliza o conjunto apenas quando um exemplo/projeto é carregado. */
+  useLayoutEffect(() => {
+    const area = areaRef.current;
+    if (!area || circuit.components.length === 0 || focusToken === 0) return;
+    const left = Math.min(...circuit.components.map((comp) => comp.x));
+    const top = Math.min(...circuit.components.map((comp) => comp.y));
+    const right = Math.max(...circuit.components.map((comp) => comp.x + CATALOG[comp.type].width));
+    const bottom = Math.max(
+      ...circuit.components.map((comp) => comp.y + CATALOG[comp.type].height),
+    );
+    area.scrollLeft = (origin.x + (left + right) / 2) * zoom - area.clientWidth / 2;
+    area.scrollTop = (origin.y + (top + bottom) / 2) * zoom - area.clientHeight / 2;
+    // A centralização deve responder somente ao token, não a cada arraste posterior.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focusToken]);
 
   const startDrag = (event: PointerEvent, comp: PlacedComponent) => {
     if (event.button !== 0 || !editable) return;
