@@ -209,9 +209,9 @@ export const CATALOG: Record<ComponentType, ComponentDef> = {
     description:
       "Reduz o ruído da descarga de ar por meio de chicanas internas, sem impedir a exaustão para a atmosfera.",
     family: "alimentacao",
-    width: 76,
-    height: 42,
-    ports: [pneumaticPort("R", "", 0, 22, "exhaust")],
+    width: 54,
+    height: 30,
+    ports: [pneumaticPort("R", "", 0, 15, "exhaust")],
   },
   valveOr: {
     type: "valveOr",

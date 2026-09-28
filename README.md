@@ -28,7 +28,7 @@ fluxo — o que está aqui foi construído inteiramente dessa forma.
   servo-piloto e solenoides.
 - Pilotagem pneumática real pelas portas 14 e 12, com memória nas válvulas de duplo piloto.
 - Propagação topológica de alimentação e escape, movimento dos cilindros, detecção de conflito
-  e de ligação direta à atmosfera.
+  e validação das portas obrigatórias antes de iniciar a simulação.
 - Impressão/PDF somente do circuito, com enquadramento automático e sem cabeçalhos da interface ou do editor.
 - Persistência local dos circuitos no navegador: salvar, abrir, renomear, excluir e
   exportar/importar em `.json`.

@@ -23,7 +23,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { CATALOG, hasPneumaticPilot } from "@/lib/pneumatics/catalog";
+import { CATALOG, hasPneumaticPilot, portsForComponent } from "@/lib/pneumatics/catalog";
 import {
   countAttachedTubes,
   nextTechnicalLabel,
@@ -78,6 +78,7 @@ function SimulatorPage() {
   const [examplesOpen, setExamplesOpen] = useState(false);
   const [canvasFocusToken, setCanvasFocusToken] = useState(0);
   const [connectionMessage, setConnectionMessage] = useState<string | null>(null);
+  const [invalidPorts, setInvalidPorts] = useState<Set<string>>(new Set());
   const blockedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const messageTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const examplesTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -96,6 +97,39 @@ function SimulatorPage() {
     setConnectionMessage(message);
     if (messageTimer.current) clearTimeout(messageTimer.current);
     messageTimer.current = setTimeout(() => setConnectionMessage(null), 2600);
+  };
+
+  const toggleSimulation = () => {
+    if (running) {
+      setRunning(false);
+      return;
+    }
+
+    const connected = new Set<string>();
+    for (const tube of circuit.tubes) {
+      connected.add(`${tube.from.componentId}:${tube.from.portId}`);
+      connected.add(`${tube.to.componentId}:${tube.to.portId}`);
+    }
+    const missing = new Set<string>();
+    for (const comp of circuit.components) {
+      for (const port of portsForComponent(comp)) {
+        // Escapes das válvulas podem descarregar livremente. Já um componente
+        // de escape ou silenciador colocado na bancada deve estar ligado.
+        const required =
+          port.kind !== "exhaust" || comp.type === "exhaust" || comp.type === "silencer";
+        const key = `${comp.id}:${port.id}`;
+        if (required && !connected.has(key)) missing.add(key);
+      }
+    }
+
+    setInvalidPorts(missing);
+    if (missing.size > 0) {
+      showMessage(
+        `${missing.size} ${missing.size === 1 ? "conector obrigatório está desconectado" : "conectores obrigatórios estão desconectados"}.`,
+      );
+      return;
+    }
+    setRunning(true);
   };
 
   /** clique direto no símbolo: respeita o tipo de acionamento configurado */
@@ -332,7 +366,7 @@ function SimulatorPage() {
         <span className="shrink-0 font-mono text-[10px] font-semibold uppercase text-primary">
           Modo editor
         </span>
-        <Button type="button" onClick={() => setRunning((v) => !v)} size="sm">
+        <Button type="button" onClick={toggleSimulation} size="sm">
           {running ? <Pause className="size-4" /> : <Play className="size-4" />}
           {running ? "Pausar" : "Simular"}
         </Button>
@@ -438,6 +472,7 @@ function SimulatorPage() {
             onPortClick={handlePortClick}
             onActivate={activateComponent}
             blockedId={blockedId}
+            invalidPorts={invalidPorts}
             onDropComponent={(type, x, y) => addComponent(type as ComponentType, x, y)}
           />
           <div className="pointer-events-none absolute bottom-4 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2">

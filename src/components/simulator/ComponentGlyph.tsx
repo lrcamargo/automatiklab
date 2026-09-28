@@ -891,17 +891,17 @@ export function ComponentGlyph({
           aria-label="Silenciador pneumático"
         >
           {defs}
-          <path d="M0 22 H18" className={baseLine} strokeWidth={1.7} />
+          <path d="M0 15 H12" className={baseLine} strokeWidth={1.5} />
           <rect
-            x={18}
-            y={8}
-            width={42}
-            height={28}
+            x={12}
+            y={5}
+            width={30}
+            height={20}
             className={activeBox(false)}
-            strokeWidth={1.7}
+            strokeWidth={1.5}
           />
-          <path d="M38 8 V18 M29 26 V36 M50 26 V36" className={baseLine} strokeWidth={1.6} />
-          <path d="M60 12 L75 22 L60 32 Z" className={baseLine} strokeWidth={1.7} fill="none" />
+          <path d="M26 5 V12 M20 18 V25 M34 18 V25" className={baseLine} strokeWidth={1.3} />
+          <path d="M42 8 L53 15 L42 22 Z" className={baseLine} strokeWidth={1.5} fill="none" />
         </svg>
       );
 
@@ -1123,41 +1123,40 @@ export function ComponentGlyph({
             className={activeBox(flowing)}
             strokeWidth={1.8}
           />
-          <path d="M0 56 H20 M68 0 V28 M116 56 H122" className={baseLine} strokeWidth={2} />
-          {/* esfera, obturador e nó central do elemento seletor */}
-          <path d="M34 45 L48 56 L34 67" className={baseLine} strokeWidth={1.6} fill="none" />
-          <circle
-            cx={50}
-            cy={56}
-            r={7}
-            className="fill-background stroke-steel"
-            strokeWidth={1.6}
-          />
-          <circle cx={68} cy={56} r={2.6} className="fill-steel stroke-steel" strokeWidth={0} />
+          <path d="M0 56 H20 M68 0 V28" className={baseLine} strokeWidth={2} />
+          {/* mecanismo interno igual ao elemento OU validado */}
           <path
-            d="M68 56 H96 M84 44 L98 56 L84 68"
+            d="M37 44 L20 56 L37 68 M86 46 L100 56 L86 66"
             className={baseLine}
-            strokeWidth={1.6}
+            strokeWidth={1.7}
             fill="none"
           />
+          <circle
+            cx={30.3}
+            cy={56}
+            r={6}
+            className="fill-background stroke-steel"
+            strokeWidth={1.7}
+          />
+          <circle cx={68} cy={56} r={2.6} className="fill-steel stroke-steel" strokeWidth={0} />
           <path d="M68 28 V56 M68 28 L82 38" className={baseLine} strokeWidth={1.4} />
-          {/* realimentação tracejada e silenciador integrado à descarga 3 */}
+          {/* realimentação e silenciador encostado no corpo principal */}
           <path
-            d="M82 38 V20 H136 V42"
+            d="M82 38 V20 H128 V42"
             className={baseLine}
             strokeWidth={1.2}
             strokeDasharray="4 3"
             fill="none"
           />
           <rect
-            x={122}
+            x={116}
             y={42}
-            width={24}
+            width={30}
             height={28}
             className="fill-background stroke-steel"
             strokeWidth={1.5}
           />
-          <path d="M130 42 V51 M138 61 V70" className={baseLine} strokeWidth={1.4} />
+          <path d="M128 42 V51 M122 61 V70 M139 61 V70" className={baseLine} strokeWidth={1.3} />
           <path d="M146 45 L159 56 L146 67 Z" className={baseLine} strokeWidth={1.5} fill="none" />
           <PortNumber x={2} y={48} value="1" />
           <PortNumber x={72} y={8} value="2" />
@@ -1200,31 +1199,27 @@ export function ComponentGlyph({
                 className={line}
                 strokeWidth={1.7}
               />
-              {/* estrangulador ajustável no ramo superior */}
+              {/* mesmo estrangulador ajustável da válvula bidirecional */}
               <path
-                d="M43 21 L57 31 L43 41 M89 21 L75 31 L89 41"
+                d="M43 22 Q66 31 89 22 M43 40 Q66 31 89 40"
                 className={baseLine}
-                strokeWidth={1.7}
+                strokeWidth={1.8}
                 fill="none"
               />
               <path
-                d="M94 45 L39 15 M39 15 L47 17 M39 15 L43 22"
+                d="M58 45 Q61 31 69 17 M69 17 L63 24 M69 17 L72 26"
                 className={baseLine}
-                strokeWidth={1.5}
-              />
-              {/* retenção em paralelo no ramo inferior */}
-              <path
-                d="M44 55 L62 65 L44 75 Z M72 54 V76"
-                className={baseLine}
-                strokeWidth={1.7}
+                strokeWidth={1.6}
                 fill="none"
               />
+              {/* retenção: obturador com esfera igual ao lado esquerdo do elemento OU */}
+              <path d="M62 55 L44 65 L62 75" className={baseLine} strokeWidth={1.7} fill="none" />
               <circle
-                cx={80}
+                cx={54.3}
                 cy={65}
                 r={6}
                 className="fill-background stroke-steel"
-                strokeWidth={1.6}
+                strokeWidth={1.7}
               />
             </>
           ) : (

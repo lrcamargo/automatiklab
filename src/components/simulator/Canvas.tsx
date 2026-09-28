@@ -27,6 +27,7 @@ interface CanvasProps {
   onDeleteTube: (id: string) => void;
   onMoveTube: (id: string, midY: number, midX: number) => void;
   blockedId: string | null;
+  invalidPorts: Set<string>;
   onDropComponent: (type: string, x: number, y: number) => void;
   /** Com a simulação rodando a bancada fica somente para operação. */
   editable: boolean;
@@ -65,6 +66,7 @@ export function Canvas(props: CanvasProps) {
     onDeleteTube,
     onMoveTube,
     blockedId,
+    invalidPorts,
     onDropComponent,
     editable,
     focusToken,
@@ -209,13 +211,11 @@ export function Canvas(props: CanvasProps) {
     let nextY = snap((event.clientY - rect.top) / zoom - drag.dy);
     if (moving) {
       const movingPorts = portsForComponent(moving);
-      const movingSize = componentSize(moving);
       let closest: { x: number; y: number; distance: number } | null = null;
       let horizontalGuide: { y: number; delta: number } | null = null;
       let verticalGuide: { x: number; delta: number } | null = null;
       for (const other of circuit.components) {
         if (other.id === moving.id) continue;
-        const otherSize = componentSize(other);
         for (const movingPort of movingPorts) {
           for (const targetPort of portsForComponent(other)) {
             const alignedX = other.x + targetPort.x - movingPort.x;
@@ -225,34 +225,16 @@ export function Canvas(props: CanvasProps) {
               closest = { x: alignedX, y: alignedY, distance };
             }
 
-            // Portas laterais orientam uma conexão horizontal: alinha somente Y,
-            // sem obrigar os componentes a se sobreporem. Portas superiores ou
-            // inferiores fazem o equivalente em X para conexões verticais.
-            const movingAtSide =
-              Math.abs(movingPort.x) < 0.5 || Math.abs(movingPort.x - movingSize.width) < 0.5;
-            const targetAtSide =
-              Math.abs(targetPort.x) < 0.5 || Math.abs(targetPort.x - otherSize.width) < 0.5;
+            // Qualquer par de portas pode compartilhar uma guia, mesmo quando
+            // uma é lateral e a outra inferior/superior. Assim é possível montar
+            // trechos retos mantendo os componentes afastados.
             const yDelta = Math.abs(alignedY - nextY);
-            if (
-              movingAtSide &&
-              targetAtSide &&
-              yDelta <= 12 &&
-              (!horizontalGuide || yDelta < horizontalGuide.delta)
-            ) {
+            if (yDelta <= 12 && (!horizontalGuide || yDelta < horizontalGuide.delta)) {
               horizontalGuide = { y: alignedY, delta: yDelta };
             }
 
-            const movingAtTopBottom =
-              Math.abs(movingPort.y) < 0.5 || Math.abs(movingPort.y - movingSize.height) < 0.5;
-            const targetAtTopBottom =
-              Math.abs(targetPort.y) < 0.5 || Math.abs(targetPort.y - otherSize.height) < 0.5;
             const xDelta = Math.abs(alignedX - nextX);
-            if (
-              movingAtTopBottom &&
-              targetAtTopBottom &&
-              xDelta <= 12 &&
-              (!verticalGuide || xDelta < verticalGuide.delta)
-            ) {
+            if (xDelta <= 12 && (!verticalGuide || xDelta < verticalGuide.delta)) {
               verticalGuide = { x: alignedX, delta: xDelta };
             }
           }
@@ -645,6 +627,7 @@ export function Canvas(props: CanvasProps) {
                 {portsForComponent(comp).map((port) => {
                   const key = `${comp.id}:${port.id}`;
                   const active = solved.pressurized.has(key);
+                  const invalid = invalidPorts.has(key);
                   const conflicted = solved.conflicts.has(key);
                   const pending =
                     pendingPort?.componentId === comp.id && pendingPort.portId === port.id;
@@ -666,13 +649,15 @@ export function Canvas(props: CanvasProps) {
                       style={{ left: port.x - 7, top: port.y - 7 }}
                       className={cn(
                         "absolute size-3.5 rounded-full border-2 transition-colors opacity-75 hover:opacity-100",
-                        pending
-                          ? "border-primary bg-primary"
-                          : conflicted
-                            ? "border-destructive bg-destructive"
-                            : active
-                              ? "border-air bg-air"
-                              : "border-steel bg-background hover:border-primary",
+                        invalid
+                          ? "animate-pulse border-destructive bg-destructive opacity-100 ring-4 ring-destructive/30"
+                          : pending
+                            ? "border-primary bg-primary"
+                            : conflicted
+                              ? "border-destructive bg-destructive"
+                              : active
+                                ? "border-air bg-air"
+                                : "border-steel bg-background hover:border-primary",
                       )}
                     ></button>
                   );

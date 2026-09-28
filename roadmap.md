@@ -18,7 +18,8 @@
 - [x] Remover as paredes da bancada: componentes e mangueiras em coordenadas negativas.
 - [x] Editar manualmente o trajeto das mangueiras arrastando os trechos horizontal e vertical.
 - [x] Rotacionar e espelhar componentes preservando as posições transformadas das portas e mangueiras.
-- [x] Alinhar portas horizontal ou verticalmente mesmo com componentes afastados e encaixá-las quando próximas, inclusive após transformações.
+- [x] Alinhar qualquer combinação de portas horizontal ou verticalmente, mesmo com componentes afastados, e encaixá-las quando próximas.
+- [x] Impedir o início da simulação quando portas obrigatórias estão desconectadas, exibindo mensagem e destaque nos conectores.
 - [x] Preservar o sentido de leitura dos textos durante o espelhamento dos símbolos.
 - [x] Corrigir a simbologia de fluxo: setas retas, tampões em T e numeração da esquerda
       para a direita.
