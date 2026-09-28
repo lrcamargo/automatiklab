@@ -149,6 +149,25 @@
   );
 }
 
+/* O símbolo acompanha o espelhamento, mas suas identificações permanecem legíveis. */
+.component-mirror-x:not(.component-mirror-y) text {
+  transform: scaleX(-1);
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.component-mirror-y:not(.component-mirror-x) text {
+  transform: scaleY(-1);
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.component-mirror-x.component-mirror-y text {
+  transform: scale(-1, -1);
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
 .technical-sheet {
   display: none;
 }

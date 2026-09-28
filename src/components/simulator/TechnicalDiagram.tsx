@@ -150,6 +150,7 @@ export function TechnicalDiagram({ circuit, runtime, solved }: TechnicalDiagramP
               >
                 <div style={{ transform: componentTransform(comp), transformOrigin: "top left" }}>
                   <div
+                    className={`${comp.mirroredX ? "component-mirror-x" : ""} ${comp.mirroredY ? "component-mirror-y" : ""}`}
                     style={{
                       transform: `scale(${comp.mirroredX ? -1 : 1}, ${comp.mirroredY ? -1 : 1})`,
                       transformOrigin: "center",

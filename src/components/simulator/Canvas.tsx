@@ -209,9 +209,13 @@ export function Canvas(props: CanvasProps) {
     let nextY = snap((event.clientY - rect.top) / zoom - drag.dy);
     if (moving) {
       const movingPorts = portsForComponent(moving);
+      const movingSize = componentSize(moving);
       let closest: { x: number; y: number; distance: number } | null = null;
+      let horizontalGuide: { y: number; delta: number } | null = null;
+      let verticalGuide: { x: number; delta: number } | null = null;
       for (const other of circuit.components) {
         if (other.id === moving.id) continue;
+        const otherSize = componentSize(other);
         for (const movingPort of movingPorts) {
           for (const targetPort of portsForComponent(other)) {
             const alignedX = other.x + targetPort.x - movingPort.x;
@@ -220,9 +224,42 @@ export function Canvas(props: CanvasProps) {
             if (distance <= 18 && (!closest || distance < closest.distance)) {
               closest = { x: alignedX, y: alignedY, distance };
             }
+
+            // Portas laterais orientam uma conexão horizontal: alinha somente Y,
+            // sem obrigar os componentes a se sobreporem. Portas superiores ou
+            // inferiores fazem o equivalente em X para conexões verticais.
+            const movingAtSide =
+              Math.abs(movingPort.x) < 0.5 || Math.abs(movingPort.x - movingSize.width) < 0.5;
+            const targetAtSide =
+              Math.abs(targetPort.x) < 0.5 || Math.abs(targetPort.x - otherSize.width) < 0.5;
+            const yDelta = Math.abs(alignedY - nextY);
+            if (
+              movingAtSide &&
+              targetAtSide &&
+              yDelta <= 12 &&
+              (!horizontalGuide || yDelta < horizontalGuide.delta)
+            ) {
+              horizontalGuide = { y: alignedY, delta: yDelta };
+            }
+
+            const movingAtTopBottom =
+              Math.abs(movingPort.y) < 0.5 || Math.abs(movingPort.y - movingSize.height) < 0.5;
+            const targetAtTopBottom =
+              Math.abs(targetPort.y) < 0.5 || Math.abs(targetPort.y - otherSize.height) < 0.5;
+            const xDelta = Math.abs(alignedX - nextX);
+            if (
+              movingAtTopBottom &&
+              targetAtTopBottom &&
+              xDelta <= 12 &&
+              (!verticalGuide || xDelta < verticalGuide.delta)
+            ) {
+              verticalGuide = { x: alignedX, delta: xDelta };
+            }
           }
         }
       }
+      if (horizontalGuide) nextY = horizontalGuide.y;
+      if (verticalGuide) nextX = verticalGuide.x;
       if (closest) {
         nextX = closest.x;
         nextY = closest.y;
@@ -582,6 +619,10 @@ export function Canvas(props: CanvasProps) {
                     }}
                   >
                     <div
+                      className={cn(
+                        comp.mirroredX && "component-mirror-x",
+                        comp.mirroredY && "component-mirror-y",
+                      )}
                       style={{
                         width: def.width,
                         height: def.height,

@@ -862,7 +862,7 @@ export function ComponentGlyph({
         </svg>
       );
 
-    /* Silenciador de escape: triângulo aberto para a atmosfera. */
+    /* Escape direto para a atmosfera, sem identificação numérica. */
     case "exhaust":
       return (
         <svg
@@ -872,9 +872,6 @@ export function ComponentGlyph({
           aria-label="Escape para a atmosfera"
         >
           {defs}
-          <text x={4} y={13} className="fill-foreground font-mono text-[10px] font-semibold">
-            {comp.label}
-          </text>
           <path
             d="M18 0 V18"
             className={live("R") ? "fill-none stroke-air" : baseLine}
@@ -894,13 +891,17 @@ export function ComponentGlyph({
           aria-label="Silenciador pneumático"
         >
           {defs}
-          <text x={4} y={10} className="fill-foreground font-mono text-[10px] font-semibold">
-            {comp.label}
-          </text>
-          <path d="M0 36 H34" className={baseLine} strokeWidth={2} />
-          <rect x={34} y={12} width={92} height={48} className={activeBox(false)} strokeWidth={2} />
-          <path d="M72 12 V29 M54 44 V60 M108 44 V60" className={baseLine} strokeWidth={2} />
-          <path d="M126 20 L148 36 L126 52 Z" className={baseLine} strokeWidth={2} fill="none" />
+          <path d="M0 22 H18" className={baseLine} strokeWidth={1.7} />
+          <rect
+            x={18}
+            y={8}
+            width={42}
+            height={28}
+            className={activeBox(false)}
+            strokeWidth={1.7}
+          />
+          <path d="M38 8 V18 M29 26 V36 M50 26 V36" className={baseLine} strokeWidth={1.6} />
+          <path d="M60 12 L75 22 L60 32 Z" className={baseLine} strokeWidth={1.7} fill="none" />
         </svg>
       );
 
@@ -1115,40 +1116,49 @@ export function ComponentGlyph({
             {comp.label}
           </text>
           <rect
-            x={24}
+            x={20}
             y={28}
-            width={88}
+            width={96}
             height={56}
             className={activeBox(flowing)}
             strokeWidth={1.8}
           />
-          <path d="M0 56 H24 M68 0 V28 M112 56 H120" className={baseLine} strokeWidth={2} />
-          <path
-            d="M38 44 L52 56 L38 68 M84 44 L98 56 L84 68"
-            className={baseLine}
-            strokeWidth={1.6}
-            fill="none"
-          />
+          <path d="M0 56 H20 M68 0 V28 M116 56 H122" className={baseLine} strokeWidth={2} />
+          {/* esfera, obturador e nó central do elemento seletor */}
+          <path d="M34 45 L48 56 L34 67" className={baseLine} strokeWidth={1.6} fill="none" />
           <circle
-            cx={56}
+            cx={50}
             cy={56}
             r={7}
             className="fill-background stroke-steel"
             strokeWidth={1.6}
           />
-          <circle cx={68} cy={56} r={2.5} className="fill-steel stroke-steel" strokeWidth={0} />
-          <path d="M68 28 L82 38" className={baseLine} strokeWidth={1.4} strokeDasharray="4 3" />
-          {/* silenciador integrado à descarga */}
+          <circle cx={68} cy={56} r={2.6} className="fill-steel stroke-steel" strokeWidth={0} />
+          <path
+            d="M68 56 H96 M84 44 L98 56 L84 68"
+            className={baseLine}
+            strokeWidth={1.6}
+            fill="none"
+          />
+          <path d="M68 28 V56 M68 28 L82 38" className={baseLine} strokeWidth={1.4} />
+          {/* realimentação tracejada e silenciador integrado à descarga 3 */}
+          <path
+            d="M82 38 V20 H136 V42"
+            className={baseLine}
+            strokeWidth={1.2}
+            strokeDasharray="4 3"
+            fill="none"
+          />
           <rect
-            x={120}
+            x={122}
             y={42}
             width={24}
             height={28}
             className="fill-background stroke-steel"
             strokeWidth={1.5}
           />
-          <path d="M128 42 V51 M136 61 V70" className={baseLine} strokeWidth={1.4} />
-          <path d="M144 45 L158 56 L144 67 Z" className={baseLine} strokeWidth={1.5} fill="none" />
+          <path d="M130 42 V51 M138 61 V70" className={baseLine} strokeWidth={1.4} />
+          <path d="M146 45 L159 56 L146 67 Z" className={baseLine} strokeWidth={1.5} fill="none" />
           <PortNumber x={2} y={48} value="1" />
           <PortNumber x={72} y={8} value="2" />
           <PortNumber x={146} y={48} value="3" />
